@@ -1,0 +1,72 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Thu Jan 21 15:02:14 2016
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000104
+                   .cinit    romdata   0x001800    program   0x000004
+                    dbgP0       code   0x001f00    program   0x000200
+.config_2007_BUILD/DEFAULT/DEBUG/MAIN.O       code   0x002007    program   0x000002
+                    dbgD0      udata   0x000070       data   0x000001
+                    dbgD1      udata   0x0000f0       data   0x000001
+                    dbgD2      udata   0x000170       data   0x000001
+                    dbgD3      udata   0x0001e5       data   0x00000b
+                    dbgD4      udata   0x0001f0       data   0x000001
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000081      
+                            0x001800    0x001801      
+                            0x001f00    0x001fff      
+                            0x002007    0x002007      
+            389 out of 8454 program addresses used, program memory utilization is 4%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   ClkLCD   0x000069    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   ClrLCD   0x000064    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  InitLCD   0x00001e    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+              KPHexToChar   0x000019    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 LLD_LOOP   0x00007b    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   MovMSB   0x000074    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                START_MSG   0x000040    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   WrtLCD   0x00005d    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_0011   0x000011    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_0017   0x000017    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_006C   0x00006c    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_0071   0x000071    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_007E   0x00007e    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                     init   0x000002    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             lcdLongDelay   0x000079    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                     test   0x000010    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                     init   0x000002    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                     test   0x000010    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_0011   0x000011    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_0017   0x000017    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+              KPHexToChar   0x000019    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  InitLCD   0x00001e    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                START_MSG   0x000040    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   WrtLCD   0x00005d    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   ClrLCD   0x000064    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   ClkLCD   0x000069    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_006C   0x00006c    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_0071   0x000071    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   MovMSB   0x000074    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             lcdLongDelay   0x000079    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 LLD_LOOP   0x00007b    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_0_007E   0x00007e    program     static C:\Users\Omar\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+
+
