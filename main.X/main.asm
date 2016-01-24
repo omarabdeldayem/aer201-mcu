@@ -1,27 +1,54 @@
-;*******************************************************************************
-;*******************************************************************************
-      List	p=16f877                 ; list directive to define processor
-      #include	<p16f877.inc>        ; processor specific variable definitions
-      __CONFIG _CP_OFF & _WDT_OFF & _BODEN_ON & _PWRTE_ON & _HS_OSC & _WRT_ENABLE_ON & _CPD_OFF & _LVP_OFF
+;******************************************************************************;
+;	 ____    ___  ______    ___  ____       ____  ____  ____    ___  ____      ;
+;	|    \  /  _]|      T  /  _]|    \     |    \l    j|    \  /  _]|    \     ;
+;	|  o  )/  [_ |      | /  [_ |  D  )    |  o  )|  T |  o  )/  [_ |  D  )    ;
+;	|   _/Y    _]l_j  l_jY    _]|    /     |   _/ |  | |   _/Y    _]|    /     ;
+;	|  |  |   [_   |  |  |   [_ |    \     |  |   |  | |  |  |   [_ |    \     ;
+;	|  |  |     T  |  |  |     T|  .  Y    |  |   j  l |  |  |     T|  .  Y    ;
+;	l__j  l_____j  l__j  l_____jl__j\_j    l__j  |____jl__j  l_____jl__j\_j	   ;
+;------------------------------------------------------------------------------;
+;				AER201 Team 61 'Peter Piper' Pipe Inspector					   ;
+;						 Author: Omar Abdeldayem							   ;
+; 						    Created: 1/12/2016								   ;
+;------------------------------------------------------------------------------;
+; DESCRIPTION:																   ;
+; It does shit, yo.															   ;
+;******************************************************************************;
+;******************************************************************************;
+;******************************************************************************;
 
- 
-	;Declare unbanked variables (at 0x70 and on)
+	List	p=16f877                 ; list directive to define processor
+	#include	<p16f877.inc>        ; processor specific variable definitions
+	__CONFIG _CP_OFF & _WDT_OFF & _BODEN_ON & _PWRTE_ON & _HS_OSC & _WRT_ENABLE_ON & _CPD_OFF & _LVP_OFF
+
+
+;******************************************************************************;
+;								BANK0 RAM									   ;
+;******************************************************************************;
 	CBLOCK	    0x70
-		    lcd_tmp	
-		    lcd_d1	
-		    lcd_d2	
+	lcd_tmp
+	lcd_d1
+	lcd_d2
+	W_temp
+	Status_Temp
 	ENDC
 
-;Declare constants for pin assignments (LCD on PORTD)
+;******************************************************************************;
+; 								 EQUATES									   ;
+;******************************************************************************;
 RS 	EQU	    2
 E 	EQU	    3
+LED_G	EQU	    B'00000001'
 
+;******************************************************************************;
+;								 MACROS										   ;
+;******************************************************************************;
 	;Helper macros
 WRT_LCD macro	    val
 	MOVLW	    val
 	CALL	    WrtLCD
 	endm
-	
+
 	;Delay: ~160us
 LCD_DLY macro
 	MOVLW	    0xFF
@@ -30,56 +57,119 @@ LCD_DLY macro
 	GOTO	    $-1
 	endm
 
-        ORG	    0x0000	    ; RESET vector must always be at 0x00
+;******************************************************************************;
+;							VECTOR TABLE (?)								   ;
+;******************************************************************************;
+    ORG	    	0x0000	    ; RESET vector must always be at 0x00
 	GOTO	    INIT	    ; Just jump to the main code section.
-	ORG	    0x0008
-	ORG	    0x0018
-	RETFIE
-	
+	ORG	    	0x0004
+	GOTO	    INT_HANDLER
+;	ORG	    	0x0018
+
+;******************************************************************************;
+;							ROBOT INITIALIZATION							   ;
+;******************************************************************************;
 INIT
-	MOVLW	    b'11111000'	    ; Global/Peripheral/TMR0/EXT/RB
-	MOVWF	    INTCON	    ; Enable interrupts
+	BSF	    	STATUS, RP0	    ;Select bank 1
+	BCF	    	PORTB, 4
 
-	BSF	    STATUS, RP0	    ; select bank 1
-	CLRF	    TRISA	    ; All port A is output
-	MOVLW	    b'11110010'	    ; Set required keypad inputs
+	CLRF	    TRISA	   		; All port A is output
+	MOVLW	    b'11110011'	    ; Set required keypad inputs
 	MOVWF	    TRISB
-	CLRF	    TRISC	    ; All port C is output
-	CLRF	    TRISD	    ; All port D is output
+	CLRF	    TRISC	    	; All port C is output
+	CLRF	    TRISD	    	; All port D is output
 
-	BCF	    STATUS, RP0	    ; select bank 0
+	BCF	    	STATUS, RP0	    ; select bank 0
+	BSF	    	INTCON, RBIE
+	BSF	    	INTCON, INTE
+	BSF	    	INTCON, GIE
+
 	CLRF	    PORTA
 	CLRF	    PORTB
 	CLRF	    PORTC
 	CLRF	    PORTD
-
-	CALL	    InitLCD	    ;Initialize the LCD (code in lcd.asm; imported by lcd.inc)
+	CALL	    LCD_INIT	    ;Initialize the LCD (code in lcd.asm; imported by lcd.inc)
 	CALL	    START_MSG
+	BSF	    	PORTC, 0
 
-START_STDBY     
-	BTFSS	    PORTB,1	    ;Wait until data is available from the keypad
-	GOTO	    $-1 
+;******************************************************************************;
+;						ROBOT START AND STANDBY								   ;
+;******************************************************************************;
+START_STDBY
+	BTFSS	    PORTB,1	    	;Wait until data is available from the keypad
+	GOTO	    $-1
 
 	SWAPF	    PORTB, W	    ;Read PortB<7:4> into W<3:0>
 	ANDLW	    0x0F
 	CALL	    KPHexToChar	    ;Convert keypad value to LCD character (value is still held in W)
-	CALL	    WrtLCD	    ;Write the value in W to LCD
-	
-	BTFSC	    PORTB,1	    ;Wait until key is released
-	GOTO	    $-1
-	
-CALIBRATE
+	CALL	    WrtLCD	    	;Write the value in W to LCD
 
+	BTFSC	    PORTB,1	    	;Wait until key is released
+	GOTO	    $-1
+
+	CALL	    CLR_LCD
+
+	GOTO	    CALIBRATE
+
+;******************************************************************************;
+;							SENSOR CALIBRATION								   ;
+;******************************************************************************;
+CALIBRATE
+	;BSF	    PORTA, 5
+	;CALL	    lcdLongDelay
+	;BCF	    PORTA, 5
+	;CALL	    lcdLongDelay
+	GOTO	    CALIBRATE
+
+;******************************************************************************;
+;							PIPE SCAN SUPERLOOP								   ;
+;******************************************************************************;
+SCAN
+	GOTO	    SCAN
+
+;******************************************************************************;
+;							INTERRUPT HANDLER								   ;
+;******************************************************************************;
+INT_HANDLER
+	MOVWF	    W_temp
+	swapf	    STATUS, W
+	MOVWF	    Status_Temp
+	BCF	    PORTC, 0
+	BCF	    INTCON, RBIF
+	BCF	    INTCON, INTF    ; clear the appropriate flag
+	SWAPF	    Status_Temp, W
+	MOVWF	    STATUS
+	SWAPF	    W_temp, F
+	SWAPF	    W_temp, W
+	RETFIE
+
+;******************************************************************************;
+;						PIN DETECTED SERVICE ROUTINE						   ;
+;******************************************************************************;
+PIN_ISR
+
+;******************************************************************************;
+;					 ROBOT MISALIGNMENT SERVICE ROUTINE					       ;
+;******************************************************************************;
+MISALIGN_ISR
+
+;******************************************************************************;
+;					     END-OF-PIPE SERVICE ROUTINE						   ;
+;******************************************************************************;
+END_ISR
+
+;******************************************************************************;
+;******************************************************************************;
 KPHexToChar
 	ADDWF	    PCL,f
 	DT	    "*0#D"	; Define Table
-
-
-;******* LCD-related subroutines *******
-InitLCD
+;******************************************************************************;
+;							  LCD INITIALIZATION							   ;
+;******************************************************************************;
+LCD_INIT
 	BCF	    STATUS, RP0
 	BSF	    PORTD, E	    ;E default high
-	
+
 	;Wait for LCD POR to finish (~15ms)
 	CALL	    lcdLongDelay
 	CALL	    lcdLongDelay
@@ -115,11 +205,13 @@ InitLCD
 	CALL	    lcdLongDelay
 	CALL	    lcdLongDelay
 	;Ready to display characters
-	CALL	    ClrLCD
+	CALL	    CLR_LCD
 	BSF	    PORTD,RS	    ; Character mode
 	RETURN
-    ;************************************
 
+;******************************************************************************;
+;								DONT BE SHY									   ;
+;******************************************************************************;
 START_MSG
 	WRT_LCD	    "H"
 	WRT_LCD	    "I"
@@ -135,8 +227,10 @@ START_MSG
 	WRT_LCD	    "A"
 	WRT_LCD	    "R"
 	WRT_LCD	    "T"
-	return
-	
+	RETURN
+
+;******************************************************************************;
+;******************************************************************************;
 	;WrtLCD: Clock MSB and LSB of W to PORTD<7:4> in two cycles
 WrtLCD
 	MOVWF	    lcd_tmp	    ; store original value
@@ -148,8 +242,8 @@ WrtLCD
 	RETURN
 
     ;ClrLCD: Clear the LCD display
-ClrLCD
-	BCF	    PORTD,RS	    ; Instruction mode
+CLR_LCD
+ 	BCF	    PORTD,RS	    ; Instruction mode
 	WRT_LCD	    b'00000001'
 	CALL	    lcdLongDelay
 	RETURN
@@ -181,5 +275,5 @@ LLD_LOOP
 	DECFSZ	    lcd_d2,f
 	GOTO	    LLD_LOOP
 	RETURN
-    
+
 	END
