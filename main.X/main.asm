@@ -73,11 +73,15 @@ INIT
 	BSF	    	STATUS, RP0	    ;Select bank 1
 	BCF	    	PORTB, 4
 
-	CLRF	    TRISA	   		; All port A is output
+	MOVLW		b'00011000'
+	MOVWF		TRISA
 	MOVLW	    b'11110011'	    ; Set required keypad inputs
 	MOVWF	    TRISB
-	CLRF	    TRISC	    	; All port C is output
+	MOVLW		b'01111001'
+	MOVWF		TRISC
 	CLRF	    TRISD	    	; All port D is output
+	MOVLW		b'00000111'
+	MOVWF		TRISE
 
 	BCF	    	STATUS, RP0	    ; select bank 0
 	BSF	    	INTCON, RBIE
