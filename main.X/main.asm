@@ -1,15 +1,15 @@
 ;******************************************************************************;
-;	 ____    ___  ______    ___  ____       ____  ____  ____    ___  ____      ;
-;	|    \  /  _]|      T  /  _]|    \     |    \l    j|    \  /  _]|    \     ;
-;	|  o  )/  [_ |      | /  [_ |  D  )    |  o  )|  T |  o  )/  [_ |  D  )    ;
-;	|   _/Y    _]l_j  l_jY    _]|    /     |   _/ |  | |   _/Y    _]|    /     ;
-;	|  |  |   [_   |  |  |   [_ |    \     |  |   |  | |  |  |   [_ |    \     ;
-;	|  |  |     T  |  |  |     T|  .  Y    |  |   j  l |  |  |     T|  .  Y    ;
-;	l__j  l_____j  l__j  l_____jl__j\_j    l__j  |____jl__j  l_____jl__j\_j	   ;
+;	 ____    ___  ______    ___  ____       ____  ____  ____    ___  ____  ;
+;	|    \  /  _]|      T  /  _]|    \     |    \l    j|    \  /  _]|    \ ;
+;	|  o  )/  [_ |      | /  [_ |  D  )    |  o  )|  T |  o  )/  [_ |  D  );
+;	|   _/Y    _]l_j  l_jY    _]|    /     |   _/ |  | |   _/Y    _]|    / ;
+;	|  |  |   [_   |  |  |   [_ |    \     |  |   |  | |  |  |   [_ |    \ ;
+;	|  |  |     T  |  |  |     T|  .  Y    |  |   j  l |  |  |     T|  .  Y;
+;	l__j  l_____j  l__j  l_____jl__j\_j    l__j  |____jl__j  l_____jl__j\_j;
 ;------------------------------------------------------------------------------;
-;				AER201 Team 61 'Peter Piper' Pipe Inspector					   ;
-;						 Author: Omar Abdeldayem							   ;
-; 						    Created: 1/12/2016								   ;
+;		AER201 Team 61 'Peter Piper' Pipe Inspector		       ;
+;			 Author: Omar Abdeldayem			       ;
+; 			    Created: 1/12/2016	  			       ;
 ;------------------------------------------------------------------------------;
 ; DESCRIPTION:																   ;
 ; It does shit, yo.															   ;
@@ -17,13 +17,13 @@
 ;******************************************************************************;
 ;******************************************************************************;
 
-	List	p=16f877                 ; list directive to define processor
-	#include	<p16f877.inc>        ; processor specific variable definitions
+	List	p=16f877		    ; list directive to define processor
+	#include	<p16f877.inc>       ; processor specific variable definitions
 	__CONFIG _CP_OFF & _WDT_OFF & _BODEN_ON & _PWRTE_ON & _HS_OSC & _WRT_ENABLE_ON & _CPD_OFF & _LVP_OFF
 
 
 ;******************************************************************************;
-;								BANK0 RAM									   ;
+;				BANK0 RAM				       ;
 ;******************************************************************************;
 	CBLOCK	    0x70
 	lcd_tmp
@@ -34,113 +34,121 @@
 	ENDC
 
 ;******************************************************************************;
-; 								 EQUATES									   ;
+; 				EQUATES					       ;
 ;******************************************************************************;
-RS 	EQU	    2
-E 	EQU	    3
-LED_G	EQU	    B'00000001'
+RS 	EQU		2
+E 	EQU		3
 
 ;******************************************************************************;
-;								 MACROS										   ;
+;				MACROS					       ;
 ;******************************************************************************;
-	;Helper macros
-WRT_LCD macro	    val
-	MOVLW	    val
-	CALL	    WrtLCD
+WRT_LCD macro		val
+	MOVLW		val
+	CALL		WrtLCD
 	endm
 
-	;Delay: ~160us
-LCD_DLY macro
-	MOVLW	    0xFF
-	MOVWF	    lcd_d1
-	DECFSZ	    lcd_d1,f
-	GOTO	    $-1
+	
+LCD_DLY macro			    ;Delay ~160us
+	MOVLW		0xFF
+	MOVWF		lcd_d1
+	DECFSZ		lcd_d1,f
+	GOTO		$-1
 	endm
 
 ;******************************************************************************;
 ;							VECTOR TABLE (?)								   ;
 ;******************************************************************************;
-    ORG	    	0x0000	    ; RESET vector must always be at 0x00
-	GOTO	    INIT	    ; Just jump to the main code section.
+	ORG	    	0x0000	    ; RESET vector must always be at 0x00
+	GOTO		INIT	    ; Just jump to the main code section.
 	ORG	    	0x0004
-	GOTO	    INT_HANDLER
+	GOTO		INT_HANDLER
 ;	ORG	    	0x0018
 
 ;******************************************************************************;
 ;							ROBOT INITIALIZATION							   ;
 ;******************************************************************************;
 INIT
-	BSF	    	STATUS, RP0	    ;Select bank 1
-	BCF	    	PORTB, 4
+	BSF	    	STATUS, RP0     ;Select bank 1
 
+	; PIN MAPPINGS AND INITIALIZATION
 	MOVLW		b'00011000'
 	MOVWF		TRISA
-	MOVLW	    b'11110011'	    ; Set required keypad inputs
-	MOVWF	    TRISB
+	MOVLW		b'11110011'	; Set required keypad inputs
+	MOVWF		TRISB
 	MOVLW		b'01111001'
 	MOVWF		TRISC
-	CLRF	    TRISD	    	; All port D is output
+	CLRF		TRISD	    	; All port D is output
 	MOVLW		b'00000111'
 	MOVWF		TRISE
 
-	BCF	    	STATUS, RP0	    ; select bank 0
-	BSF	    	INTCON, RBIE
+	MOVLW		b'10011111'	; PWM pulsing period
+	MOVWF		PR2
+	
+	BCF	    	STATUS, RP0	; select bank 0
+	
+	CLRF		CCPR1L		; Setup PWM pins
+	MOVLW		B'00001100'
+	MOVWF		CCP1CON
+	
+	BSF	    	INTCON, RBIE	; Setup and enable interrupts
 	BSF	    	INTCON, INTE
 	BSF	    	INTCON, GIE
 
-	CLRF	    PORTA
-	CLRF	    PORTB
-	CLRF	    PORTC
-	CLRF	    PORTD
-	CALL	    LCD_INIT	    ;Initialize the LCD (code in lcd.asm; imported by lcd.inc)
-	CALL	    START_MSG
-	BSF	    	PORTC, 0
+	MOVLW		B'00000010'	; Initialize and start timer 2
+	MOVWF		T2CON
+	CLRF		TMR2
+	BSF		T2CON, TMR2ON
+	
+	CALL		LCD_INIT	; Initialize the LCD (code in lcd.asm; imported by lcd.inc)
+	CALL		START_MSG
+	;BSF	    	PORTC, 0
 
 ;******************************************************************************;
-;						ROBOT START AND STANDBY								   ;
+;			 ROBOT START AND STANDBY			       ;
 ;******************************************************************************;
 START_STDBY
-	BTFSS	    PORTB,1	    	;Wait until data is available from the keypad
+	BTFSS	    PORTB, 1	    	; Wait until data is available from the keypad
 	GOTO	    $-1
 
-	SWAPF	    PORTB, W	    ;Read PortB<7:4> into W<3:0>
+	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
 	ANDLW	    0x0F
-	CALL	    KPHexToChar	    ;Convert keypad value to LCD character (value is still held in W)
-	CALL	    WrtLCD	    	;Write the value in W to LCD
+	CALL	    KPHexToChar		; Convert keypad value to LCD character (value is still held in W)
+	CALL	    WrtLCD	    	; Write the value in W to LCD
 
-	BTFSC	    PORTB,1	    	;Wait until key is released
+	BTFSC	    PORTB,1	    	; Wait until key is released
 	GOTO	    $-1
 
 	CALL	    CLR_LCD
-
 	GOTO	    CALIBRATE
 
 ;******************************************************************************;
-;							SENSOR CALIBRATION								   ;
+;			    SENSOR CALIBRATION				       ;
 ;******************************************************************************;
 CALIBRATE
-	;BSF	    PORTA, 5
-	;CALL	    lcdLongDelay
-	;BCF	    PORTA, 5
-	;CALL	    lcdLongDelay
+	INCFSZ	    CCPR1L
+	GOTO	    CALIBRATE
+	GOTO	    SCAN
+;******************************************************************************;
+;			  PIPE SCAN SUPERLOOP				       ;
+;******************************************************************************;
+SCAN
+	DECF	    CCPR1L
+	DECFSZ	    CCPR1L				
+	GOTO	    SCAN
 	GOTO	    CALIBRATE
 
 ;******************************************************************************;
-;							PIPE SCAN SUPERLOOP								   ;
-;******************************************************************************;
-SCAN
-	GOTO	    SCAN
-
-;******************************************************************************;
-;							INTERRUPT HANDLER								   ;
+;			   INTERRUPT HANDLER				       ;
 ;******************************************************************************;
 INT_HANDLER
 	MOVWF	    W_temp
 	swapf	    STATUS, W
 	MOVWF	    Status_Temp
-	BCF	    PORTC, 0
+	
+;	BCF	    PORTC, 0
+	
 	BCF	    INTCON, RBIF
-	BCF	    INTCON, INTF    ; clear the appropriate flag
+	BCF	    INTCON, INTF    ; Clear the interrupt flag
 	SWAPF	    Status_Temp, W
 	MOVWF	    STATUS
 	SWAPF	    W_temp, F
@@ -148,17 +156,17 @@ INT_HANDLER
 	RETFIE
 
 ;******************************************************************************;
-;						PIN DETECTED SERVICE ROUTINE						   ;
+;			PIN DETECTED SERVICE ROUTINE			       ;
 ;******************************************************************************;
 PIN_ISR
 
 ;******************************************************************************;
-;					 ROBOT MISALIGNMENT SERVICE ROUTINE					       ;
+;		    ROBOT MISALIGNMENT SERVICE ROUTINE			       ;
 ;******************************************************************************;
 MISALIGN_ISR
 
 ;******************************************************************************;
-;					     END-OF-PIPE SERVICE ROUTINE						   ;
+;			END-OF-PIPE SERVICE ROUTINE			       ;
 ;******************************************************************************;
 END_ISR
 
@@ -168,7 +176,7 @@ KPHexToChar
 	ADDWF	    PCL,f
 	DT	    "*0#D"	; Define Table
 ;******************************************************************************;
-;							  LCD INITIALIZATION							   ;
+;			    LCD INITIALIZATION				       ;
 ;******************************************************************************;
 LCD_INIT
 	BCF	    STATUS, RP0
@@ -279,5 +287,5 @@ LLD_LOOP
 	DECFSZ	    lcd_d2,f
 	GOTO	    LLD_LOOP
 	RETURN
-
+	
 	END
