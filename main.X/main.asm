@@ -32,6 +32,8 @@
 	long_del
 	W_temp
 	Status_Temp
+	m_num_spots
+	spot_base_loc
 	ENDC
 
 ;******************************************************************************;
@@ -45,10 +47,15 @@ E 	EQU		3
 ;******************************************************************************;
 WRT_LCD macro		val
 	MOVLW		val
-	CALL		WrtLCD
+	CALL		LCD_CMD
 	endm
 
-LCD_DLY macro			    ;Delay ~160us
+WRT_MEM_LCD macro		val
+	MOVFW		val
+	CALL		LCD_CMD
+	endm
+
+LCD_DLY macro				;Delay ~160us
 	MOVLW		0xFF
 	MOVWF		lcd_d1
 	DECFSZ		lcd_d1, f
@@ -58,11 +65,10 @@ LCD_DLY macro			    ;Delay ~160us
 ;******************************************************************************;
 ;			   VECTOR TABLE (?)				       ;
 ;******************************************************************************;
-	ORG	    	0x0000	    ; RESET vector must always be at 0x00
-	GOTO		INIT	    ; Just jump to the main code section.
+	ORG	    	0x0000		; RESET vector must always be at 0x00
+	GOTO		INIT		; Just jump to the main code section.
 	ORG	    	0x0004
 	GOTO		INT_HANDLER
-;	ORG	    	0x0018
 
 ;******************************************************************************;
 ;			  ROBOT INITIALIZATION				       ;
@@ -103,22 +109,19 @@ INIT
 	CLRF		PORTC
 	CALL		LCD_INIT	; Initialize the LCD (code in lcd.asm; imported by lcd.inc)
 	CALL		START_MSG
-	CALL		lcdLongDelay
-	CALL		SHIFT_LCD
 	;BSF	    	PORTC, 0
 
 ;******************************************************************************;
 ;			 ROBOT START AND STANDBY			       ;
 ;******************************************************************************;
 START_STDBY
-	CALL	    SHIFT_LCD
 	BTFSS	    PORTB, 1	    	; Wait until data is available from the keypad
-	GOTO	    $-2
+	GOTO	    START_STDBY
 
 	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
 	ANDLW	    0x0F
 	CALL	    KPHexToChar		; Convert keypad value to LCD character (value is still held in W)
-	CALL	    WrtLCD	    	; Write the value in W to LCD
+	CALL	    CLR_LCD
 
 	BTFSC	    PORTB,1	    	; Wait until key is released
 	GOTO	    $-1
@@ -126,7 +129,10 @@ START_STDBY
 	BSF	    PORTA, 5
 	CALL	    CLR_LCD
 	BCF	    PORTA, 5
-	GOTO	    CALIBRATE
+	
+	CALL	    STOP_STDBY_MSG
+	GOTO	    STOP_STDBY
+	; GOTO	    CALIBRATE
 
 ;******************************************************************************;
 ;			    SENSOR CALIBRATION				       ;
@@ -166,6 +172,7 @@ INT_HANDLER
 ;			PIN DETECTED SERVICE ROUTINE			       ;
 ;******************************************************************************;
 PIN_ISR
+	GOTO	    PIN_ISR
 
 ;******************************************************************************;
 ;		    ROBOT MISALIGNMENT SERVICE ROUTINE			       ;
@@ -178,10 +185,35 @@ MISALIGN_ISR
 END_ISR
 
 ;******************************************************************************;
+;			      STOP STANDBY				       ;
+;******************************************************************************;
+STOP_STDBY
+	BTFSS	    PORTB, 1	    	; Wait until data is available from the keypad
+	GOTO	    STOP_STDBY
+
+	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
+	ANDLW	    0x0F
+	CALL	    KPHexToChar		; Convert keypad value to LCD character (value is still held in W)
+	CALL	    CLR_LCD
+	GOTO	    STOP_DATA
+
+;******************************************************************************;
+;			       DISPLAY DATA				       ;
+;******************************************************************************;
+STOP_DATA
+	MOVLW	    "7"
+	MOVWF	    m_num_spots
+	
+	CALL	    WRT_DATA
+	CALL	    SHIFT_LCD	
+	GOTO	    $-1
+	
+;******************************************************************************;
 ;******************************************************************************;
 KPHexToChar
-	ADDWF	    PCL,f
+	ADDWF	    PCL, f
 	DT	    "*0#D"	; Define Table
+	
 ;******************************************************************************;
 ;			    LCD INITIALIZATION				       ;
 ;******************************************************************************;
@@ -229,7 +261,7 @@ LCD_INIT
 	RETURN
 
 ;******************************************************************************;
-;			       DONT BE SHY				       ;
+;				   HELLO				       ;
 ;******************************************************************************;
 START_MSG
 	WRT_LCD	    "H"
@@ -247,11 +279,50 @@ START_MSG
 	WRT_LCD	    "R"
 	WRT_LCD	    "T"
 	RETURN
-
+	
+;******************************************************************************;
+;			         GOODBYE  				       ;
+;******************************************************************************;
+STOP_STDBY_MSG
+	WRT_LCD	    "H"
+	WRT_LCD	    "I"
+	WRT_LCD	    "T"
+	WRT_LCD	    " "
+	WRT_LCD	    "*"
+	WRT_LCD	    " "
+	WRT_LCD	    "F"
+	WRT_LCD	    "O"
+	WRT_LCD	    "R"
+	WRT_LCD	    " "
+	WRT_LCD	    "D"
+	WRT_LCD	    "A"
+	WRT_LCD	    "T"
+	WRT_LCD	    "A"
+	RETURN
+;******************************************************************************;
+;				  DATA					       ;
+;******************************************************************************;
+WRT_DATA	
+	WRT_LCD	    "N"
+	WRT_LCD	    "U"
+	WRT_LCD	    "M"
+	WRT_LCD	    " "
+	WRT_LCD	    "S"
+	WRT_LCD	    "P"
+	WRT_LCD	    "O"
+	WRT_LCD	    "T"
+	WRT_LCD	    "S"
+	WRT_LCD	    ":"
+	WRT_LCD	    " "
+	WRT_MEM_LCD m_num_spots
+	WRT_LCD	    " "
+	WRT_LCD	    " "
+	RETURN
+;******************************************************************************;		
 ;******************************************************************************;
 ;******************************************************************************;
 	;WrtLCD: Clock MSB and LSB of W to PORTD<7:4> in two cycles
-WrtLCD
+LCD_CMD
 	MOVWF	    lcd_tmp	    ; store original value
 	CALL	    MovMSB	    ; move MSB to PORTD
 	CALL	    ClkLCD
@@ -267,6 +338,7 @@ SHIFT_LCD
 	CALL	    LONG_DLY
 	CALL	    LONG_DLY
 	CALL	    LONG_DLY
+	BSF	    PORTD, RS
 	RETURN
 	
     ;ClrLCD: Clear the LCD display
@@ -274,6 +346,7 @@ CLR_LCD
  	BCF	    PORTD, RS	    ; Instruction mode
 	WRT_LCD	    b'00000001'
 	CALL	    lcdLongDelay
+	BSF	    PORTD, RS
 	RETURN
 
     ;ClkLCD: Pulse the E line low
