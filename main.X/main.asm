@@ -29,6 +29,7 @@
 	lcd_tmp
 	lcd_d1
 	lcd_d2
+	long_del
 	W_temp
 	Status_Temp
 	ENDC
@@ -47,16 +48,15 @@ WRT_LCD macro		val
 	CALL		WrtLCD
 	endm
 
-	
 LCD_DLY macro			    ;Delay ~160us
 	MOVLW		0xFF
 	MOVWF		lcd_d1
-	DECFSZ		lcd_d1,f
+	DECFSZ		lcd_d1, f
 	GOTO		$-1
 	endm
 
 ;******************************************************************************;
-;							VECTOR TABLE (?)								   ;
+;			   VECTOR TABLE (?)				       ;
 ;******************************************************************************;
 	ORG	    	0x0000	    ; RESET vector must always be at 0x00
 	GOTO		INIT	    ; Just jump to the main code section.
@@ -65,7 +65,7 @@ LCD_DLY macro			    ;Delay ~160us
 ;	ORG	    	0x0018
 
 ;******************************************************************************;
-;							ROBOT INITIALIZATION							   ;
+;			  ROBOT INITIALIZATION				       ;
 ;******************************************************************************;
 INIT
 	BSF	    	STATUS, RP0     ;Select bank 1
@@ -99,16 +99,21 @@ INIT
 	CLRF		TMR2
 	BSF		T2CON, TMR2ON
 	
+	CLRF		PORTA
+	CLRF		PORTC
 	CALL		LCD_INIT	; Initialize the LCD (code in lcd.asm; imported by lcd.inc)
 	CALL		START_MSG
+	CALL		lcdLongDelay
+	CALL		SHIFT_LCD
 	;BSF	    	PORTC, 0
 
 ;******************************************************************************;
 ;			 ROBOT START AND STANDBY			       ;
 ;******************************************************************************;
 START_STDBY
+	CALL	    SHIFT_LCD
 	BTFSS	    PORTB, 1	    	; Wait until data is available from the keypad
-	GOTO	    $-1
+	GOTO	    $-2
 
 	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
 	ANDLW	    0x0F
@@ -118,7 +123,9 @@ START_STDBY
 	BTFSC	    PORTB,1	    	; Wait until key is released
 	GOTO	    $-1
 
+	BSF	    PORTA, 5
 	CALL	    CLR_LCD
+	BCF	    PORTA, 5
 	GOTO	    CALIBRATE
 
 ;******************************************************************************;
@@ -222,7 +229,7 @@ LCD_INIT
 	RETURN
 
 ;******************************************************************************;
-;								DONT BE SHY									   ;
+;			       DONT BE SHY				       ;
 ;******************************************************************************;
 START_MSG
 	WRT_LCD	    "H"
@@ -253,9 +260,18 @@ WrtLCD
 	CALL	    ClkLCD
 	RETURN
 
+SHIFT_LCD
+	BCF	    PORTD, RS
+	WRT_LCD	    B'00011000'
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	RETURN
+	
     ;ClrLCD: Clear the LCD display
 CLR_LCD
- 	BCF	    PORTD,RS	    ; Instruction mode
+ 	BCF	    PORTD, RS	    ; Instruction mode
 	WRT_LCD	    b'00000001'
 	CALL	    lcdLongDelay
 	RETURN
@@ -278,13 +294,22 @@ MovMSB
 	ANDWF	    PORTD,f
 	RETURN
 
+LONG_DLY
+	MOVLW	    0xFFFF
+	MOVWF	    long_del
+LD_LOOP	
+	LCD_DLY
+	DECFSZ	    long_del, f
+	GOTO	    LD_LOOP
+	RETURN
+	
     ;Delay: ~5ms
 lcdLongDelay
 	MOVLW	    d'20'
 	MOVWF	    lcd_d2
 LLD_LOOP
 	LCD_DLY
-	DECFSZ	    lcd_d2,f
+	DECFSZ	    lcd_d2, f
 	GOTO	    LLD_LOOP
 	RETURN
 	
