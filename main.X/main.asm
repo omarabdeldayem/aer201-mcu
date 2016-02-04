@@ -33,6 +33,7 @@
 	W_temp
 	Status_Temp
 	m_num_spots
+	count
 	spot_base_loc
 	ENDC
 
@@ -120,7 +121,6 @@ START_STDBY
 
 	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
 	ANDLW	    0x0F
-	CALL	    KPHexToChar		; Convert keypad value to LCD character (value is still held in W)
 	CALL	    CLR_LCD
 
 	BTFSC	    PORTB,1	    	; Wait until key is released
@@ -193,7 +193,6 @@ STOP_STDBY
 
 	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
 	ANDLW	    0x0F
-	CALL	    KPHexToChar		; Convert keypad value to LCD character (value is still held in W)
 	CALL	    CLR_LCD
 	GOTO	    STOP_DATA
 
@@ -201,18 +200,76 @@ STOP_STDBY
 ;			       DISPLAY DATA				       ;
 ;******************************************************************************;
 STOP_DATA
-	MOVLW	    "7"
+	MOVLW	    b'00000100'
+	MOVWF	    count
+
+	MOVLW	    "4"
 	MOVWF	    m_num_spots
 	
 	CALL	    WRT_DATA
-	CALL	    SHIFT_LCD	
-	GOTO	    $-1
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
 	
-;******************************************************************************;
-;******************************************************************************;
-KPHexToChar
-	ADDWF	    PCL, f
-	DT	    "*0#D"	; Define Table
+	CALL	    CLR_LCD
+	
+	MOVLW	    spot_base_loc
+	MOVWF	    FSR
+	
+	MOVLW	    "1"
+	MOVWF	    spot_base_loc
+	
+	MOVLW	    "3"
+	MOVWF	    spot_base_loc + 1
+	
+	MOVLW	    "6"
+	MOVWF	    spot_base_loc + 2
+	
+	MOVLW	    "8"
+	MOVWF	    spot_base_loc + 3
+	
+	
+DATA_LOOP	
+	WRT_LCD	    "S"
+	WRT_LCD	    "P"
+	WRT_LCD	    "O"
+	WRT_LCD	    "T"
+	WRT_LCD	    ":"
+	WRT_LCD	    " "
+	WRT_MEM_LCD INDF
+	
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    LONG_DLY
+	CALL	    CLR_LCD
+	INCF	    FSR, F
+
+	DECFSZ	    count, F
+	GOTO	    DATA_LOOP
+	
+	WRT_LCD	    "E"
+	WRT_LCD	    "N"
+	WRT_LCD	    "D"
+
+	GOTO	    FINISH
 	
 ;******************************************************************************;
 ;			    LCD INITIALIZATION				       ;
@@ -222,39 +279,40 @@ LCD_INIT
 	BSF	    PORTD, E	    ;E default high
 
 	;Wait for LCD POR to finish (~15ms)
-	CALL	    lcdLongDelay
-	CALL	    lcdLongDelay
-	CALL	    lcdLongDelay
+	CALL	    LCD_LONG_DELAY
+	CALL	    LCD_LONG_DELAY
+	CALL	    LCD_LONG_DELAY
 
 	;Ensure 8-bit mode first (no way to immediately guarantee 4-bit mode)
 	; -> Send b'0011' 3 times
 	BCF	    PORTD,RS	    ;Instruction mode
 	MOVLW	    B'00110000'
 	CALL	    MovMSB
-	CALL	    lcdLongDelay
-	CALL	    lcdLongDelay
+	CALL	    LCD_LONG_DELAY
+	CALL	    LCD_LONG_DELAY
 	CALL	    ClkLCD	    ;Finish last 4-bit send (if reset occurred in middle of a send)
-	CALL	    lcdLongDelay    ;->max instruction time ~= 5ms
+	CALL	    LCD_LONG_DELAY  ;->max instruction time ~= 5ms
 	CALL	    ClkLCD	    ;Assuming 4-bit mode, set 8-bit mode
 	CALL	    ClkLCD	    ;(note: if it's in 8-bit mode already, it will stay in 8-bit mode)
 
     ;Now that we know for sure it's in 8-bit mode, set 4-bit mode.
 	MOVLW	    B'00100000'
 	CALL	    MovMSB
-	CALL	    lcdLongDelay
-	CALL	    lcdLongDelay
+	CALL	    LCD_LONG_DELAY
+	CALL	    LCD_LONG_DELAY
 	CALL	    ClkLCD
 
 	;Give LCD init instructions
 	WRT_LCD	    B'00101000'	    ; 4 bits, 2 lines,5X8 dot
-	CALL	    lcdLongDelay
-	CALL	    lcdLongDelay
+	CALL	    LCD_LONG_DELAY
+	CALL	    LCD_LONG_DELAY
+	
 	WRT_LCD	    B'00001111'	    ; display on,cursor,blink
-	CALL	    lcdLongDelay
-	CALL	    lcdLongDelay
+	CALL	    LCD_LONG_DELAY
+	CALL	    LCD_LONG_DELAY
 	WRT_LCD	    B'00000110'	    ; Increment,no shift
-	CALL	    lcdLongDelay
-	CALL	    lcdLongDelay
+	CALL	    LCD_LONG_DELAY
+	CALL	    LCD_LONG_DELAY
 	;Ready to display characters
 	CALL	    CLR_LCD
 	BSF	    PORTD,RS	    ; Character mode
@@ -299,6 +357,7 @@ STOP_STDBY_MSG
 	WRT_LCD	    "T"
 	WRT_LCD	    "A"
 	RETURN
+	 
 ;******************************************************************************;
 ;				  DATA					       ;
 ;******************************************************************************;
@@ -345,7 +404,7 @@ SHIFT_LCD
 CLR_LCD
  	BCF	    PORTD, RS	    ; Instruction mode
 	WRT_LCD	    b'00000001'
-	CALL	    lcdLongDelay
+	CALL	    LCD_LONG_DELAY
 	BSF	    PORTD, RS
 	RETURN
 
@@ -377,7 +436,7 @@ LD_LOOP
 	RETURN
 	
     ;Delay: ~5ms
-lcdLongDelay
+LCD_LONG_DELAY
 	MOVLW	    d'20'
 	MOVWF	    lcd_d2
 LLD_LOOP
@@ -385,5 +444,8 @@ LLD_LOOP
 	DECFSZ	    lcd_d2, f
 	GOTO	    LLD_LOOP
 	RETURN
+	
+FINISH	
+	GOTO	FINISH
 	
 	END

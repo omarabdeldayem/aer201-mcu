@@ -1,4 +1,10 @@
-Message[302] C:\USERS\OMAR\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 50 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] C:\USERS\OMAR\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 52 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] C:\USERS\OMAR\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 53 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] C:\USERS\OMAR\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 54 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 82 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 84 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 86 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 87 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 89 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 92 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 141 : Using default destination of 1 (file).
+Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 148 : Using default destination of 1 (file).
+Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 149 : Using default destination of 1 (file).
+Warning[202] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 430 : Argument out of range.  Least significant bits used.

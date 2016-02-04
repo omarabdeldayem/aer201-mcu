@@ -1,18 +1,32 @@
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE  1
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00001 ;*******************************************************************
-                      00002 ; Keypad/LCD Test Code
-                      00003 ; Assembler : mpasm.exe
-                      00004 ; Linker    : mplink.exe
-                      00005 ; Written By : Kevin Lam
-                      00006 ;*******************************************************************
-                      00007 
-                      00008       List      p=16f877                 ; list directive to define processor
-                      00009       #include  <p16f877.inc>        ; processor specific variable definitions
+                      00001 ;******************************************************************************;
+                      00002 ;        ____    ___  ______    ___  ____       ____  ____  ____    ___  ____  ;
+                      00003 ;       |    \  /  _]|      T  /  _]|    \     |    \l    j|    \  /  _]|    \ ;
+                      00004 ;       |  o  )/  [_ |      | /  [_ |  D  )    |  o  )|  T |  o  )/  [_ |  D  );
+                      00005 ;       |   _/Y    _]l_j  l_jY    _]|    /     |   _/ |  | |   _/Y    _]|    / ;
+                      00006 ;       |  |  |   [_   |  |  |   [_ |    \     |  |   |  | |  |  |   [_ |    \ ;
+                      00007 ;       |  |  |     T  |  |  |     T|  .  Y    |  |   j  l |  |  |     T|  .  Y;
+                      00008 ;       l__j  l_____j  l__j  l_____jl__j\_j    l__j  |____jl__j  l_____jl__j\_j;
+                      00009 ;------------------------------------------------------------------------------;
+                      00010 ;               AER201 Team 61 'Peter Piper' Pipe Inspector                    ;
+                      00011 ;                        Author: Omar Abdeldayem                               ;
+                      00012 ;                           Created: 1/12/2016                                 ;
+                      00013 ;------------------------------------------------------------------------------;
+                      00014 ; DESCRIPTION:                                                                                          
+                                                               ;
+                      00015 ; It does shit, yo.                                                                                     
+                                                               ;
+                      00016 ;******************************************************************************;
+                      00017 ;******************************************************************************;
+                      00018 ;******************************************************************************;
+                      00019 
+                      00020         List    p=16f877                    ; list directive to define processor
+                      00021         #include        <p16f877.inc>       ; processor specific variable definitions
                       00001         LIST
                       00002 
                       00003 ;==========================================================================
@@ -23,252 +37,644 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00008 ;==========================================================================
                       00009 
                       00541         LIST
-2007   3F72           00010       __CONFIG _CP_OFF & _WDT_OFF & _BODEN_ON & _PWRTE_ON & _HS_OSC & _WRT_ENABLE_ON & _CPD_OFF & _LVP_O
-                            FF
-                      00011 
-                      00012  
-                      00013         ;Declare unbanked variables (at 0x70 and on)
-                      00014         cblock      0x70
-  00000070            00015                     lcd_tmp     
-  00000071            00016                     lcd_d1      
-  00000072            00017                     lcd_d2      
-                      00018         endc
-                      00019 
-                      00020 ;Declare constants for pin assignments (LCD on PORTD)
-  00000002            00021 RS      EQU         2
-  00000003            00022 E       EQU         3
+2007   3F72           00022         __CONFIG _CP_OFF & _WDT_OFF & _BODEN_ON & _PWRTE_ON & _HS_OSC & _WRT_ENABLE_ON & _CPD_OFF & _LVP
+                            _OFF
                       00023 
-                      00024         ;Helper macros
-                      00025 WRT_LCD macro       val
-                      00026         movlw       val
-                      00027         call        WrtLCD
-                      00028         endm
-                      00029         
-                      00030 ;Delay: ~160us
-                      00031 LCD_DLY macro
-                      00032         movlw       0xFF
-                      00033         movwf       lcd_d1
-                      00034         decfsz      lcd_d1,f
-                      00035         goto        $-1
-                      00036         endm
-                      00037 
-                      00038 
-                      00039         ORG         0x0000          ; RESET vector must always be at 0x00
-0000   018A           00040         clrf        PCLATH          ; Clear page bits
-0001   2???           00041         goto        init            ; Just jump to the main code section.
-                      00042         
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE  2
+                      00024 
+                      00025 ;******************************************************************************;
+                      00026 ;                               BANK0 RAM                                      ;
+                      00027 ;******************************************************************************;
+                      00028         CBLOCK      0x70
+  00000070            00029         lcd_tmp
+  00000071            00030         lcd_d1
+  00000072            00031         lcd_d2
+  00000073            00032         long_del
+  00000074            00033         W_temp
+  00000075            00034         Status_Temp
+  00000076            00035         m_num_spots
+  00000077            00036         spot_base_loc
+  00000078            00037         count
+                      00038         ENDC
+                      00039 
+                      00040 ;******************************************************************************;
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00043 ;       ORG         0x0004
-                      00044 ;       movwf       w_temp
-                      00045         
-0002                  00046 init
-0002   018B           00047         clrf        INTCON          ; No interrupts
-                      00048 
-0003   1683           00049         bsf         STATUS,RP0      ; select bank 1
+                      00041 ;                               EQUATES                                        ;
+                      00042 ;******************************************************************************;
+  00000002            00043 RS      EQU             2
+  00000003            00044 E       EQU             3
+                      00045 
+                      00046 ;******************************************************************************;
+                      00047 ;                               MACROS                                         ;
+                      00048 ;******************************************************************************;
+                      00049 WRT_LCD macro           val
+                      00050         MOVLW           val
+                      00051         CALL            LCD_CMD
+                      00052         endm
+                      00053 
+                      00054 WRT_MEM_LCD macro               val
+                      00055         MOVFW           val
+                      00056         CALL            LCD_CMD
+                      00057         endm
+                      00058 
+                      00059 LCD_DLY macro                           ;Delay ~160us
+                      00060         MOVLW           0xFF
+                      00061         MOVWF           lcd_d1
+                      00062         DECFSZ          lcd_d1, f
+                      00063         GOTO            $-1
+                      00064         endm
+                      00065 
+                      00066 ;******************************************************************************;
+                      00067 ;                          VECTOR TABLE (?)                                    ;
+                      00068 ;******************************************************************************;
+                      00069         ORG             0x0000          ; RESET vector must always be at 0x00
+0000   2???           00070         GOTO            INIT            ; Just jump to the main code section.
+                      00071         ORG             0x0004
+0004   2???           00072         GOTO            INT_HANDLER
+                      00073 
+                      00074 ;******************************************************************************;
+                      00075 ;                         ROBOT INITIALIZATION                                 ;
+                      00076 ;******************************************************************************;
+0005                  00077 INIT
+0005   1683           00078         BSF             STATUS, RP0     ;Select bank 1
+                      00079 
+                      00080         ; PIN MAPPINGS AND INITIALIZATION
+0006   3018           00081         MOVLW           b'00011000'
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0004   0185           00050         clrf        TRISA           ; All port A is output
-0005   30F2           00051         movlw       b'11110010'     ; Set required keypad inputs
+0007   0085           00082         MOVWF           TRISA
+0008   30F3           00083         MOVLW           b'11110011'     ; Set required keypad inputs
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0006   0086           00052         movwf       TRISB
+0009   0086           00084         MOVWF           TRISB
+000A   3079           00085         MOVLW           b'01111001'
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0007   0187           00053         clrf        TRISC           ; All port C is output
+000B   0087           00086         MOVWF           TRISC
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0008   0188           00054         clrf        TRISD           ; All port D is output
-                      00055 
-0009   1283           00056         bcf         STATUS,RP0      ; select bank 0
-000A   0185           00057         clrf        PORTA
-000B   0186           00058         clrf        PORTB
-000C   0187           00059         clrf        PORTC
-000D   0188           00060         clrf        PORTD
-                      00061 
-000E   2???           00062         call        InitLCD         ;Initialize the LCD (code in lcd.asm; imported by lcd.inc)
-000F   2???           00063         call        START_MSG
-                      00064 
-0010                  00065 test     
-0010   1C86           00066         btfss       PORTB,1         ;Wait until data is available from the keypad
-0011   2???           00067         goto        $-1 
-                      00068 
-0012   0E06           00069         swapf       PORTB,W         ;Read PortB<7:4> into W<3:0>
-0013   390F           00070         andlw       0x0F
-0014   2???           00071         call        KPHexToChar     ;Convert keypad value to LCD character (value is still held in W)
-0015   2???           00072         call        WrtLCD          ;Write the value in W to LCD
-                      00073         
-0016   1886           00074         btfsc       PORTB,1         ;Wait until key is released
-0017   2???           00075         goto        $-1
-0018   2???           00076         goto        test
-                      00077 
-0019                  00078 KPHexToChar
-0019   0782           00079         addwf       PCL,f
-001A   342A 3430 3423 00080         DT          "*0#D"      ; Define Table
-       3444 
-                      00081 
-                      00082 
-                      00083 ;******* LCD-related subroutines *******
-001E                  00084 InitLCD
-001E   1283           00085         bcf         STATUS, RP0
-001F   1588           00086         bsf         PORTD, E        ;E default high
-                      00087         
-                      00088         ;Wait for LCD POR to finish (~15ms)
-0020   2???           00089         call        lcdLongDelay
-0021   2???           00090         call        lcdLongDelay
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE  3
+000C   0188           00087         CLRF            TRISD           ; All port D is output
+000D   3007           00088         MOVLW           b'00000111'
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0022   2???           00091         call        lcdLongDelay
-                      00092 
-                      00093         ;Ensure 8-bit mode first (no way to immediately guarantee 4-bit mode)
-                      00094         ; -> Send b'0011' 3 times
-0023   1108           00095         bcf         PORTD,RS        ;Instruction mode
-0024   3030           00096         movlw       B'00110000'
-0025   2???           00097         call        MovMSB
-0026   2???           00098         call        lcdLongDelay
-0027   2???           00099         call        lcdLongDelay
-0028   2???           00100         call        ClkLCD          ;Finish last 4-bit send (if reset occurred in middle of a send)
-0029   2???           00101         call        lcdLongDelay    ;->max instruction time ~= 5ms
-002A   2???           00102         call        ClkLCD          ;Assuming 4-bit mode, set 8-bit mode
-002B   2???           00103         call        ClkLCD          ;(note: if it's in 8-bit mode already, it will stay in 8-bit mode)
-                      00104 
-                      00105     ;Now that we know for sure it's in 8-bit mode, set 4-bit mode.
-002C   3020           00106         movlw       B'00100000'
-002D   2???           00107         call        MovMSB
-002E   2???           00108         call        lcdLongDelay
-002F   2???           00109         call        lcdLongDelay
-0030   2???           00110         call        ClkLCD
-                      00111 
-                      00112         ;Give LCD init instructions
-                      00113         WRT_LCD     B'00101000'     ; 4 bits, 2 lines,5X8 dot
-0031   3028               M         movlw       B'00101000'
-0032   2???               M         call        WrtLCD
-0033   2???           00114         call        lcdLongDelay
-0034   2???           00115         call        lcdLongDelay
-                      00116         WRT_LCD     B'00001111'     ; display on,cursor,blink
-0035   300F               M         movlw       B'00001111'
-0036   2???               M         call        WrtLCD
-0037   2???           00117         call        lcdLongDelay
-0038   2???           00118         call        lcdLongDelay
-                      00119         WRT_LCD     B'00000110'     ; Increment,no shift
-0039   3006               M         movlw       B'00000110'
-003A   2???               M         call        WrtLCD
-003B   2???           00120         call        lcdLongDelay
-003C   2???           00121         call        lcdLongDelay
-                      00122         ;Ready to display characters
-003D   2???           00123         call        ClrLCD
-003E   1508           00124         bsf         PORTD,RS        ; Character mode
-003F   0008           00125         return
-                      00126     ;************************************
-                      00127 
-0040                  00128 START_MSG
-0040   3048           00129         movlw       "H"
-0041   2???           00130         call        WrtLCD
-0042   3049           00131         movlw       "I"
-0043   2???           00132         call        WrtLCD
-0044   3054           00133         movlw       "T"
-0045   2???           00134         call        WrtLCD
-0046   3020           00135         movlw       " "
-0047   2???           00136         call        WrtLCD
-0048   302A           00137         movlw       "*"
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE  4
+000E   0089           00089         MOVWF           TRISE
+                      00090 
+000F   309F           00091         MOVLW           b'10011111'     ; PWM pulsing period
+Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
+0010   0092           00092         MOVWF           PR2
+                      00093         
+0011   1283           00094         BCF             STATUS, RP0     ; select bank 0
+                      00095         
+0012   0195           00096         CLRF            CCPR1L          ; Setup PWM pins
+0013   300C           00097         MOVLW           B'00001100'
+0014   0097           00098         MOVWF           CCP1CON
+                      00099         
+0015   158B           00100         BSF             INTCON, RBIE    ; Setup and enable interrupts
+0016   160B           00101         BSF             INTCON, INTE
+0017   178B           00102         BSF             INTCON, GIE
+                      00103 
+0018   3002           00104         MOVLW           B'00000010'     ; Initialize and start timer 2
+0019   0092           00105         MOVWF           T2CON
+001A   0191           00106         CLRF            TMR2
+001B   1512           00107         BSF             T2CON, TMR2ON
+                      00108         
+001C   0185           00109         CLRF            PORTA
+001D   0187           00110         CLRF            PORTC
+001E   2???           00111         CALL            LCD_INIT        ; Initialize the LCD (code in lcd.asm; imported by lcd.inc)
+001F   2???           00112         CALL            START_MSG
+                      00113         ;BSF            PORTC, 0
+                      00114 
+                      00115 ;******************************************************************************;
+                      00116 ;                        ROBOT START AND STANDBY                               ;
+                      00117 ;******************************************************************************;
+0020                  00118 START_STDBY
+0020   1C86           00119         BTFSS       PORTB, 1            ; Wait until data is available from the keypad
+0021   2???           00120         GOTO        START_STDBY
+                      00121 
+0022   0E06           00122         SWAPF       PORTB, W            ; Read PortB<7:4> into W<3:0>
+0023   390F           00123         ANDLW       0x0F
+0024   2???           00124         CALL        CLR_LCD
+                      00125 
+0025   1886           00126         BTFSC       PORTB,1             ; Wait until key is released
+0026   2???           00127         GOTO        $-1
+                      00128 
+0027   1685           00129         BSF         PORTA, 5
+0028   2???           00130         CALL        CLR_LCD
+0029   1285           00131         BCF         PORTA, 5
+                      00132         
+002A   2???           00133         CALL        STOP_STDBY_MSG
+002B   2???           00134         GOTO        STOP_STDBY
+                      00135         ; GOTO      CALIBRATE
+                      00136 
+                      00137 ;******************************************************************************;
+                      00138 ;                           SENSOR CALIBRATION                                 ;
+                      00139 ;******************************************************************************;
+002C                  00140 CALIBRATE
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0049   2???           00138         call        WrtLCD
-004A   3020           00139         movlw       " "
-004B   2???           00140         call        WrtLCD
-004C   3054           00141         movlw       "T"
-004D   2???           00142         call        WrtLCD
-004E   304F           00143         movlw       "O"
-004F   2???           00144         call        WrtLCD
-0050   3020           00145         movlw       " "
-0051   2???           00146         call        WrtLCD
-0052   3053           00147         movlw       "S"
-0053   2???           00148         call        WrtLCD
-0054   3054           00149         movlw       "T"
-0055   2???           00150         call        WrtLCD
-0056   3041           00151         movlw       "A"
-0057   2???           00152         call        WrtLCD
-0058   3052           00153         movlw       "R"
-0059   2???           00154         call        WrtLCD
-005A   3054           00155         movlw       "T"
-005B   2???           00156         call        WrtLCD
-005C   0008           00157         return
-                      00158         
-                      00159         ;WrtLCD: Clock MSB and LSB of W to PORTD<7:4> in two cycles
-005D                  00160 WrtLCD
-005D   00F0           00161         movwf       lcd_tmp         ; store original value
-005E   2???           00162         call        MovMSB          ; move MSB to PORTD
-005F   2???           00163         call        ClkLCD
-0060   0E70           00164         swapf       lcd_tmp,w       ; Swap LSB of value into MSB of W
-0061   2???           00165         call        MovMSB          ; move to PORTD
-0062   2???           00166         call        ClkLCD
-0063   0008           00167         return
-                      00168 
-                      00169     ;ClrLCD: Clear the LCD display
-0064                  00170 ClrLCD
-0064   1108           00171         bcf         PORTD,RS        ; Instruction mode
-                      00172         WRT_LCD     b'00000001'
-0065   3001               M         movlw       b'00000001'
-0066   2???               M         call        WrtLCD
-0067   2???           00173         call        lcdLongDelay
-0068   0008           00174         return
-                      00175 
-                      00176     ;ClkLCD: Pulse the E line low
-0069                  00177 ClkLCD
-                      00178         LCD_DLY
-0069   30FF               M         movlw       0xFF
-006A   00F1               M         movwf       lcd_d1
-006B   0BF1               M         decfsz      lcd_d1,f
-006C   2???               M         goto        $-1
-006D   1188           00179         bcf         PORTD,E
-                      00180         LCD_DLY             ; __    __
-006E   30FF               M         movlw       0xFF
-006F   00F1               M         movwf       lcd_d1
-0070   0BF1               M         decfsz      lcd_d1,f
-0071   2???               M         goto        $-1
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE  5
+Message[305]: Using default destination of 1 (file).
+002C   0F95           00141         INCFSZ      CCPR1L
+002D   2???           00142         GOTO        CALIBRATE
+002E   2???           00143         GOTO        SCAN
+                      00144 ;******************************************************************************;
+                      00145 ;                         PIPE SCAN SUPERLOOP                                  ;
+                      00146 ;******************************************************************************;
+002F                  00147 SCAN
+Message[305]: Using default destination of 1 (file).
+002F   0395           00148         DECF        CCPR1L
+Message[305]: Using default destination of 1 (file).
+0030   0B95           00149         DECFSZ      CCPR1L                              
+0031   2???           00150         GOTO        SCAN
+0032   2???           00151         GOTO        CALIBRATE
+                      00152 
+                      00153 ;******************************************************************************;
+                      00154 ;                          INTERRUPT HANDLER                                   ;
+                      00155 ;******************************************************************************;
+0033                  00156 INT_HANDLER
+0033   00F4           00157         MOVWF       W_temp
+0034   0E03           00158         swapf       STATUS, W
+0035   00F5           00159         MOVWF       Status_Temp
+                      00160         
+                      00161 ;       BCF         PORTC, 0
+                      00162         
+0036   100B           00163         BCF         INTCON, RBIF
+0037   108B           00164         BCF         INTCON, INTF    ; Clear the interrupt flag
+0038   0E75           00165         SWAPF       Status_Temp, W
+0039   0083           00166         MOVWF       STATUS
+003A   0EF4           00167         SWAPF       W_temp, F
+003B   0E74           00168         SWAPF       W_temp, W
+003C   0009           00169         RETFIE
+                      00170 
+                      00171 ;******************************************************************************;
+                      00172 ;                       PIN DETECTED SERVICE ROUTINE                           ;
+                      00173 ;******************************************************************************;
+003D                  00174 PIN_ISR
+003D   2???           00175         GOTO        PIN_ISR
+                      00176 
+                      00177 ;******************************************************************************;
+                      00178 ;                   ROBOT MISALIGNMENT SERVICE ROUTINE                         ;
+                      00179 ;******************************************************************************;
+003E                  00180 MISALIGN_ISR
+                      00181 
+                      00182 ;******************************************************************************;
+                      00183 ;                       END-OF-PIPE SERVICE ROUTINE                            ;
+                      00184 ;******************************************************************************;
+003E                  00185 END_ISR
+                      00186 
+                      00187 ;******************************************************************************;
+                      00188 ;                             STOP STANDBY                                     ;
+                      00189 ;******************************************************************************;
+003E                  00190 STOP_STDBY
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0072   1588           00181         bsf         PORTD,E ;   |__|
-0073   0008           00182         return
-                      00183 
-                      00184     ;****************************************
-                      00185 
-                      00186     ;MovMSB: Move MSB of W to PORTD, without disturbing LSB
-0074                  00187 MovMSB
-0074   39F0           00188         andlw       0xF0
-0075   0488           00189         iorwf       PORTD,f
-0076   380F           00190         iorlw       0x0F
-0077   0588           00191         andwf       PORTD,f
-0078   0008           00192         return
+003E   1C86           00191         BTFSS       PORTB, 1            ; Wait until data is available from the keypad
+003F   2???           00192         GOTO        STOP_STDBY
                       00193 
-                      00194     ;Delay: ~5ms
-0079                  00195 lcdLongDelay
-0079   3014           00196         movlw       d'20'
-007A   00F2           00197         movwf       lcd_d2
-007B                  00198 LLD_LOOP
-                      00199         LCD_DLY
-007B   30FF               M         movlw       0xFF
-007C   00F1               M         movwf       lcd_d1
-007D   0BF1               M         decfsz      lcd_d1,f
-007E   2???               M         goto        $-1
-007F   0BF2           00200         decfsz      lcd_d2,f
-0080   2???           00201         goto        LLD_LOOP
-0081   0008           00202         return
-                      00203     
-3F72                  00204         END
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE  6
+0040   0E06           00194         SWAPF       PORTB, W            ; Read PortB<7:4> into W<3:0>
+0041   390F           00195         ANDLW       0x0F
+0042   2???           00196         CALL        CLR_LCD
+0043   2???           00197         GOTO        STOP_DATA
+                      00198 
+                      00199 ;******************************************************************************;
+                      00200 ;                              DISPLAY DATA                                    ;
+                      00201 ;******************************************************************************;
+0044                  00202 STOP_DATA
+0044   3001           00203         MOVLW       b'00000001'
+0045   00F8           00204         MOVWF       count
+                      00205 ;       CLRF        count
+0046   3036           00206         MOVLW       "6"
+0047   00F6           00207         MOVWF       m_num_spots
+                      00208         
+0048   2???           00209         CALL        WRT_DATA
+0049   2???           00210         CALL        LONG_DLY
+004A   2???           00211         CALL        LONG_DLY
+004B   2???           00212         CALL        LONG_DLY
+004C   2???           00213         CALL        LONG_DLY
+004D   2???           00214         CALL        LONG_DLY
+004E   2???           00215         CALL        LONG_DLY
+004F   2???           00216         CALL        LONG_DLY
+0050   2???           00217         CALL        LONG_DLY
+0051   2???           00218         CALL        LONG_DLY
+0052   2???           00219         CALL        LONG_DLY
+0053   2???           00220         CALL        LONG_DLY
+0054   2???           00221         CALL        LONG_DLY
+                      00222         
+0055   2???           00223         CALL        CLR_LCD
+                      00224         
+0056   3077           00225         MOVLW       spot_base_loc
+0057   0084           00226         MOVWF       FSR
+                      00227         
+0058   3031           00228         MOVLW       "1"
+0059   00F7           00229         MOVWF       spot_base_loc
+                      00230         
+005A   3033           00231         MOVLW       "3"
+005B   00F8           00232         MOVWF       spot_base_loc + 1
+                      00233         
+005C   3036           00234         MOVLW       "6"
+005D   00F9           00235         MOVWF       spot_base_loc + 2
+                      00236         
+005E   3038           00237         MOVLW       "8"
+005F   00FA           00238         MOVWF       spot_base_loc + 3
+                      00239         
+                      00240         
+0060                  00241 DATA_LOOP       
+                      00242         WRT_LCD     "S"
+0060   3053               M         MOVLW           "S"
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE  6
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0061   2???               M         CALL            LCD_CMD
+                      00243         WRT_LCD     "P"
+0062   3050               M         MOVLW           "P"
+0063   2???               M         CALL            LCD_CMD
+                      00244         WRT_LCD     "O"
+0064   304F               M         MOVLW           "O"
+0065   2???               M         CALL            LCD_CMD
+                      00245         WRT_LCD     "T"
+0066   3054               M         MOVLW           "T"
+0067   2???               M         CALL            LCD_CMD
+                      00246         WRT_LCD     ":"
+0068   303A               M         MOVLW           ":"
+0069   2???               M         CALL            LCD_CMD
+                      00247         WRT_LCD     " "
+006A   3020               M         MOVLW           " "
+006B   2???               M         CALL            LCD_CMD
+                      00248         WRT_MEM_LCD INDF
+006C   0800               M         MOVFW           INDF
+006D   2???               M         CALL            LCD_CMD
+                      00249         
+006E   2???           00250         CALL        LONG_DLY
+006F   2???           00251         CALL        LONG_DLY
+0070   2???           00252         CALL        LONG_DLY
+0071   2???           00253         CALL        LONG_DLY
+0072   2???           00254         CALL        LONG_DLY
+0073   2???           00255         CALL        LONG_DLY
+0074   2???           00256         CALL        LONG_DLY
+0075   2???           00257         CALL        LONG_DLY
+0076   2???           00258         CALL        LONG_DLY
+0077   2???           00259         CALL        LONG_DLY
+0078   2???           00260         CALL        LONG_DLY
+0079   2???           00261         CALL        LONG_DLY
+007A   2???           00262         CALL        CLR_LCD
+007B   0A84           00263         INCF        FSR, F
+                      00264 
+007C   0BF8           00265         DECFSZ      count, F
+007D   2???           00266         GOTO        DATA_LOOP
+                      00267         
+                      00268         WRT_LCD     "E"
+007E   3045               M         MOVLW           "E"
+007F   2???               M         CALL            LCD_CMD
+                      00269         WRT_LCD     "N"
+0080   304E               M         MOVLW           "N"
+0081   2???               M         CALL            LCD_CMD
+                      00270         WRT_LCD     "D"
+0082   3044               M         MOVLW           "D"
+0083   2???               M         CALL            LCD_CMD
+                      00271 
+0084   2???           00272         GOTO        FINISH
+                      00273         
+                      00274 ;******************************************************************************;
+                      00275 ;                           LCD INITIALIZATION                                 ;
+                      00276 ;******************************************************************************;
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE  7
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0085                  00277 LCD_INIT
+0085   1283           00278         BCF         STATUS, RP0
+0086   1588           00279         BSF         PORTD, E        ;E default high
+                      00280 
+                      00281         ;Wait for LCD POR to finish (~15ms)
+0087   2???           00282         CALL        LCD_LONG_DELAY
+0088   2???           00283         CALL        LCD_LONG_DELAY
+0089   2???           00284         CALL        LCD_LONG_DELAY
+                      00285 
+                      00286         ;Ensure 8-bit mode first (no way to immediately guarantee 4-bit mode)
+                      00287         ; -> Send b'0011' 3 times
+008A   1108           00288         BCF         PORTD,RS        ;Instruction mode
+008B   3030           00289         MOVLW       B'00110000'
+008C   2???           00290         CALL        MovMSB
+008D   2???           00291         CALL        LCD_LONG_DELAY
+008E   2???           00292         CALL        LCD_LONG_DELAY
+008F   2???           00293         CALL        ClkLCD          ;Finish last 4-bit send (if reset occurred in middle of a send)
+0090   2???           00294         CALL        LCD_LONG_DELAY  ;->max instruction time ~= 5ms
+0091   2???           00295         CALL        ClkLCD          ;Assuming 4-bit mode, set 8-bit mode
+0092   2???           00296         CALL        ClkLCD          ;(note: if it's in 8-bit mode already, it will stay in 8-bit mode)
+                      00297 
+                      00298     ;Now that we know for sure it's in 8-bit mode, set 4-bit mode.
+0093   3020           00299         MOVLW       B'00100000'
+0094   2???           00300         CALL        MovMSB
+0095   2???           00301         CALL        LCD_LONG_DELAY
+0096   2???           00302         CALL        LCD_LONG_DELAY
+0097   2???           00303         CALL        ClkLCD
+                      00304 
+                      00305         ;Give LCD init instructions
+                      00306         WRT_LCD     B'00101000'     ; 4 bits, 2 lines,5X8 dot
+0098   3028               M         MOVLW           B'00101000'
+0099   2???               M         CALL            LCD_CMD
+009A   2???           00307         CALL        LCD_LONG_DELAY
+009B   2???           00308         CALL        LCD_LONG_DELAY
+                      00309         
+                      00310         WRT_LCD     B'00001111'     ; display on,cursor,blink
+009C   300F               M         MOVLW           B'00001111'
+009D   2???               M         CALL            LCD_CMD
+009E   2???           00311         CALL        LCD_LONG_DELAY
+009F   2???           00312         CALL        LCD_LONG_DELAY
+                      00313         WRT_LCD     B'00000110'     ; Increment,no shift
+00A0   3006               M         MOVLW           B'00000110'
+00A1   2???               M         CALL            LCD_CMD
+00A2   2???           00314         CALL        LCD_LONG_DELAY
+00A3   2???           00315         CALL        LCD_LONG_DELAY
+                      00316         ;Ready to display characters
+00A4   2???           00317         CALL        CLR_LCD
+00A5   1508           00318         BSF         PORTD,RS        ; Character mode
+00A6   0008           00319         RETURN
+                      00320 
+                      00321 ;******************************************************************************;
+                      00322 ;                                  HELLO                                       ;
+                      00323 ;******************************************************************************;
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE  8
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00A7                  00324 START_MSG
+                      00325         WRT_LCD     "H"
+00A7   3048               M         MOVLW           "H"
+00A8   2???               M         CALL            LCD_CMD
+                      00326         WRT_LCD     "I"
+00A9   3049               M         MOVLW           "I"
+00AA   2???               M         CALL            LCD_CMD
+                      00327         WRT_LCD     "T"
+00AB   3054               M         MOVLW           "T"
+00AC   2???               M         CALL            LCD_CMD
+                      00328         WRT_LCD     " "
+00AD   3020               M         MOVLW           " "
+00AE   2???               M         CALL            LCD_CMD
+                      00329         WRT_LCD     "*"
+00AF   302A               M         MOVLW           "*"
+00B0   2???               M         CALL            LCD_CMD
+                      00330         WRT_LCD     " "
+00B1   3020               M         MOVLW           " "
+00B2   2???               M         CALL            LCD_CMD
+                      00331         WRT_LCD     "T"
+00B3   3054               M         MOVLW           "T"
+00B4   2???               M         CALL            LCD_CMD
+                      00332         WRT_LCD     "O"
+00B5   304F               M         MOVLW           "O"
+00B6   2???               M         CALL            LCD_CMD
+                      00333         WRT_LCD     " "
+00B7   3020               M         MOVLW           " "
+00B8   2???               M         CALL            LCD_CMD
+                      00334         WRT_LCD     "S"
+00B9   3053               M         MOVLW           "S"
+00BA   2???               M         CALL            LCD_CMD
+                      00335         WRT_LCD     "T"
+00BB   3054               M         MOVLW           "T"
+00BC   2???               M         CALL            LCD_CMD
+                      00336         WRT_LCD     "A"
+00BD   3041               M         MOVLW           "A"
+00BE   2???               M         CALL            LCD_CMD
+                      00337         WRT_LCD     "R"
+00BF   3052               M         MOVLW           "R"
+00C0   2???               M         CALL            LCD_CMD
+                      00338         WRT_LCD     "T"
+00C1   3054               M         MOVLW           "T"
+00C2   2???               M         CALL            LCD_CMD
+00C3   0008           00339         RETURN
+                      00340         
+                      00341 ;******************************************************************************;
+                      00342 ;                                GOODBYE                                       ;
+                      00343 ;******************************************************************************;
+00C4                  00344 STOP_STDBY_MSG
+                      00345         WRT_LCD     "H"
+00C4   3048               M         MOVLW           "H"
+00C5   2???               M         CALL            LCD_CMD
+                      00346         WRT_LCD     "I"
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE  9
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+00C6   3049               M         MOVLW           "I"
+00C7   2???               M         CALL            LCD_CMD
+                      00347         WRT_LCD     "T"
+00C8   3054               M         MOVLW           "T"
+00C9   2???               M         CALL            LCD_CMD
+                      00348         WRT_LCD     " "
+00CA   3020               M         MOVLW           " "
+00CB   2???               M         CALL            LCD_CMD
+                      00349         WRT_LCD     "*"
+00CC   302A               M         MOVLW           "*"
+00CD   2???               M         CALL            LCD_CMD
+                      00350         WRT_LCD     " "
+00CE   3020               M         MOVLW           " "
+00CF   2???               M         CALL            LCD_CMD
+                      00351         WRT_LCD     "F"
+00D0   3046               M         MOVLW           "F"
+00D1   2???               M         CALL            LCD_CMD
+                      00352         WRT_LCD     "O"
+00D2   304F               M         MOVLW           "O"
+00D3   2???               M         CALL            LCD_CMD
+                      00353         WRT_LCD     "R"
+00D4   3052               M         MOVLW           "R"
+00D5   2???               M         CALL            LCD_CMD
+                      00354         WRT_LCD     " "
+00D6   3020               M         MOVLW           " "
+00D7   2???               M         CALL            LCD_CMD
+                      00355         WRT_LCD     "D"
+00D8   3044               M         MOVLW           "D"
+00D9   2???               M         CALL            LCD_CMD
+                      00356         WRT_LCD     "A"
+00DA   3041               M         MOVLW           "A"
+00DB   2???               M         CALL            LCD_CMD
+                      00357         WRT_LCD     "T"
+00DC   3054               M         MOVLW           "T"
+00DD   2???               M         CALL            LCD_CMD
+                      00358         WRT_LCD     "A"
+00DE   3041               M         MOVLW           "A"
+00DF   2???               M         CALL            LCD_CMD
+00E0   0008           00359         RETURN
+                      00360          
+                      00361 ;******************************************************************************;
+                      00362 ;                                 DATA                                         ;
+                      00363 ;******************************************************************************;
+00E1                  00364 WRT_DATA        
+                      00365         WRT_LCD     "N"
+00E1   304E               M         MOVLW           "N"
+00E2   2???               M         CALL            LCD_CMD
+                      00366         WRT_LCD     "U"
+00E3   3055               M         MOVLW           "U"
+00E4   2???               M         CALL            LCD_CMD
+                      00367         WRT_LCD     "M"
+00E5   304D               M         MOVLW           "M"
+00E6   2???               M         CALL            LCD_CMD
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 10
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00368         WRT_LCD     " "
+00E7   3020               M         MOVLW           " "
+00E8   2???               M         CALL            LCD_CMD
+                      00369         WRT_LCD     "S"
+00E9   3053               M         MOVLW           "S"
+00EA   2???               M         CALL            LCD_CMD
+                      00370         WRT_LCD     "P"
+00EB   3050               M         MOVLW           "P"
+00EC   2???               M         CALL            LCD_CMD
+                      00371         WRT_LCD     "O"
+00ED   304F               M         MOVLW           "O"
+00EE   2???               M         CALL            LCD_CMD
+                      00372         WRT_LCD     "T"
+00EF   3054               M         MOVLW           "T"
+00F0   2???               M         CALL            LCD_CMD
+                      00373         WRT_LCD     "S"
+00F1   3053               M         MOVLW           "S"
+00F2   2???               M         CALL            LCD_CMD
+                      00374         WRT_LCD     ":"
+00F3   303A               M         MOVLW           ":"
+00F4   2???               M         CALL            LCD_CMD
+                      00375         WRT_LCD     " "
+00F5   3020               M         MOVLW           " "
+00F6   2???               M         CALL            LCD_CMD
+                      00376         WRT_MEM_LCD m_num_spots
+00F7   0876               M         MOVFW           m_num_spots
+00F8   2???               M         CALL            LCD_CMD
+                      00377         WRT_LCD     " "
+00F9   3020               M         MOVLW           " "
+00FA   2???               M         CALL            LCD_CMD
+                      00378         WRT_LCD     " "
+00FB   3020               M         MOVLW           " "
+00FC   2???               M         CALL            LCD_CMD
+00FD   0008           00379         RETURN
+                      00380 ;******************************************************************************;                
+                      00381 ;******************************************************************************;
+                      00382 ;******************************************************************************;
+                      00383         ;WrtLCD: Clock MSB and LSB of W to PORTD<7:4> in two cycles
+00FE                  00384 LCD_CMD
+00FE   00F0           00385         MOVWF       lcd_tmp         ; store original value
+00FF   2???           00386         CALL        MovMSB          ; move MSB to PORTD
+0100   2???           00387         CALL        ClkLCD
+0101   0E70           00388         SWAPF       lcd_tmp,w       ; Swap LSB of value into MSB of W
+0102   2???           00389         CALL        MovMSB          ; move to PORTD
+0103   2???           00390         CALL        ClkLCD
+0104   0008           00391         RETURN
+                      00392 
+0105                  00393 SHIFT_LCD
+0105   1108           00394         BCF         PORTD, RS
+                      00395         WRT_LCD     B'00011000'
+0106   3018               M         MOVLW           B'00011000'
+0107   2???               M         CALL            LCD_CMD
+0108   2???           00396         CALL        LONG_DLY
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0109   2???           00397         CALL        LONG_DLY
+010A   2???           00398         CALL        LONG_DLY
+010B   2???           00399         CALL        LONG_DLY
+010C   1508           00400         BSF         PORTD, RS
+010D   0008           00401         RETURN
+                      00402         
+                      00403     ;ClrLCD: Clear the LCD display
+010E                  00404 CLR_LCD
+010E   1108           00405         BCF         PORTD, RS       ; Instruction mode
+                      00406         WRT_LCD     b'00000001'
+010F   3001               M         MOVLW           b'00000001'
+0110   2???               M         CALL            LCD_CMD
+0111   2???           00407         CALL        LCD_LONG_DELAY
+0112   1508           00408         BSF         PORTD, RS
+0113   0008           00409         RETURN
+                      00410 
+                      00411     ;ClkLCD: Pulse the E line low
+0114                  00412 ClkLCD
+                      00413         LCD_DLY
+0114   30FF               M         MOVLW           0xFF
+0115   00F1               M         MOVWF           lcd_d1
+0116   0BF1               M         DECFSZ          lcd_d1, f
+0117   2???               M         GOTO            $-1
+0118   1188           00414         BCF         PORTD,E
+                      00415         LCD_DLY             ; __    __
+0119   30FF               M         MOVLW           0xFF
+011A   00F1               M         MOVWF           lcd_d1
+011B   0BF1               M         DECFSZ          lcd_d1, f
+011C   2???               M         GOTO            $-1
+011D   1588           00416         BSF         PORTD,E ;   |__|
+011E   0008           00417         RETURN
+                      00418 
+                      00419     ;****************************************
+                      00420 
+                      00421     ;MovMSB: Move MSB of W to PORTD, without disturbing LSB
+011F                  00422 MovMSB
+011F   39F0           00423         ANDLW       0xF0
+0120   0488           00424         IORWF       PORTD,f
+0121   380F           00425         IORLW       0x0F
+0122   0588           00426         ANDWF       PORTD,f
+0123   0008           00427         RETURN
+                      00428 
+0124                  00429 LONG_DLY
+Warning[202]: Argument out of range.  Least significant bits used.
+0124   30FF           00430         MOVLW       0xFFFF
+0125   00F3           00431         MOVWF       long_del
+0126                  00432 LD_LOOP 
+                      00433         LCD_DLY
+0126   30FF               M         MOVLW           0xFF
+0127   00F1               M         MOVWF           lcd_d1
+0128   0BF1               M         DECFSZ          lcd_d1, f
+0129   2???               M         GOTO            $-1
+012A   0BF3           00434         DECFSZ      long_del, f
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 12
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+012B   2???           00435         GOTO        LD_LOOP
+012C   0008           00436         RETURN
+                      00437         
+                      00438     ;Delay: ~5ms
+012D                  00439 LCD_LONG_DELAY
+012D   3014           00440         MOVLW       d'20'
+012E   00F2           00441         MOVWF       lcd_d2
+012F                  00442 LLD_LOOP
+                      00443         LCD_DLY
+012F   30FF               M         MOVLW           0xFF
+0130   00F1               M         MOVWF           lcd_d1
+0131   0BF1               M         DECFSZ          lcd_d1, f
+0132   2???               M         GOTO            $-1
+0133   0BF2           00444         DECFSZ      lcd_d2, f
+0134   2???           00445         GOTO        LLD_LOOP
+0135   0008           00446         RETURN
+                      00447         
+0136                  00448 FINISH  
+0136   2???           00449         GOTO    FINISH
+                      00450         
+3F72                  00451         END
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 13
 
 
 SYMBOL TABLE
@@ -293,6 +699,7 @@ BCLIF                             00000003
 BF                                00000000
 BRGH                              00000002
 C                                 00000000
+CALIBRATE                         0000002C
 CCP1CON                           00000017
 CCP1IE                            00000002
 CCP1IF                            00000002
@@ -322,18 +729,19 @@ CHS1                              00000004
 CHS2                              00000005
 CKE                               00000006
 CKP                               00000004
+CLR_LCD                           0000010E
 CREN                              00000004
 CSRC                              00000007
-ClkLCD                            00000069
-ClrLCD                            00000064
-D                                 00000005
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE  7
+ClkLCD                            00000114
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 14
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+D                                 00000005
 DATA_ADDRESS                      00000005
+DATA_LOOP                         00000060
 DC                                00000001
 D_A                               00000005
 D_NOT_A                           00000005
@@ -347,8 +755,10 @@ EEDATH                            0000010E
 EEIE                              00000004
 EEIF                              00000004
 EEPGD                             00000007
+END_ISR                           0000003E
 F                                 00000001
 FERR                              00000002
+FINISH                            00000136
 FSR                               00000004
 GCEN                              00000007
 GIE                               00000007
@@ -362,20 +772,32 @@ I2C_STOP                          00000004
 IBF                               00000007
 IBOV                              00000005
 INDF                              00000000
+INIT                              00000005
 INTCON                            0000000B
 INTE                              00000004
 INTEDG                            00000006
 INTF                              00000001
+INT_HANDLER                       00000033
 IRP                               00000007
-InitLCD                           0000001E
-KPHexToChar                       00000019
+LCD_CMD                           000000FE
 LCD_DLY                           
-LLD_LOOP                          0000007B
-MovMSB                            00000074
+LCD_INIT                          00000085
+LCD_LONG_DELAY                    0000012D
+LD_LOOP                           00000126
+LLD_LOOP                          0000012F
+LONG_DLY                          00000124
+MISALIGN_ISR                      0000003E
+MovMSB                            0000011F
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BO                            00000000
 NOT_BOR                           00000000
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 15
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 NOT_DONE                          00000002
 NOT_PD                            00000003
 NOT_POR                           00000001
@@ -386,12 +808,6 @@ NOT_TO                            00000004
 NOT_TX8                           00000006
 NOT_W                             00000002
 NOT_WRITE                         00000002
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE  8
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 OBF                               00000006
 OERR                              00000001
 OPTION_REG                        00000081
@@ -407,6 +823,7 @@ PEIE                              00000006
 PEN                               00000002
 PIE1                              0000008C
 PIE2                              0000008D
+PIN_ISR                           0000003D
 PIR1                              0000000C
 PIR2                              0000000D
 PORTA                             00000005
@@ -434,6 +851,12 @@ RB1                               00000001
 RB2                               00000002
 RB3                               00000003
 RB4                               00000004
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 16
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 RB5                               00000005
 RB6                               00000006
 RB7                               00000007
@@ -445,12 +868,6 @@ RC2                               00000002
 RC3                               00000003
 RC4                               00000004
 RC5                               00000005
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE  9
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 RC6                               00000006
 RC7                               00000007
 RC8_9                             00000006
@@ -483,7 +900,9 @@ RX9D                              00000000
 R_NOT_W                           00000002
 R_W                               00000002
 S                                 00000003
+SCAN                              0000002F
 SEN                               00000000
+SHIFT_LCD                         00000105
 SMP                               00000007
 SPBRG                             00000099
 SPEN                              00000007
@@ -491,6 +910,12 @@ SREN                              00000005
 SSPADD                            00000093
 SSPBUF                            00000013
 SSPCON                            00000014
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 17
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 SSPCON2                           00000091
 SSPEN                             00000005
 SSPIE                             00000003
@@ -501,15 +926,14 @@ SSPM2                             00000002
 SSPM3                             00000003
 SSPOV                             00000006
 SSPSTAT                           00000094
-START_MSG                         00000040
+START_MSG                         000000A7
+START_STDBY                       00000020
 STATUS                            00000003
+STOP_DATA                         00000044
+STOP_STDBY                        0000003E
+STOP_STDBY_MSG                    000000C4
 SYNC                              00000004
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE 10
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
+Status_Temp                       00000075
 T0CS                              00000005
 T0IE                              00000005
 T0IF                              00000002
@@ -545,6 +969,12 @@ TRISA                             00000085
 TRISA0                            00000000
 TRISA1                            00000001
 TRISA2                            00000002
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 18
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
 TRISA3                            00000003
 TRISA4                            00000004
 TRISA5                            00000005
@@ -563,12 +993,6 @@ TRISC1                            00000001
 TRISC2                            00000002
 TRISC3                            00000003
 TRISC4                            00000004
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE 11
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 TRISC5                            00000005
 TRISC6                            00000006
 TRISC7                            00000007
@@ -601,14 +1025,22 @@ WCOL                              00000007
 WR                                00000001
 WREN                              00000002
 WRERR                             00000003
+WRT_DATA                          000000E1
 WRT_LCD                           
-WrtLCD                            0000005D
+WRT_MEM_LCD                       
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 19
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+W_temp                            00000074
 Z                                 00000002
-_.org_0_0011                      00000011
-_.org_0_0017                      00000017
-_.org_0_006C                      0000006C
-_.org_0_0071                      00000071
-_.org_0_007E                      0000007E
+_.org_1_0026                      00000026
+_.org_1_0117                      00000117
+_.org_1_011C                      0000011C
+_.org_1_0129                      00000129
+_.org_1_0132                      00000132
 _BODEN_OFF                        00003FBF
 _BODEN_ON                         00003FFF
 _BOREN_OFF                        00003FBF
@@ -622,12 +1054,6 @@ _CP_OFF                           00003FFF
 _CP_UPPER_256                     00002FEF
 _DEBUG_OFF                        00003FFF
 _DEBUG_ON                         000037FF
-MPASM 5.65                          MAIN.ASM   1-21-2016  15:02:13         PAGE 12
-
-
-SYMBOL TABLE
-  LABEL                             VALUE 
-
 _DEVID1                           00002006
 _FOSC_EXTRC                       00003FFF
 _FOSC_HS                          00003FFE
@@ -656,15 +1082,22 @@ _XT_OSC                           00003FFD
 __16F877                          00000001
 __DEBUG                           
 __MPLAB_DEBUGGER_PICKIT2          1
-init                              00000002
-lcdLongDelay                      00000079
+count                             00000078
 lcd_d1                            00000071
 lcd_d2                            00000072
 lcd_tmp                           00000070
-test                              00000010
+long_del                          00000073
+MPASM 5.65                          MAIN.ASM   2-4-2016  14:53:35         PAGE 20
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+m_num_spots                       00000076
+spot_base_loc                     00000077
 
 Errors   :     0
-Warnings :     0 reported,     0 suppressed
-Messages :     4 reported,     0 suppressed
+Warnings :     1 reported,     0 suppressed
+Messages :     9 reported,     0 suppressed
 
 
