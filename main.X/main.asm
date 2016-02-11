@@ -87,7 +87,6 @@ INIT
 	CLRF		TRISD	    	; All port D is output
 	MOVLW		b'00000111'
 	MOVWF		TRISE
-
 	MOVLW		b'10011111'	; PWM pulsing period
 	MOVWF		PR2
 	
@@ -130,26 +129,21 @@ START_STDBY
 	CALL	    CLR_LCD
 	BCF	    PORTA, 5
 	
-	CALL	    STOP_STDBY_MSG
-	GOTO	    STOP_STDBY
-	; GOTO	    CALIBRATE
+	;CALL	    STOP_STDBY_MSG
+	;GOTO	    STOP_STDBY
+	 GOTO	    SCAN
 
 ;******************************************************************************;
 ;			    SENSOR CALIBRATION				       ;
 ;******************************************************************************;
 CALIBRATE
-	INCFSZ	    CCPR1L
 	GOTO	    CALIBRATE
-	GOTO	    SCAN
 ;******************************************************************************;
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-	DECF	    CCPR1L
-	DECFSZ	    CCPR1L				
+	CALL	    PWM
 	GOTO	    SCAN
-	GOTO	    CALIBRATE
-
 ;******************************************************************************;
 ;			   INTERRUPT HANDLER				       ;
 ;******************************************************************************;
@@ -168,6 +162,13 @@ INT_HANDLER
 	SWAPF	    W_temp, W
 	RETFIE
 
+PWM	
+	INCFSZ	    CCPR1L
+	GOTO	    PWM
+PWM_DWN	DECF	    CCPR1L
+	DECFSZ	    CCPR1L
+	GOTO	    PWM_DWN
+	RETURN
 ;******************************************************************************;
 ;			PIN DETECTED SERVICE ROUTINE			       ;
 ;******************************************************************************;
@@ -192,9 +193,9 @@ STOP_STDBY
 	GOTO	    STOP_STDBY
 
 	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
-	ANDLW	    0x0F
+	ANDLW	    0x0F 
 	CALL	    CLR_LCD
-	GOTO	    STOP_DATA
+	 GOTO	    STOP_DATA
 
 ;******************************************************************************;
 ;			       DISPLAY DATA				       ;
@@ -246,6 +247,8 @@ DATA_LOOP
 	WRT_LCD	    ":"
 	WRT_LCD	    " "
 	WRT_MEM_LCD INDF
+	WRT_LCD	    "c"
+	WRT_LCD	    "m"
 	
 	CALL	    LONG_DLY
 	CALL	    LONG_DLY
@@ -374,8 +377,6 @@ WRT_DATA
 	WRT_LCD	    ":"
 	WRT_LCD	    " "
 	WRT_MEM_LCD m_num_spots
-	WRT_LCD	    " "
-	WRT_LCD	    " "
 	RETURN
 ;******************************************************************************;		
 ;******************************************************************************;
@@ -383,7 +384,7 @@ WRT_DATA
 	;WrtLCD: Clock MSB and LSB of W to PORTD<7:4> in two cycles
 LCD_CMD
 	MOVWF	    lcd_tmp	    ; store original value
-	CALL	    MovMSB	    ; move MSB to PORTD
+	CALL	    MovMSB	    ; move MSB to PORTD 
 	CALL	    ClkLCD
 	SWAPF	    lcd_tmp,w	    ; Swap LSB of value into MSB of W
 	CALL	    MovMSB	    ; move to PORTD
