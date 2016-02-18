@@ -36,6 +36,7 @@
 	mult_val2
 	threshold_distance
 	rob_distance
+	measured_distance
 	p_gain
 	l_pwm_duty
 	r_pwm_duty
@@ -193,21 +194,24 @@ PWM_DWN	BSF	    PORTA, 5
 	GOTO	    PWM_DWN
 	RETURN
 ;******************************************************************************;
-;			PIN DETECTED SERVICE ROUTINE			       ;
+;			TOGGLE ARM STATE ROUTINE   			       ;
 ;******************************************************************************;
-PIN_ISR
+ARM_TOGGLE
 	; control servo to control arm
 	; if degree is set to 180, set to 0
 	; otherwise set to 0
-	GOTO	    PIN_ISR
+	GOTO	    ARM_TOGGLE
 
 ;******************************************************************************;
-;		    ROBOT MISALIGNMENT SERVICE ROUTINE			       ;
+;			  ROBOT REALIGNMENT ROUTINE	    		       ;
 ;******************************************************************************;
-MISALIGN_ISR
+REALIGN
 	CLRW
-	MOVF	    p_gain, W
-	ADDWF	    
+	MOVF	    threshold_distance, W
+	SUBWF	    measured_distance, rob_distance
+	MOVF	    rob_distance, W
+	ADDWF	    l_pwm_duty, F
+	SUBWF	    r_pwm_duty, F
 	RETURN
 	
 ;******************************************************************************;
@@ -222,6 +226,7 @@ USONIC_SEND_PULSE
 	BSF	    PORTB, 3
 	CALL	    LCD_DLY
 	BCF	    PORTB, 3
+	CALL	    LCD_DLY
 	RETURN
 
 USONIC_READ_ECHO
@@ -236,10 +241,10 @@ STOP_STDBY
 	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
 	ANDLW	    0x0F 
 	CALL	    CLR_LCD
-	 GOTO	    STOP_DATA
+	GOTO	    STOP_DATA
 
 ;******************************************************************************;
-;			 0      DISPLAY DATA				       ;
+;			        DISPLAY DATA				       ;
 ;******************************************************************************;
 STOP_DATA
 	MOVLW	    b'00000100'
