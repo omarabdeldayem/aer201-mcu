@@ -30,10 +30,17 @@
 	lcd_d1
 	lcd_d2
 	long_del
-	W_temp
-	Status_Temp
-	m_num_spots
+	temp_w
+	temp_status
+	mult_val1
+	mult_val2
+	threshold_distance
+	rob_distance
+	p_gain
+	l_pwm_duty
+	r_pwm_duty
 	count
+	num_spots
 	spot_base_loc
 	ENDC
 
@@ -46,12 +53,20 @@ E 	EQU		3
 ;******************************************************************************;
 ;				MACROS					       ;
 ;******************************************************************************;
+MULT	macro		val1, val2, result
+	MOVF		val1, W
+	ADDWF		val1, W
+	MOVWF		result
+	DECFSZ		val2, f
+	GOTO		$-3
+	endm
+	
 WRT_LCD macro		val
 	MOVLW		val
 	CALL		LCD_CMD
 	endm
 
-WRT_MEM_LCD macro		val
+WRT_MEM_LCD macro	val
 	MOVFW		val
 	CALL		LCD_CMD
 	endm
@@ -100,6 +115,11 @@ INIT
 	BSF	    	INTCON, INTE
 	BSF	    	INTCON, GIE
 
+	MOVLW		B'00000010'	; Initialize and start timer 1
+	MOVWF		T1CON
+	CLRF		TMR1
+	BSF		T1CON, TMR1ON
+	
 	MOVLW		B'00000010'	; Initialize and start timer 2
 	MOVWF		T2CON
 	CLRF		TMR2
@@ -107,9 +127,8 @@ INIT
 	
 	CLRF		PORTA
 	CLRF		PORTC
-	CALL		LCD_INIT	; Initialize the LCD (code in lcd.asm; imported by lcd.inc)
+	CALL		LCD_INIT	; Initialize the LCD 
 	CALL		START_MSG
-	;BSF	    	PORTC, 0
 
 ;******************************************************************************;
 ;			 ROBOT START AND STANDBY			       ;
@@ -124,48 +143,52 @@ START_STDBY
 
 	BTFSC	    PORTB,1	    	; Wait until key is released
 	GOTO	    $-1
-
+	
 	BSF	    PORTA, 5
 	CALL	    CLR_LCD
 	BCF	    PORTA, 5
-	
-	;CALL	    STOP_STDBY_MSG
-	;GOTO	    STOP_STDBY
-	 GOTO	    SCAN
+	GOTO	    SCAN
 
 ;******************************************************************************;
 ;			    SENSOR CALIBRATION				       ;
 ;******************************************************************************;
 CALIBRATE
 	GOTO	    CALIBRATE
+	
 ;******************************************************************************;
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
 	CALL	    PWM
+	CALL	    USONIC_SEND_PULSE
+	CALL	    USONIC_READ_ECHO
 	GOTO	    SCAN
+	
 ;******************************************************************************;
 ;			   INTERRUPT HANDLER				       ;
 ;******************************************************************************;
 INT_HANDLER
-	MOVWF	    W_temp
-	swapf	    STATUS, W
-	MOVWF	    Status_Temp
-	
-;	BCF	    PORTC, 0
+	MOVWF	    temp_w
+	SWAPF	    STATUS, W
+	MOVWF	    temp_status
 	
 	BCF	    INTCON, RBIF
 	BCF	    INTCON, INTF    ; Clear the interrupt flag
-	SWAPF	    Status_Temp, W
+	SWAPF	    temp_status, W
 	MOVWF	    STATUS
-	SWAPF	    W_temp, F
-	SWAPF	    W_temp, W
+	SWAPF	    temp_w, F
+	SWAPF	    temp_w, W
 	RETFIE
-
+	
+;******************************************************************************;
+;			    PWM CONTROL					       ;
+;******************************************************************************;
 PWM	
+	BCF	    PORTA, 5
 	INCFSZ	    CCPR1L
 	GOTO	    PWM
-PWM_DWN	DECF	    CCPR1L
+PWM_DWN	BSF	    PORTA, 5
+	DECF	    CCPR1L
 	DECFSZ	    CCPR1L
 	GOTO	    PWM_DWN
 	RETURN
@@ -173,18 +196,36 @@ PWM_DWN	DECF	    CCPR1L
 ;			PIN DETECTED SERVICE ROUTINE			       ;
 ;******************************************************************************;
 PIN_ISR
+	; control servo to control arm
+	; if degree is set to 180, set to 0
+	; otherwise set to 0
 	GOTO	    PIN_ISR
 
 ;******************************************************************************;
 ;		    ROBOT MISALIGNMENT SERVICE ROUTINE			       ;
 ;******************************************************************************;
 MISALIGN_ISR
-
+	CLRW
+	MOVF	    p_gain, W
+	ADDWF	    
+	RETURN
+	
 ;******************************************************************************;
 ;			END-OF-PIPE SERVICE ROUTINE			       ;
 ;******************************************************************************;
 END_ISR
+	RETURN
+;******************************************************************************;
+;			      ULTRASONIC				       ;
+;******************************************************************************;
+USONIC_SEND_PULSE
+	BSF	    PORTB, 3
+	CALL	    LCD_DLY
+	BCF	    PORTB, 3
+	RETURN
 
+USONIC_READ_ECHO
+	RETURN
 ;******************************************************************************;
 ;			      STOP STANDBY				       ;
 ;******************************************************************************;
@@ -198,14 +239,14 @@ STOP_STDBY
 	 GOTO	    STOP_DATA
 
 ;******************************************************************************;
-;			       DISPLAY DATA				       ;
+;			 0      DISPLAY DATA				       ;
 ;******************************************************************************;
 STOP_DATA
 	MOVLW	    b'00000100'
 	MOVWF	    count
 
 	MOVLW	    "4"
-	MOVWF	    m_num_spots
+	MOVWF	    num_spots
 	
 	CALL	    WRT_DATA
 	CALL	    LONG_DLY
@@ -259,9 +300,6 @@ DATA_LOOP
 	CALL	    LONG_DLY
 	CALL	    LONG_DLY
 	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
 	CALL	    CLR_LCD
 	INCF	    FSR, F
 
@@ -281,13 +319,13 @@ LCD_INIT
 	BCF	    STATUS, RP0
 	BSF	    PORTD, E	    ;E default high
 
-	;Wait for LCD POR to finish (~15ms)
+				    ;Wait for LCD POR to finish (~15ms)
 	CALL	    LCD_LONG_DELAY
 	CALL	    LCD_LONG_DELAY
 	CALL	    LCD_LONG_DELAY
 
-	;Ensure 8-bit mode first (no way to immediately guarantee 4-bit mode)
-	; -> Send b'0011' 3 times
+				    ;Ensure 8-bit mode first (no way to immediately guarantee 4-bit mode)
+				    ; -> Send b'0011' 3 times
 	BCF	    PORTD,RS	    ;Instruction mode
 	MOVLW	    B'00110000'
 	CALL	    MovMSB
@@ -298,14 +336,14 @@ LCD_INIT
 	CALL	    ClkLCD	    ;Assuming 4-bit mode, set 8-bit mode
 	CALL	    ClkLCD	    ;(note: if it's in 8-bit mode already, it will stay in 8-bit mode)
 
-    ;Now that we know for sure it's in 8-bit mode, set 4-bit mode.
+				    ;Now that we know for sure it's in 8-bit mode, set 4-bit mode.
 	MOVLW	    B'00100000'
 	CALL	    MovMSB
 	CALL	    LCD_LONG_DELAY
 	CALL	    LCD_LONG_DELAY
 	CALL	    ClkLCD
 
-	;Give LCD init instructions
+				    ;Give LCD init instructions
 	WRT_LCD	    B'00101000'	    ; 4 bits, 2 lines,5X8 dot
 	CALL	    LCD_LONG_DELAY
 	CALL	    LCD_LONG_DELAY
@@ -316,7 +354,7 @@ LCD_INIT
 	WRT_LCD	    B'00000110'	    ; Increment,no shift
 	CALL	    LCD_LONG_DELAY
 	CALL	    LCD_LONG_DELAY
-	;Ready to display characters
+				    ;Ready to display characters
 	CALL	    CLR_LCD
 	BSF	    PORTD,RS	    ; Character mode
 	RETURN
@@ -376,7 +414,7 @@ WRT_DATA
 	WRT_LCD	    "S"
 	WRT_LCD	    ":"
 	WRT_LCD	    " "
-	WRT_MEM_LCD m_num_spots
+	WRT_MEM_LCD num_spots
 	RETURN
 ;******************************************************************************;		
 ;******************************************************************************;
