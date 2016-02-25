@@ -25,7 +25,8 @@
 ;******************************************************************************;
 ;				BANK0 RAM				       ;
 ;******************************************************************************;
-	CBLOCK	    0x70
+	CBLOCK	    0x30
+	; RTC I2C Mem
 	dt1
         dt2
         dt3
@@ -38,14 +39,18 @@
         DOUT
         B1
         B2
+	; LCD MEM
 	lcd_tmp
 	lcd_d1
 	lcd_d2
 	long_del
 	temp_w
 	temp_status
+	; MULTIPLICATION VALS
 	mult_val1
 	mult_val2
+	; ROBOT VARS
+	pwm_state
 	threshold_distance
 	rob_distance
 	measured_distance
@@ -121,22 +126,7 @@ LCD_DLY macro				;Delay ~160us
 ;			  ROBOT INITIALIZATION				       ;
 ;******************************************************************************;
 INIT
-	;Set SDA and SCL to high-Z first as required for I2C
-        bsf         STATUS,RP0
-        bsf         TRISC,4
-        bsf         TRISC,3
-        ;Setup I2C
-        clrf        SSPSTAT         ;I2C line levels, and clear all flags
-        movlw       d'24'           ;100kHz baud rate: 10MHz osc / [4*(24+1)]
-        movwf       SSPADD          ;RTC only supports 100kHz
-
-        bcf         STATUS,RP0
-        movlw       b'00001000'     ;Config SSP for Master Mode I2C
-        movwf       SSPCON
-        bsf         SSPCON,SSPEN    ;Enable SSP module
-        call        I2CStop         ;Ensure the bus is free
-	
-	BSF	    STATUS, RP0     ;Select bank 1
+	BSF	    	STATUS, RP0     ;Select bank 1
 
 	; PIN MAPPINGS AND INITIALIZATION
 	MOVLW	    b'00011000'
@@ -148,7 +138,8 @@ INIT
 	CLRF	    TRISD	    	; All port D is output
 	MOVLW	    b'00000111'
 	MOVWF	    TRISE
-	MOVLW	    b'10011111'		; PWM pulsing period
+		     
+	MOVLW	    b'10000000'		; PWM pulsing period (484Hz)
 	MOVWF	    PR2
 	
 	BCF	    STATUS, RP0		; select bank 0
@@ -171,6 +162,14 @@ INIT
 	CLRF	    PORTA
 	CLRF	    PORTC
 	CALL	    LCD_INIT		; Initialize the LCD 
+	
+					; Initialize RTC time
+;	CLRF        DAT			;Set data to 0
+;        CLRF        ADD			;Set register address to 0
+;        CALL        wr			;Write 0 to Seconds
+;        BSF         ADD,0		;Set register address to 1
+;        CALL        wr			;Write 0 to Minutes
+	
 	CALL	    START_MSG
 
 ;******************************************************************************;
@@ -202,7 +201,8 @@ CALIBRATE
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-	CALL	    PWM
+	CALL	    PWML
+	CALL	    PWMR
 	CALL	    USONIC_SEND_PULSE
 	CALL	    USONIC_READ_ECHO
 	GOTO	    SCAN
@@ -226,18 +226,25 @@ INT_HANDLER
 ;******************************************************************************;
 ;			    PWM CONTROL					       ;
 ;******************************************************************************;
-PWM	
-	BCF	    PORTA, 5
+PWML	
+	BCF	    PORTA, 1
 	INCFSZ	    CCPR1L
-	INCFSZ	    CCPR2L
-	GOTO	    PWM
-PWM_DWN	BSF	    PORTA, 5
-	DECF	    CCPR1L
-	DECF	    CCPR2L
+	GOTO	    PWML
+PWML_DN	BSF	    PORTA, 1
 	DECFSZ	    CCPR1L
-	GOTO	    PWM_DWN
-	DECF	    CCPR2L
+	GOTO	    PWML_DN
 	RETURN
+
+PWMR	
+	BCF	    PORTA, 2
+	INCFSZ	    CCPR2L
+	GOTO	    PWMR
+PWMR_DN	
+	BSF	    PORTA, 2
+	DECFSZ	    CCPR2L
+	GOTO	    PWMR_DN
+	RETURN
+	
 ;******************************************************************************;
 ;			TOGGLE ARM STATE ROUTINE   			       ;
 ;******************************************************************************;
@@ -318,7 +325,20 @@ STOP_DATA
 	
 	MOVLW	    spot_base_loc
 	MOVWF	    FSR
-		
+	
+	MOVLW	    "1"
+	MOVWF	    spot_base_loc
+	
+	MOVLW	    "3"
+	MOVWF	    spot_base_loc + 1
+	
+	MOVLW	    "6"
+	MOVWF	    spot_base_loc + 2
+	
+	MOVLW	    "8"
+	MOVWF	    spot_base_loc + 3
+	
+	
 DATA_LOOP	
 	WRT_LCD	    "S"
 	WRT_LCD	    "P"
@@ -524,69 +544,70 @@ LLD_LOOP
 	RETURN
 
 asdfasdf
-          ;SEND "MIN SEC" HEADER
-	      movlw     0x0C           ; Clear display
-          call      SEND
-          movlw     "M"
-          call      SEND
-          movlw     "I"
-          call      SEND
-          movlw     "N"
-          call      SEND
-          movlw     " "
-          call      SEND
-          movlw     " "
-          call      SEND
-          movlw     "S"
-          call      SEND
-          movlw     "E"
-          call      SEND
-          movlw     "C"
-          call      SEND
-          movlw     0xA             ; new line
-          call      SEND
-          movlw     0xD
-          call      SEND
-          
-          ;READ MINUTE
-          movlw     0x01            ; Read minute
-          movwf     ADD
-          call      rd
-          movf      DOUT,w
-          call      ADJT            ; display minute
+	;SEND "MIN SEC" HEADER
+	movlw     0x0C           ; Clear display
+	call      LCD_CMD
+	movlw     "M"
+	call      LCD_CMD
+	movlw     "I"
+	call      LCD_CMD
+	movlw     "N"
+	call      LCD_CMD
+	movlw     " "
+	call      LCD_CMD
+	movlw     " "
+	call      LCD_CMD
+	movlw     "S"
+	call      LCD_CMD
+	movlw     "E"
+	call      LCD_CMD
+	movlw     "C"
+	call      LCD_CMD
+	movlw     0xA             ; new line
+	call      LCD_CMD
+	movlw     0xD
+	call      LCD_CMD
 
-          movlw     " "
-          call      SEND
-          movlw     " "
-          call      SEND
-          movlw     " "
-          call      SEND
+	;READ MINUTE
+	movlw     0x01            ; Read minute
+	movwf     ADD
+	call      rd
+	movf      DOUT,w
+	call      ADJT            ; display minute
 
-          ;READ SECOND
-          movlw     0x00            ; Read second
-          movwf     ADD
-          call      rd              ; call read sub
-          movf      DOUT,w
-          call      ADJT            ; display second
-          
-          call      SDel
-          goto      asdfasdf
+	movlw     " "
+	call      LCD_CMD
+	movlw     " "
+	call      LCD_CMD
+	movlw     " "
+	call      LCD_CMD
+
+	;READ SECOND
+	movlw     0x00            ; Read second
+	movwf     ADD
+	call      rd              ; call read sub
+	movf      DOUT,w
+	call      ADJT            ; display second
+
+	call      SDel
+	goto      asdfasdf
 
 ;**********************************************************
 ; Convert time 1 byte to ASCII 2 bytes and send to display
 ; Input  : W
 ; Output : -
 ;**********************************************************
-ADJT      movwf     B1             ; B1 = HHHH LLLL
-          swapf     B1,w           ; W  = LLLL HHHH
-          andlw     0x0f           ; Mask upper four bits 0000 HHHH
-          addlw     0x30           ; convert to ASCII
-          call      SEND           ; Send first digit
-          movf      B1,w
-          andlw     0x0f           ; w  = 0000 LLLL
-          addlw     0x30           ; convert to ASCII
-          call      SEND
-          return
+ADJT      
+	movwf     B1             ; B1 = HHHH LLLL
+	swapf     B1,w           ; W  = LLLL HHHH
+	andlw     0x0f           ; Mask upper four bits 0000 HHHH
+	addlw     0x30           ; convert to ASCII
+	call      LCD_CMD           ; Send first digit
+	movf      B1,w
+	andlw     0x0f           ; w  = 0000 LLLL
+	addlw     0x30           ; convert to ASCII
+	call      LCD_CMD
+	return
 
 ;********************************************************
 ; Send data to RS-232
@@ -594,14 +615,13 @@ ADJT      movwf     B1             ; B1 = HHHH LLLL
 ; Output : Computer screen
 ;********************************************************
 SEND
-          banksel   TXREG
-          movwf     TXREG          ; Send recent data to TX
-          bsf       STATUS,RP0
-          btfss     TXSTA,1        ; check TRMT bit in TXSTA register
-          goto      $-1            ; TXREG full  or TRMT = 0
-          bcf       STATUS,RP0
-          return
-
+	banksel   TXREG
+	movwf     TXREG          ; Send recent data to TX
+	bsf       STATUS,RP0
+	btfss     TXSTA,1        ; check TRMT bit in TXSTA register
+	goto      $-1            ; TXREG full  or TRMT = 0
+	bcf       STATUS,RP0
+	return
 
 ;***********************************************
 ;  I2C Support Functions
