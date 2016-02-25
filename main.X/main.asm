@@ -26,6 +26,18 @@
 ;				BANK0 RAM				       ;
 ;******************************************************************************;
 	CBLOCK	    0x70
+	dt1
+        dt2
+        dt3
+        XBUF
+        count
+        CONTROL
+        ADD
+        DAT
+        flag
+        DOUT
+        B1
+        B2
 	lcd_tmp
 	lcd_d1
 	lcd_d2
@@ -40,7 +52,7 @@
 	p_gain
 	l_pwm_duty
 	r_pwm_duty
-	count
+	spot_count
 	num_spots
 	spot_base_loc
 	ENDC
@@ -54,82 +66,112 @@ E 	EQU		3
 ;******************************************************************************;
 ;				MACROS					       ;
 ;******************************************************************************;
-MULT	macro		val1, val2, result
-	MOVF		val1, W
-	ADDWF		val1, W
-	MOVWF		result
-	DECFSZ		val2, f
-	GOTO		$-3
+TOASCII	macro	    msd
+	MOVWF	    msd           
+	SWAPF	    msd,W        
+	ANDLW	    0x0F                      
+	ADDLW	    -10                    
+	BTFSC	    STATUS, C
+	ADDLW	    'A'-'0'-10
+	ADDLW	    '0'+10
+	XORWF	    msd, F        
+	XORWF	    msd, W        
+	XORWF	    msd, F        
+	ANDLW	    0x0F              
+	ADDLW	    -10               
+	BTFSC	    STATUS, C
+	ADDLW	    'A'-'0'-10
+	ADDLW	    '0'+10            
 	endm
 	
-WRT_LCD macro		val
-	MOVLW		val
-	CALL		LCD_CMD
+MULT	macro	    val1, val2, result
+	MOVF	    val1, W
+	ADDWF	    val1, W
+	MOVWF	    result
+	DECFSZ	    val2, f
+	GOTO	    $-3
+	endm
+	
+WRT_LCD macro	    val
+	MOVLW	    val
+	CALL	    LCD_CMD
 	endm
 
-WRT_MEM_LCD macro	val
-	MOVFW		val
-	CALL		LCD_CMD
+WRT_MEM_LCD macro   val
+	MOVFW	    val
+	CALL	    LCD_CMD
 	endm
 
 LCD_DLY macro				;Delay ~160us
-	MOVLW		0xFF
-	MOVWF		lcd_d1
-	DECFSZ		lcd_d1, f
-	GOTO		$-1
+	MOVLW	    0xFF
+	MOVWF	    lcd_d1
+	DECFSZ	    lcd_d1, f
+	GOTO	    $-1
 	endm
 
 ;******************************************************************************;
-;			   VECTOR TABLE (?)				       ;
+;			   VECTOR TABLE 				       ;
 ;******************************************************************************;
-	ORG	    	0x0000		; RESET vector must always be at 0x00
-	GOTO		INIT		; Just jump to the main code section.
-	ORG	    	0x0004
-	GOTO		INT_HANDLER
+	ORG	    0x0000		; RESET vector must always be at 0x00
+	GOTO	    INIT		; Just jump to the main code section.
+	ORG	    0x0004
+	GOTO	    INT_HANDLER
 
 ;******************************************************************************;
 ;			  ROBOT INITIALIZATION				       ;
 ;******************************************************************************;
 INIT
-	BSF	    	STATUS, RP0     ;Select bank 1
+	;Set SDA and SCL to high-Z first as required for I2C
+        bsf         STATUS,RP0
+        bsf         TRISC,4
+        bsf         TRISC,3
+        ;Setup I2C
+        clrf        SSPSTAT         ;I2C line levels, and clear all flags
+        movlw       d'24'           ;100kHz baud rate: 10MHz osc / [4*(24+1)]
+        movwf       SSPADD          ;RTC only supports 100kHz
+
+        bcf         STATUS,RP0
+        movlw       b'00001000'     ;Config SSP for Master Mode I2C
+        movwf       SSPCON
+        bsf         SSPCON,SSPEN    ;Enable SSP module
+        call        I2CStop         ;Ensure the bus is free
+	
+	BSF	    STATUS, RP0     ;Select bank 1
 
 	; PIN MAPPINGS AND INITIALIZATION
-	MOVLW		b'00011000'
-	MOVWF		TRISA
-	MOVLW		b'11110011'	; Set required keypad inputs
-	MOVWF		TRISB
-	MOVLW		b'01111001'
-	MOVWF		TRISC
-	CLRF		TRISD	    	; All port D is output
-	MOVLW		b'00000111'
-	MOVWF		TRISE
-	MOVLW		b'10011111'	; PWM pulsing period
-	MOVWF		PR2
+	MOVLW	    b'00011000'
+	MOVWF	    TRISA
+	MOVLW	    b'11110011'		; Set required keypad inputs
+	MOVWF	    TRISB
+	MOVLW	    b'01111001'
+	MOVWF	    TRISC
+	CLRF	    TRISD	    	; All port D is output
+	MOVLW	    b'00000111'
+	MOVWF	    TRISE
+	MOVLW	    b'10011111'		; PWM pulsing period
+	MOVWF	    PR2
 	
-	BCF	    	STATUS, RP0	; select bank 0
+	BCF	    STATUS, RP0		; select bank 0
 	
-	CLRF		CCPR1L		; Setup PWM pins
-	MOVLW		B'00001100'
-	MOVWF		CCP1CON
+	CLRF	    CCPR1L		; Setup PWM pins
+	CLRF	    CCPR2L
+	MOVLW	    B'00001100'
+	MOVWF	    CCP1CON
+	MOVWF	    CCP2CON
 	
-	BSF	    	INTCON, RBIE	; Setup and enable interrupts
-	BSF	    	INTCON, INTE
-	BSF	    	INTCON, GIE
-
-	MOVLW		B'00000010'	; Initialize and start timer 1
-	MOVWF		T1CON
-	CLRF		TMR1
-	BSF		T1CON, TMR1ON
+	BSF	    INTCON, RBIE	; Setup and enable interrupts
+	BSF	    INTCON, INTE
+	BSF	    INTCON, GIE
 	
-	MOVLW		B'00000010'	; Initialize and start timer 2
-	MOVWF		T2CON
-	CLRF		TMR2
-	BSF		T2CON, TMR2ON
+	MOVLW	    B'00000010'		; Initialize and start timer 2
+	MOVWF	    T2CON
+	CLRF	    TMR2
+	BSF	    T2CON, TMR2ON
 	
-	CLRF		PORTA
-	CLRF		PORTC
-	CALL		LCD_INIT	; Initialize the LCD 
-	CALL		START_MSG
+	CLRF	    PORTA
+	CLRF	    PORTC
+	CALL	    LCD_INIT		; Initialize the LCD 
+	CALL	    START_MSG
 
 ;******************************************************************************;
 ;			 ROBOT START AND STANDBY			       ;
@@ -174,7 +216,7 @@ INT_HANDLER
 	MOVWF	    temp_status
 	
 	BCF	    INTCON, RBIF
-	BCF	    INTCON, INTF    ; Clear the interrupt flag
+	BCF	    INTCON, INTF	  ; Clear the interrupt flag
 	SWAPF	    temp_status, W
 	MOVWF	    STATUS
 	SWAPF	    temp_w, F
@@ -187,11 +229,14 @@ INT_HANDLER
 PWM	
 	BCF	    PORTA, 5
 	INCFSZ	    CCPR1L
+	INCFSZ	    CCPR2L
 	GOTO	    PWM
 PWM_DWN	BSF	    PORTA, 5
 	DECF	    CCPR1L
+	DECF	    CCPR2L
 	DECFSZ	    CCPR1L
 	GOTO	    PWM_DWN
+	DECF	    CCPR2L
 	RETURN
 ;******************************************************************************;
 ;			TOGGLE ARM STATE ROUTINE   			       ;
@@ -219,8 +264,9 @@ REALIGN
 ;******************************************************************************;
 END_ISR
 	RETURN
+
 ;******************************************************************************;
-;			      ULTRASONIC				       ;
+;		      ULTRASONIC SENSOR SUBROUTINES			       ;
 ;******************************************************************************;
 USONIC_SEND_PULSE
 	BSF	    PORTB, 3
@@ -231,6 +277,7 @@ USONIC_SEND_PULSE
 
 USONIC_READ_ECHO
 	RETURN
+
 ;******************************************************************************;
 ;			      STOP STANDBY				       ;
 ;******************************************************************************;
@@ -248,7 +295,7 @@ STOP_STDBY
 ;******************************************************************************;
 STOP_DATA
 	MOVLW	    b'00000100'
-	MOVWF	    count
+	MOVWF	    spot_count
 
 	MOVLW	    "4"
 	MOVWF	    num_spots
@@ -271,20 +318,7 @@ STOP_DATA
 	
 	MOVLW	    spot_base_loc
 	MOVWF	    FSR
-	
-	MOVLW	    "1"
-	MOVWF	    spot_base_loc
-	
-	MOVLW	    "3"
-	MOVWF	    spot_base_loc + 1
-	
-	MOVLW	    "6"
-	MOVWF	    spot_base_loc + 2
-	
-	MOVLW	    "8"
-	MOVWF	    spot_base_loc + 3
-	
-	
+		
 DATA_LOOP	
 	WRT_LCD	    "S"
 	WRT_LCD	    "P"
@@ -308,7 +342,7 @@ DATA_LOOP
 	CALL	    CLR_LCD
 	INCF	    FSR, F
 
-	DECFSZ	    count, F
+	DECFSZ	    spot_count, F
 	GOTO	    DATA_LOOP
 	
 	WRT_LCD	    "E"
@@ -488,7 +522,238 @@ LLD_LOOP
 	DECFSZ	    lcd_d2, f
 	GOTO	    LLD_LOOP
 	RETURN
-	
+
+asdfasdf
+          ;SEND "MIN SEC" HEADER
+	      movlw     0x0C           ; Clear display
+          call      SEND
+          movlw     "M"
+          call      SEND
+          movlw     "I"
+          call      SEND
+          movlw     "N"
+          call      SEND
+          movlw     " "
+          call      SEND
+          movlw     " "
+          call      SEND
+          movlw     "S"
+          call      SEND
+          movlw     "E"
+          call      SEND
+          movlw     "C"
+          call      SEND
+          movlw     0xA             ; new line
+          call      SEND
+          movlw     0xD
+          call      SEND
+          
+          ;READ MINUTE
+          movlw     0x01            ; Read minute
+          movwf     ADD
+          call      rd
+          movf      DOUT,w
+          call      ADJT            ; display minute
+
+          movlw     " "
+          call      SEND
+          movlw     " "
+          call      SEND
+          movlw     " "
+          call      SEND
+
+          ;READ SECOND
+          movlw     0x00            ; Read second
+          movwf     ADD
+          call      rd              ; call read sub
+          movf      DOUT,w
+          call      ADJT            ; display second
+          
+          call      SDel
+          goto      asdfasdf
+
+;**********************************************************
+; Convert time 1 byte to ASCII 2 bytes and send to display
+; Input  : W
+; Output : -
+;**********************************************************
+ADJT      movwf     B1             ; B1 = HHHH LLLL
+          swapf     B1,w           ; W  = LLLL HHHH
+          andlw     0x0f           ; Mask upper four bits 0000 HHHH
+          addlw     0x30           ; convert to ASCII
+          call      SEND           ; Send first digit
+          movf      B1,w
+          andlw     0x0f           ; w  = 0000 LLLL
+          addlw     0x30           ; convert to ASCII
+          call      SEND
+          return
+
+;********************************************************
+; Send data to RS-232
+; Input  : W
+; Output : Computer screen
+;********************************************************
+SEND
+          banksel   TXREG
+          movwf     TXREG          ; Send recent data to TX
+          bsf       STATUS,RP0
+          btfss     TXSTA,1        ; check TRMT bit in TXSTA register
+          goto      $-1            ; TXREG full  or TRMT = 0
+          bcf       STATUS,RP0
+          return
+
+
+;***********************************************
+;  I2C Support Functions
+;***********************************************
+
+;CHECK_ACK: If bad ACK bit received, goto err_address
+CHECK_ACK   macro   err_address
+        btfsc       SSPCON2,ACKSTAT
+        goto        err_address
+        endm
+
+;******************************************
+; Write data DAT to register ADD of the RTC
+; Input   : ADD,DAT
+; Output  : EEPROM
+;******************************************
+wr
+        ;Select the DS1307 on the bus, in WRITE mode
+        call        I2CStart
+        movlw       0xD0        ;DS1307 address | WRITE bit
+        call        I2CWrite
+        CHECK_ACK   WR_ERR
+
+        ;Write data to I2C bus (Register Address in RTC)
+        movf        ADD,w       ;Set register pointer in RTC
+        call        I2CWrite
+        CHECK_ACK   WR_ERR
+
+        ;Write data to I2C bus (Data to be placed in RTC register)
+        movf        DAT,w       ;Write data to register in RTC
+        call        I2CWrite
+        CHECK_ACK   WR_ERR
+        goto        WR_END
+
+WR_ERR  bcf         STATUS,RP0
+        movlw       "E"
+        call        SEND
+        
+        ;Release the I2C bus
+WR_END  call        I2CStop
+        return
+
+;************************************
+; Read data
+; Input   : ADD
+; Output  : DOUT
+;************************************
+rd
+        ;Select the DS1307 on the bus, in WRITE mode
+        call        I2CStart
+        movlw       0xD0        ;DS1307 address | WRITE bit
+        call        I2CWrite
+        CHECK_ACK   RD_ERR
+
+        ;Write data to I2C bus (Register Address in RTC)
+        movf        ADD,w       ;Set register pointer in RTC
+        call        I2CWrite
+        CHECK_ACK   RD_ERR
+
+        ;Re-Select the DS1307 on the bus, in READ mode
+        call        I2CRepeatedStart
+        movlw       0xD1        ;DS1307 address | READ bit
+        call        I2CWrite
+        CHECK_ACK   RD_ERR
+
+        ;Read data from I2C bus (Contents of Register in RTC)
+        call        I2CRead
+        movwf       DOUT
+        call        I2CNak      ;Send acknowledgement of data reception
+        
+        goto        RD_END
+
+RD_ERR  bcf         STATUS,RP0
+        movlw       "E"
+        call        SEND
+        
+        ;Release the I2C bus
+RD_END  call        I2CStop
+        return
+
+
+I2CCondition   macro   condition
+        banksel     SSPCON2
+        bsf         SSPCON2,condition
+        btfsc       SSPCON2,condition
+        goto        $-1
+        endm
+I2CStart
+        I2CCondition    SEN
+        return
+I2CRepeatedStart    ;Repeated Start, generally used to change IO direction
+        I2CCondition    RSEN
+        return
+I2CStop
+        I2CCondition    PEN
+        return
+        
+I2CAck
+        banksel     SSPCON2
+        bcf         SSPCON2,ACKDT
+        bsf         SSPCON2,ACKEN
+        btfsc       SSPCON2,ACKEN
+        goto        $-1
+        return
+I2CNak
+        banksel     SSPCON2
+        bsf         SSPCON2,ACKDT
+        bsf         SSPCON2,ACKEN
+        btfsc       SSPCON2,ACKEN
+        goto        $-1
+        return
+
+;*********************************************
+;I2CWrite: Blocking write of 'w' to slave device.
+;       Selects register bank1 so you can check
+;       SSPCON2,ACKSTAT immediately after.
+;*********************************************
+I2CWrite
+        banksel     SSPBUF
+        movwf       SSPBUF
+        banksel     SSPSTAT
+        btfsc       SSPSTAT,R_W ;While transmit is in progress, wait
+        goto        $-1
+        banksel     SSPCON2
+        return
+        
+;*********************************************
+;I2CRead: Blocking read from slave device.
+;Input:   None
+;Output:  W
+;*********************************************
+I2CRead
+        banksel     SSPCON2
+        bsf         SSPCON2,RCEN    ;Begin receiving byte from
+        btfsc       SSPCON2,RCEN
+        goto        $-1
+        banksel     SSPBUF
+        movf        SSPBUF,w
+        return
+
+;******************************
+; Short delay
+;******************************
+SDel      movlw     0x00
+          movwf     dt1
+sd2       movlw     0x00
+          movwf     dt2
+sd1       decfsz    dt2
+          goto      sd1
+          decfsz    dt1
+          goto      sd2
+          return
 FINISH	
 	GOTO	FINISH
 	
