@@ -1,0 +1,553 @@
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE  1
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00001 #include <p16f877.inc>
+                      00001         LIST
+                      00002 
+                      00003 ;==========================================================================
+                      00004 ; Build date : Dec 08 2015
+                      00005 ;  MPASM PIC16F877 processor include
+                      00006 ; 
+                      00007 ;  (c) Copyright 1999-2015 Microchip Technology, All rights reserved
+                      00008 ;==========================================================================
+                      00009 
+                      00541         LIST
+                      00002         
+                      00003         ;Declare unbanked variables (at 0x70 and on)
+                      00004         udata_shr
+0000                  00005 lcd_tmp res     1
+0001                  00006 lcd_d1  res     1
+0002                  00007 lcd_d2  res     1
+0003                  00008 com             res     1
+0004                  00009 dat             res     1
+                      00010 
+                      00011         ;Declare constants for pin assignments (LCD on PORTD)
+                      00012 #define RS      PORTD,2
+                      00013 #define E       PORTD,3
+                      00014 
+                      00015 ;Delay: ~160us
+                      00016 LCD_DELAY macro
+                      00017         movlw   0xFF
+                      00018         movwf   lcd_d1
+                      00019         decfsz  lcd_d1,f
+                      00020         goto    $-1
+                      00021         endm
+                      00022         
+                      00023 
+                      00024         code 
+  0000                00025         global InitLCD,WR_INS,WR_DATA,CLR_LCD           ;Only these functions are visible to other asm f
+                            iles.
+                      00026     ;***********************************
+0000                  00027 InitLCD
+0000   1283           00028         bcf STATUS,RP0
+0001   1588           00029         bsf E     ;E default high
+                      00030         
+                      00031         ;Wait for LCD POR to finish (~15ms)
+0002   2???           00032         call lcdLongDelay
+0003   2???           00033         call lcdLongDelay
+0004   2???           00034         call lcdLongDelay
+                      00035 
+                      00036         ;Ensure 8-bit mode first (no way to immediately guarantee 4-bit mode)
+                      00037         ; -> Send b'0011' 3 times
+0005   3033           00038         movlw   b'00110011'
+0006   2???           00039         call    WR_INS
+0007   2???           00040         call lcdLongDelay
+0008   2???           00041         call lcdLongDelay
+0009   3032           00042         movlw   b'00110010'
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE  2
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+000A   2???           00043         call    WR_INS
+000B   2???           00044         call lcdLongDelay
+000C   2???           00045         call lcdLongDelay
+                      00046 
+                      00047         ; 4 bits, 2 lines, 5x7 dots
+000D   3028           00048         movlw   b'00101000'
+000E   2???           00049         call    WR_INS
+000F   2???           00050         call lcdLongDelay
+0010   2???           00051         call lcdLongDelay
+                      00052 
+                      00053         ; display on/off
+0011   300C           00054         movlw   b'00001100'
+0012   2???           00055         call    WR_INS
+0013   2???           00056         call lcdLongDelay
+0014   2???           00057         call lcdLongDelay
+                      00058         
+                      00059         ; Entry mode
+0015   3006           00060         movlw   b'00000110'
+0016   2???           00061         call    WR_INS
+0017   2???           00062         call lcdLongDelay
+0018   2???           00063         call lcdLongDelay
+                      00064 
+                      00065         ; Clear ram
+0019   3001           00066         movlw   b'00000001'
+001A   2???           00067         call    WR_INS
+001B   2???           00068         call lcdLongDelay
+001C   2???           00069         call lcdLongDelay
+001D   0008           00070         return
+                      00071     ;************************************
+                      00072 
+                      00073     ;ClrLCD: Clear the LCD display
+001E                  00074 CLR_LCD
+001E   3001           00075         movlw   B'00000001'
+001F   2???           00076         call    WR_INS
+0020   0008           00077     return
+                      00078 
+                      00079     ;****************************************
+                      00080     ; Write command to LCD - Input : W , output : -
+                      00081     ;****************************************
+0021                  00082 WR_INS
+0021   1108           00083         bcf             RS                              ;clear RS
+0022   00??           00084         movwf   com                             ;W --> com
+0023   39F0           00085         andlw   0xF0                    ;mask 4 bits MSB w = X0
+0024   0088           00086         movwf   PORTD                   ;Send 4 bits MSB
+0025   1588           00087         bsf             E                               ;
+0026   2???           00088         call    lcdLongDelay    ;__    __
+0027   1188           00089         bcf             E                               ;  |__|
+0028   0E??           00090         swapf   com,w
+0029   39F0           00091         andlw   0xF0                    ;1111 0010
+002A   0088           00092         movwf   PORTD                   ;send 4 bits LSB
+002B   1588           00093         bsf             E                               ;
+002C   2???           00094         call    lcdLongDelay    ;__    __
+002D   1188           00095         bcf             E                               ;  |__|
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE  3
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+002E   2???           00096         call    lcdLongDelay
+002F   0008           00097         return
+                      00098 
+                      00099     ;****************************************
+                      00100     ; Write data to LCD - Input : W , output : -
+                      00101     ;****************************************
+0030                  00102 WR_DATA
+0030   1508           00103         bsf             RS                              
+0031   00??           00104         movwf   dat
+0032   08??           00105         movf    dat,w
+0033   39F0           00106         andlw   0xF0            
+0034   3E04           00107         addlw   4
+0035   0088           00108         movwf   PORTD           
+0036   1588           00109         bsf             E                               ;
+0037   2???           00110         call    lcdLongDelay    ;__    __
+0038   1188           00111         bcf             E                               ;  |__|
+0039   0E??           00112         swapf   dat,w
+003A   39F0           00113         andlw   0xF0            
+003B   3E04           00114         addlw   4
+003C   0088           00115         movwf   PORTD           
+003D   1588           00116         bsf             E                               ;
+003E   2???           00117         call    lcdLongDelay    ;__    __
+003F   1188           00118         bcf             E                               ;  |__|
+0040   0008           00119         return
+                      00120 
+0041                  00121 lcdLongDelay
+0041   3014           00122     movlw d'20'
+0042   00??           00123     movwf lcd_d2
+0043                  00124 LLD_LOOP
+                      00125     LCD_DELAY
+0043   30FF               M         movlw   0xFF
+0044   00??               M         movwf   lcd_d1
+0045   0B??               M         decfsz  lcd_d1,f
+0046   2???               M         goto    $-1
+0047   0B??           00126     decfsz lcd_d2,f
+0048   2???           00127     goto LLD_LOOP
+0049   0008           00128     return
+                      00129     
+                      00130     end
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE  4
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+ACKDT                             00000005
+ACKEN                             00000004
+ACKSTAT                           00000006
+ADCON0                            0000001F
+ADCON1                            0000009F
+ADCS0                             00000006
+ADCS1                             00000007
+ADDEN                             00000003
+ADFM                              00000007
+ADIE                              00000006
+ADIF                              00000006
+ADON                              00000000
+ADRESH                            0000001E
+ADRESL                            0000009E
+BCLIE                             00000003
+BCLIF                             00000003
+BF                                00000000
+BRGH                              00000002
+C                                 00000000
+CCP1CON                           00000017
+CCP1IE                            00000002
+CCP1IF                            00000002
+CCP1M0                            00000000
+CCP1M1                            00000001
+CCP1M2                            00000002
+CCP1M3                            00000003
+CCP1X                             00000005
+CCP1Y                             00000004
+CCP2CON                           0000001D
+CCP2IE                            00000000
+CCP2IF                            00000000
+CCP2M0                            00000000
+CCP2M1                            00000001
+CCP2M2                            00000002
+CCP2M3                            00000003
+CCP2X                             00000005
+CCP2Y                             00000004
+CCPR1                             00000015
+CCPR1H                            00000016
+CCPR1L                            00000015
+CCPR2                             0000001B
+CCPR2H                            0000001C
+CCPR2L                            0000001B
+CHS0                              00000003
+CHS1                              00000004
+CHS2                              00000005
+CKE                               00000006
+CKP                               00000004
+CLR_LCD                           0000001E
+CREN                              00000004
+CSRC                              00000007
+D                                 00000005
+DATA_ADDRESS                      00000005
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE  5
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+DC                                00000001
+D_A                               00000005
+D_NOT_A                           00000005
+E                                 PORTD,3
+EEADR                             0000010D
+EEADRH                            0000010F
+EECON1                            0000018C
+EECON2                            0000018D
+EEDATA                            0000010C
+EEDATH                            0000010E
+EEIE                              00000004
+EEIF                              00000004
+EEPGD                             00000007
+F                                 00000001
+FERR                              00000002
+FSR                               00000004
+GCEN                              00000007
+GIE                               00000007
+GO                                00000002
+GO_DONE                           00000002
+GO_NOT_DONE                       00000002
+I2C_DATA                          00000005
+I2C_READ                          00000002
+I2C_START                         00000003
+I2C_STOP                          00000004
+IBF                               00000007
+IBOV                              00000005
+INDF                              00000000
+INTCON                            0000000B
+INTE                              00000004
+INTEDG                            00000006
+INTF                              00000001
+IRP                               00000007
+InitLCD                           00000000
+LCD_DELAY                         
+LLD_LOOP                          00000043
+NOT_A                             00000005
+NOT_ADDRESS                       00000005
+NOT_BO                            00000000
+NOT_BOR                           00000000
+NOT_DONE                          00000002
+NOT_PD                            00000003
+NOT_POR                           00000001
+NOT_RBPU                          00000007
+NOT_RC8                           00000006
+NOT_T1SYNC                        00000002
+NOT_TO                            00000004
+NOT_TX8                           00000006
+NOT_W                             00000002
+NOT_WRITE                         00000002
+OBF                               00000006
+OERR                              00000001
+OPTION_REG                        00000081
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE  6
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+P                                 00000004
+PCFG0                             00000000
+PCFG1                             00000001
+PCFG2                             00000002
+PCFG3                             00000003
+PCL                               00000002
+PCLATH                            0000000A
+PCON                              0000008E
+PEIE                              00000006
+PEN                               00000002
+PIE1                              0000008C
+PIE2                              0000008D
+PIR1                              0000000C
+PIR2                              0000000D
+PORTA                             00000005
+PORTB                             00000006
+PORTC                             00000007
+PORTD                             00000008
+PORTE                             00000009
+PR2                               00000092
+PS0                               00000000
+PS1                               00000001
+PS2                               00000002
+PSA                               00000003
+PSPIE                             00000007
+PSPIF                             00000007
+PSPMODE                           00000004
+R                                 00000002
+RA0                               00000000
+RA1                               00000001
+RA2                               00000002
+RA3                               00000003
+RA4                               00000004
+RA5                               00000005
+RB0                               00000000
+RB1                               00000001
+RB2                               00000002
+RB3                               00000003
+RB4                               00000004
+RB5                               00000005
+RB6                               00000006
+RB7                               00000007
+RBIE                              00000003
+RBIF                              00000000
+RC0                               00000000
+RC1                               00000001
+RC2                               00000002
+RC3                               00000003
+RC4                               00000004
+RC5                               00000005
+RC6                               00000006
+RC7                               00000007
+RC8_9                             00000006
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE  7
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+RC9                               00000006
+RCD8                              00000000
+RCEN                              00000003
+RCIE                              00000005
+RCIF                              00000005
+RCREG                             0000001A
+RCSTA                             00000018
+RD                                00000000
+RD0                               00000000
+RD1                               00000001
+RD2                               00000002
+RD3                               00000003
+RD4                               00000004
+RD5                               00000005
+RD6                               00000006
+RD7                               00000007
+RE0                               00000000
+RE1                               00000001
+RE2                               00000002
+READ_WRITE                        00000002
+RP0                               00000005
+RP1                               00000006
+RS                                PORTD,2
+RSEN                              00000001
+RX9                               00000006
+RX9D                              00000000
+R_NOT_W                           00000002
+R_W                               00000002
+S                                 00000003
+SEN                               00000000
+SMP                               00000007
+SPBRG                             00000099
+SPEN                              00000007
+SREN                              00000005
+SSPADD                            00000093
+SSPBUF                            00000013
+SSPCON                            00000014
+SSPCON2                           00000091
+SSPEN                             00000005
+SSPIE                             00000003
+SSPIF                             00000003
+SSPM0                             00000000
+SSPM1                             00000001
+SSPM2                             00000002
+SSPM3                             00000003
+SSPOV                             00000006
+SSPSTAT                           00000094
+STATUS                            00000003
+SYNC                              00000004
+T0CS                              00000005
+T0IE                              00000005
+T0IF                              00000002
+T0SE                              00000004
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE  8
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+T1CKPS0                           00000004
+T1CKPS1                           00000005
+T1CON                             00000010
+T1INSYNC                          00000002
+T1OSCEN                           00000003
+T1SYNC                            00000002
+T2CKPS0                           00000000
+T2CKPS1                           00000001
+T2CON                             00000012
+TMR0                              00000001
+TMR0IE                            00000005
+TMR0IF                            00000002
+TMR1                              0000000E
+TMR1CS                            00000001
+TMR1H                             0000000F
+TMR1IE                            00000000
+TMR1IF                            00000000
+TMR1L                             0000000E
+TMR1ON                            00000000
+TMR2                              00000011
+TMR2IE                            00000001
+TMR2IF                            00000001
+TMR2ON                            00000002
+TOUTPS0                           00000003
+TOUTPS1                           00000004
+TOUTPS2                           00000005
+TOUTPS3                           00000006
+TRISA                             00000085
+TRISA0                            00000000
+TRISA1                            00000001
+TRISA2                            00000002
+TRISA3                            00000003
+TRISA4                            00000004
+TRISA5                            00000005
+TRISB                             00000086
+TRISB0                            00000000
+TRISB1                            00000001
+TRISB2                            00000002
+TRISB3                            00000003
+TRISB4                            00000004
+TRISB5                            00000005
+TRISB6                            00000006
+TRISB7                            00000007
+TRISC                             00000087
+TRISC0                            00000000
+TRISC1                            00000001
+TRISC2                            00000002
+TRISC3                            00000003
+TRISC4                            00000004
+TRISC5                            00000005
+TRISC6                            00000006
+TRISC7                            00000007
+TRISD                             00000088
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE  9
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+TRISD0                            00000000
+TRISD1                            00000001
+TRISD2                            00000002
+TRISD3                            00000003
+TRISD4                            00000004
+TRISD5                            00000005
+TRISD6                            00000006
+TRISD7                            00000007
+TRISE                             00000089
+TRISE0                            00000000
+TRISE1                            00000001
+TRISE2                            00000002
+TRMT                              00000001
+TX8_9                             00000006
+TX9                               00000006
+TX9D                              00000000
+TXD8                              00000000
+TXEN                              00000005
+TXIE                              00000004
+TXIF                              00000004
+TXREG                             00000019
+TXSTA                             00000098
+UA                                00000001
+W                                 00000000
+WCOL                              00000007
+WR                                00000001
+WREN                              00000002
+WRERR                             00000003
+WR_DATA                           00000030
+WR_INS                            00000021
+Z                                 00000002
+_.code_0046                       00000046
+_BODEN_OFF                        00003FBF
+_BODEN_ON                         00003FFF
+_BOREN_OFF                        00003FBF
+_BOREN_ON                         00003FFF
+_CONFIG                           00002007
+_CPD_OFF                          00003FFF
+_CPD_ON                           00003EFF
+_CP_ALL                           00000FCF
+_CP_HALF                          00001FDF
+_CP_OFF                           00003FFF
+_CP_UPPER_256                     00002FEF
+_DEBUG_OFF                        00003FFF
+_DEBUG_ON                         000037FF
+_DEVID1                           00002006
+_FOSC_EXTRC                       00003FFF
+_FOSC_HS                          00003FFE
+_FOSC_LP                          00003FFC
+_FOSC_XT                          00003FFD
+_HS_OSC                           00003FFE
+_IDLOC0                           00002000
+_IDLOC1                           00002001
+MPASM 5.65                           LCD.ASM   2-27-2016  18:08:36         PAGE 10
+
+
+SYMBOL TABLE
+  LABEL                             VALUE 
+
+_IDLOC2                           00002002
+_IDLOC3                           00002003
+_LP_OSC                           00003FFC
+_LVP_OFF                          00003F7F
+_LVP_ON                           00003FFF
+_PWRTE_OFF                        00003FFF
+_PWRTE_ON                         00003FF7
+_RC_OSC                           00003FFF
+_WDTE_OFF                         00003FFB
+_WDTE_ON                          00003FFF
+_WDT_OFF                          00003FFB
+_WDT_ON                           00003FFF
+_WRT_ENABLE_OFF                   00003DFF
+_WRT_ENABLE_ON                    00003FFF
+_WRT_OFF                          00003DFF
+_WRT_ON                           00003FFF
+_XT_OSC                           00003FFD
+__16F877                          00000001
+com                               00000003
+dat                               00000004
+lcdLongDelay                      00000041
+lcd_d1                            00000001
+lcd_d2                            00000002
+lcd_tmp                           00000000
+
+Errors   :     0
+Warnings :     0 reported,     0 suppressed
+Messages :     0 reported,     0 suppressed
+
+
