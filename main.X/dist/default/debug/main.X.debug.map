@@ -1,0 +1,223 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Sun Feb 28 14:06:07 2016
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                   .org_0       code   0x000000    program   0x000002
+                   .cinit    romdata   0x000001    program   0x000004
+                   .org_1       code   0x000004    program   0x00048c
+                    .code       code   0x00024a    program   0x000290
+                    dbgP0       code   0x001f00    program   0x000200
+.config_2007_BUILD/DEFAULT/DEBUG/MAIN.O       code   0x002007    program   0x000002
+                    dbgD0      udata   0x000070       data   0x000001
+               .udata_shr      udata   0x000071       data   0x000005
+                    dbgD1      udata   0x0000f0       data   0x000001
+                    dbgD2      udata   0x000170       data   0x000001
+                    dbgD3      udata   0x0001e5       data   0x00000b
+                    dbgD4      udata   0x0001f0       data   0x000001
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000002      
+                            0x000004    0x000391      
+                            0x001f00    0x001fff      
+                            0x002007    0x002007      
+            1170 out of 8454 program addresses used, program memory utilization is 13%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+               ARM_TOGGLE   0x00007f    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   BORROW   0x000230    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                CALIBRATE   0x000054    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  CLR_LCD   0x000268    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                DATA_LOOP   0x0000b8    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  DIV16X8   0x00022a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                    DIV_1   0x00022b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                    DIV_2   0x000234    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 DIV_DONE   0x000236    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   FINISH   0x000249    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+           GET_START_TIME   0x00012d    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+            GET_STOP_TIME   0x000148    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                     INIT   0x000005    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+              INT_HANDLER   0x00005b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  InitLCD   0x00024a    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+           LCD_LONG_DELAY   0x000240    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  LD_LOOP   0x000239    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 LLD_LOOP   0x00028d    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                 LLD_LOOP   0x000242    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 LONG_DLY   0x000237    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  MX_LOOP   0x000072    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                     PWML   0x000066    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  PWML_DN   0x000068    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                     PWMR   0x00006b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  PWMR_DN   0x00006d    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   RD_END   0x00032a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                   RD_ERR   0x000329    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                 READ_IRS   0x000070    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  REALIGN   0x000080    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+              RETURN_HOME   0x0000a5    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                    R_END   0x00038c    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                     SCAN   0x000055    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             SET_RTC_TIME   0x0001c2    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 SHOW_RTC   0x000163    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                START_MSG   0x0000dc    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+              START_STDBY   0x00004a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                STOP_DATA   0x0000ad    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+               STOP_STDBY   0x0000a6    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+           STOP_STDBY_MSG   0x0000f9    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   USHOLD   0x00008f    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+         USONIC_READ_ECHO   0x00008c    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+        USONIC_SEND_PULSE   0x000081    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 WRT_DATA   0x000116    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  WR_DATA   0x00027a    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                   WR_END   0x0002db    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                   WR_ERR   0x0002da    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                   WR_INS   0x00026b    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                    W_END   0x000362    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0010   0x0002a4    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0016   0x0002aa    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_001E   0x0002b2    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_002E   0x0002c2    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_003E   0x0002d2    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0046   0x000290    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+              _.code_004B   0x0002df    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0051   0x0002e5    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0059   0x0002ed    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0069   0x0002fd    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0074   0x000308    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_007C   0x000310    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0087   0x00031b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0093   0x000327    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_009A   0x00032e    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00AE   0x000342    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00B6   0x00034a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00C6   0x00035a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00D2   0x000366    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00D8   0x00036c    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00E0   0x000374    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00EB   0x00037f    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00F7   0x00038b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00FC   0x000390    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+             _.org_1_0050   0x000050    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_0085   0x000085    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_008A   0x00008a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_008D   0x00008d    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_023C   0x00023c    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_0245   0x000245    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+         i2c_common_setup   0x000294    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+             lcdLongDelay   0x00028b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                 p2p_read   0x000368    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                p2p_write   0x00033e    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                 read_rtc   0x0002e1    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              rtc_convert   0x000330    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                write_rtc   0x0002a6    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                      com   0x000074       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                      dat   0x000075       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                   lcd_d1   0x000072       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                   lcd_d2   0x000073       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                  lcd_tmp   0x000071       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                     INIT   0x000005    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+              START_STDBY   0x00004a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_0050   0x000050    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                CALIBRATE   0x000054    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                     SCAN   0x000055    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+              INT_HANDLER   0x00005b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                     PWML   0x000066    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  PWML_DN   0x000068    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                     PWMR   0x00006b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  PWMR_DN   0x00006d    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 READ_IRS   0x000070    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  MX_LOOP   0x000072    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+               ARM_TOGGLE   0x00007f    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  REALIGN   0x000080    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+        USONIC_SEND_PULSE   0x000081    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_0085   0x000085    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_008A   0x00008a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+         USONIC_READ_ECHO   0x00008c    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_008D   0x00008d    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   USHOLD   0x00008f    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+              RETURN_HOME   0x0000a5    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+               STOP_STDBY   0x0000a6    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                STOP_DATA   0x0000ad    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                DATA_LOOP   0x0000b8    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                START_MSG   0x0000dc    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+           STOP_STDBY_MSG   0x0000f9    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 WRT_DATA   0x000116    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+           GET_START_TIME   0x00012d    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+            GET_STOP_TIME   0x000148    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 SHOW_RTC   0x000163    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             SET_RTC_TIME   0x0001c2    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  DIV16X8   0x00022a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                    DIV_1   0x00022b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   BORROW   0x000230    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                    DIV_2   0x000234    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 DIV_DONE   0x000236    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 LONG_DLY   0x000237    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  LD_LOOP   0x000239    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_023C   0x00023c    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+           LCD_LONG_DELAY   0x000240    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                 LLD_LOOP   0x000242    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+             _.org_1_0245   0x000245    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                   FINISH   0x000249    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\main.asm
+                  InitLCD   0x00024a    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                  CLR_LCD   0x000268    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                   WR_INS   0x00026b    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                  WR_DATA   0x00027a    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+             lcdLongDelay   0x00028b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                 LLD_LOOP   0x00028d    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+              _.code_0046   0x000290    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+         i2c_common_setup   0x000294    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0010   0x0002a4    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                write_rtc   0x0002a6    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0016   0x0002aa    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_001E   0x0002b2    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_002E   0x0002c2    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_003E   0x0002d2    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                   WR_ERR   0x0002da    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                   WR_END   0x0002db    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_004B   0x0002df    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                 read_rtc   0x0002e1    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0051   0x0002e5    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0059   0x0002ed    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0069   0x0002fd    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0074   0x000308    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_007C   0x000310    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0087   0x00031b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_0093   0x000327    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                   RD_ERR   0x000329    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                   RD_END   0x00032a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_009A   0x00032e    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              rtc_convert   0x000330    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                p2p_write   0x00033e    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00AE   0x000342    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00B6   0x00034a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00C6   0x00035a    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                    W_END   0x000362    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00D2   0x000366    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                 p2p_read   0x000368    program     extern C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00D8   0x00036c    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00E0   0x000374    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00EB   0x00037f    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00F7   0x00038b    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                    R_END   0x00038c    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+              _.code_00FC   0x000390    program     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\i2c_common.asm
+                  lcd_tmp   0x000071       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                   lcd_d1   0x000072       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                   lcd_d2   0x000073       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                      com   0x000074       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+                      dat   0x000075       data     static C:\Users\Omar Abdeldayem\Desktop\NSCI\YEAR2\SEM2\AER201\MCU\aer201-mcu\main.X\lcd.asm
+
+

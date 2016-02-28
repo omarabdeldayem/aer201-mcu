@@ -46,15 +46,13 @@
 	lcd_d2
 	long_del
 	temp_w	    ; 0x40
-	temp_status
+	temp_status ; 0x41
 		    ; DIVISION Registers
-	COUNT
-	DIVREG0
-	DIVREG1
-	MODREG0
-	MODREG1
-	TEMP0
-	TEMP1
+	DIV_HI	    ; 0X42
+	DIV_LO	    ; 0X43
+	DIVISOR	    ; 0X44
+	Q
+		    ; 0x48 
 		    ; ROBOT VARS
 	start_min
 	start_min10
@@ -207,7 +205,7 @@ SCAN
 	CALL	    PWML
 	CALL	    PWMR
 	CALL	    USONIC_SEND_PULSE
-;	CALL	    USONIC_READ_ECHO
+	CALL	    USONIC_READ_ECHO
 ;	CALL	    SHOW_RTC		    ; DEBUG
 	CALL	    READ_IRS
 	GOTO	    SCAN
@@ -307,13 +305,21 @@ USHOLD	BTFSC	    PORTB, 4
 	GOTO	    USHOLD
 	BCF	    T1CON, 0
 	MOVF	    TMR1H, W
-	MOVWF	    MODREG1
+	MOVWF	    DIV_HI
 	MOVF	    TMR1L, W
-	MOVWF	    MODREG0
-	MOVLW	    d'60'
-	CALL	    DIV16_6
-	MOVF	    DIVREG0, W
+	MOVWF	    DIV_LO
+	CLRF	    TMR1H
+	CLRF	    TMR1L
+
+	MOVLW	    d'58'
+	MOVWF	    DIVISOR
+	CALL	    DIV16X8
+	MOVF	    Q, W
 	MOVWF	    measured_distance
+	CALL	    rtc_convert
+	;CALL	    CLR_LCD		; DEBUG!
+	;WRT_MEM_LCD 0x77
+	;WRT_MEM_LCD 0x78
 	RETURN
 
 ;******************************************************************************;
@@ -552,47 +558,24 @@ SET_RTC_TIME
 ;******************************************************************************;		
 ;******************************************************************************;
 ;******************************************************************************;
-DIV16_6
-    ;SHIFT LEFT BY 10 BITS
-	MOVWF	    TEMP1
-	CLRF	    TEMP0
-	BCF	    STATUS,C
-	RLF	    TEMP1,F
-	RLF	    TEMP1,F
-
-	MOVLW	    11
-	MOVWF	    COUNT
-	CLRF	    DIVREG0
-	CLRF	    DIVREG1
-DIV16_6_LOOP
-	MOVF	    TEMP0,W     ;W=MOD-DIVISOR
-	SUBWF	    MODREG0,W
-	MOVF	    TEMP1,W
-	BTFSS	    STATUS,C    ;PROCESS BORROW
-	ADDLW	    1
-	SUBWF	    MODREG1,W
-
-	BTFSS	    STATUS,C    ;IF W<0
-	GOTO	    DIV16_6_NOSUB
-
-	MOVF	    TEMP0,W     ;MOD=MOD-DIVISOR
-	SUBWF	    MODREG0,F
-	BTFSS	    STATUS,C
-	DECF	    MODREG1,F
-	MOVF	    TEMP1,W
-	SUBWF	    MODREG1,F
-
-	BSF	    STATUS,C
-DIV16_6_NOSUB
-	RLF	    DIVREG0,F   ;DIV << 1 + CARRY
-	RLF	    DIVREG1,F
-
-	BCF	    STATUS,C    ;DIVISOR>>=1
-	RRF	    TEMP1,F
-	RRF	    TEMP0,F
-
-	DECFSZ	    COUNT,F
-	GOTO	    DIV16_6_LOOP
+DIV16X8	; DIV_HI and DIV_LO / DIVSOR.  result to Q
+		; does not deal with divide by 0 case
+	CLRF Q
+DIV_1
+	MOVF DIVISOR, W
+	SUBWF DIV_LO, F
+	BTFSS STATUS, C	; if positive skip
+	GOTO BORROW
+	GOTO DIV_2
+BORROW
+	MOVLW 0x01
+	SUBWF DIV_HI, F	; DIV_HI = DIV_HI - 1
+	BTFSS STATUS, C	; if no borrow occurred
+	GOTO DIV_DONE	
+DIV_2
+	INCF Q, F
+	GOTO DIV_1
+DIV_DONE
 	RETURN
 	
 LONG_DLY
