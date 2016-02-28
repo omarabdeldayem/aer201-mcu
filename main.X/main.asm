@@ -47,6 +47,14 @@
 	long_del
 	temp_w	    ; 0x40
 	temp_status
+		    ; DIVISION Registers
+	COUNT
+	DIVREG0
+	DIVREG1
+	MODREG0
+	MODREG1
+	TEMP0
+	TEMP1
 		    ; ROBOT VARS
 	start_min
 	start_min10
@@ -57,7 +65,6 @@
 	stop_sec
 	stop_sec10
 	multiplex_count
-	threshold_distance
 	rob_distance
 	measured_distance
 	rob_return
@@ -66,6 +73,10 @@
 	spot_base_loc
 	ENDC
 
+;******************************************************************************;
+;				BANK0 RAM				       ;
+;******************************************************************************;
+	#define	    crit_dist	    d'5'
 ;******************************************************************************;
 ;				MACROS					       ;
 ;******************************************************************************;
@@ -143,6 +154,11 @@ INIT
 	CLRF	    TMR2
 	BSF	    T2CON, TMR2ON
 	
+	MOVLW	    0X10		; TMR1 for Ultrasonic Sensors
+	MOVWF	    T1CON
+	CLRF	    TMR1H
+	CLRF	    TMR1L
+	
 	clrf	    PORTA
         clrf	    PORTB
         clrf	    PORTC 
@@ -190,7 +206,7 @@ CALIBRATE
 SCAN
 	CALL	    PWML
 	CALL	    PWMR
-;	CALL	    USONIC_SEND_PULSE
+	CALL	    USONIC_SEND_PULSE
 ;	CALL	    USONIC_READ_ECHO
 ;	CALL	    SHOW_RTC		    ; DEBUG
 	CALL	    READ_IRS
@@ -278,12 +294,26 @@ REALIGN
 ;******************************************************************************;
 USONIC_SEND_PULSE
 	BSF	    PORTB, 3
-	CALL	    LCD_DLY
+	LCD_DLY
 	BCF	    PORTB, 3
-	CALL	    LCD_DLY
+	LCD_DLY
 	RETURN
 
 USONIC_READ_ECHO
+	BTFSS	    PORTB, 4
+	GOTO	    $-1
+	BSF	    T1CON, 0
+USHOLD	BTFSC	    PORTB, 4
+	GOTO	    USHOLD
+	BCF	    T1CON, 0
+	MOVF	    TMR1H, W
+	MOVWF	    MODREG1
+	MOVF	    TMR1L, W
+	MOVWF	    MODREG0
+	MOVLW	    d'60'
+	CALL	    DIV16_6
+	MOVF	    DIVREG0, W
+	MOVWF	    measured_distance
 	RETURN
 
 ;******************************************************************************;
@@ -416,7 +446,8 @@ WRT_DATA
 	WRT_LCD	    " "
 ;	WRT_MEM_LCD num_spots
 	RETURN
-;******************************************************************************;		
+;******************************************************************************;
+;			    RETREIVE START TIME				       ;
 ;******************************************************************************;
 GET_START_TIME
 	;Get minute		
@@ -433,7 +464,8 @@ GET_START_TIME
 	MOVFW	    0X78
 	MOVWF	    start_sec
 	RETURN
-;******************************************************************************;		
+;******************************************************************************;
+;			    RETREIVE STOP TIME				       ;
 ;******************************************************************************;
 GET_STOP_TIME
 	;Get minute		
@@ -450,7 +482,8 @@ GET_STOP_TIME
 	MOVFW	    0X78
 	MOVWF	    stop_sec
 	RETURN
-;******************************************************************************;		
+;******************************************************************************;
+;			DISPLAY RTC TIME TO LCD				       ;
 ;******************************************************************************;
 SHOW_RTC
 	;clear LCD screen
@@ -498,7 +531,8 @@ SHOW_RTC
 	WRT_MEM_LCD 0x78
 
 	RETURN
-;******************************************************************************;		
+;******************************************************************************;
+;			INITIALIZE RTC TIME				       ;
 ;******************************************************************************;		
 SET_RTC_TIME
 	rtc_resetAll	;reset rtc
@@ -518,8 +552,51 @@ SET_RTC_TIME
 ;******************************************************************************;		
 ;******************************************************************************;
 ;******************************************************************************;
+DIV16_6
+    ;SHIFT LEFT BY 10 BITS
+	MOVWF	    TEMP1
+	CLRF	    TEMP0
+	BCF	    STATUS,C
+	RLF	    TEMP1,F
+	RLF	    TEMP1,F
+
+	MOVLW	    11
+	MOVWF	    COUNT
+	CLRF	    DIVREG0
+	CLRF	    DIVREG1
+DIV16_6_LOOP
+	MOVF	    TEMP0,W     ;W=MOD-DIVISOR
+	SUBWF	    MODREG0,W
+	MOVF	    TEMP1,W
+	BTFSS	    STATUS,C    ;PROCESS BORROW
+	ADDLW	    1
+	SUBWF	    MODREG1,W
+
+	BTFSS	    STATUS,C    ;IF W<0
+	GOTO	    DIV16_6_NOSUB
+
+	MOVF	    TEMP0,W     ;MOD=MOD-DIVISOR
+	SUBWF	    MODREG0,F
+	BTFSS	    STATUS,C
+	DECF	    MODREG1,F
+	MOVF	    TEMP1,W
+	SUBWF	    MODREG1,F
+
+	BSF	    STATUS,C
+DIV16_6_NOSUB
+	RLF	    DIVREG0,F   ;DIV << 1 + CARRY
+	RLF	    DIVREG1,F
+
+	BCF	    STATUS,C    ;DIVISOR>>=1
+	RRF	    TEMP1,F
+	RRF	    TEMP0,F
+
+	DECFSZ	    COUNT,F
+	GOTO	    DIV16_6_LOOP
+	RETURN
+	
 LONG_DLY
-	MOVLW	    0xFFFF
+	MOVLW	    0xFF
 	MOVWF	    long_del
 LD_LOOP	
 	LCD_DLY

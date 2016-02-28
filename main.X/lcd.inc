@@ -1,3 +1,3 @@
-extern	InitLCD,WR_INS,WR_DATA,CLR_LCD
+    extern	InitLCD,WR_INS,WR_DATA,CLR_LCD
 
 
