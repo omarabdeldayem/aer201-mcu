@@ -52,7 +52,9 @@
 	DIV_LO	    ; 0X43
 	DIVISOR	    ; 0X44
 	Q
-		    ; 0x48 
+	d1
+	d2
+	d3
 		    ; ROBOT VARS
 	start_min
 	start_min10
@@ -98,13 +100,6 @@ LCD_INS	macro	    val
 WRT_MEM_LCD macro   val
 	MOVFW	    val
 	CALL	    WR_DATA
-	endm
-
-LCD_DLY macro				;Delay ~160us
-	MOVLW	    0xFF
-	MOVWF	    lcd_d1
-	DECFSZ	    lcd_d1, f
-	GOTO	    $-1
 	endm
 
 ;******************************************************************************;
@@ -202,10 +197,10 @@ CALIBRATE
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-	CALL	    PWML
-	CALL	    PWMR
 	CALL	    USONIC_SEND_PULSE
 	CALL	    USONIC_READ_ECHO
+	CALL	    PWML
+	CALL	    PWMR
 ;	CALL	    SHOW_RTC		    ; DEBUG
 	CALL	    READ_IRS
 	GOTO	    SCAN
@@ -292,9 +287,8 @@ REALIGN
 ;******************************************************************************;
 USONIC_SEND_PULSE
 	BSF	    PORTB, 3
-	LCD_DLY
+	CALL	    DEL_20US
 	BCF	    PORTB, 3
-	LCD_DLY
 	RETURN
 
 USONIC_READ_ECHO
@@ -586,16 +580,15 @@ LD_LOOP
 	DECFSZ	    long_del, f
 	GOTO	    LD_LOOP
 	RETURN
-	
-    ;Delay: ~5ms
-LCD_LONG_DELAY
-	MOVLW	    d'20'
-	MOVWF	    lcd_d2
-LLD_LOOP
-	LCD_DLY
-	DECFSZ	    lcd_d2, f
-	GOTO	    LLD_LOOP
+
+DEL_20US
+	movlw	0x21
+	movwf	d1
+DEL_20US_0
+	decfsz	d1, f
+	goto	DEL_20US_0
 	RETURN
+
 FINISH	
 	GOTO	FINISH
 	
