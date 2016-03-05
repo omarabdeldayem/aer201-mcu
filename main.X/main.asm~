@@ -64,10 +64,8 @@
 	stop_min10
 	stop_sec
 	stop_sec10
-	spot_detected
 	multiplex_count
-	rob_lat_distance
-	rob_long_distance
+	rob_distance
 	measured_distance
 	rob_return
 	spot_count
@@ -118,10 +116,7 @@ WRT_MEM_LCD macro   val
 INIT
 	BSF	    STATUS, RP0		; Select bank 1
 	CLRF	    INTCON		; Disable interrupts for now
-	
-	MOVLW	    0x06
-	MOVWF	    ADCON1
-	
+					
 	MOVLW	    b'00011000'		; PORT A pin mapping
 	MOVWF	    TRISA
 	MOVLW	    b'11110011'		; PORT B pin mapping
@@ -131,8 +126,8 @@ INIT
 	CLRF	    TRISD	    	; PORT D pin mapping
 	MOVLW	    b'00000111'		; PORT E pin mapping
 	MOVWF	    TRISE
-	
-	MOVLW	    b'01000001'		; PWM pulsing period (484Hz)
+		     
+	MOVLW	    b'10000000'		; PWM pulsing period (484Hz)
 	MOVWF	    PR2
        
 	BCF	    STATUS, RP0		; select bank 0
@@ -141,13 +136,13 @@ INIT
 ;	BSF	    INTCON, INTE
 ;	BSF	    INTCON, GIE
 	
-	CLRF	    CCPR1L		; Se Btup PWM pins
+	CLRF	    CCPR1L		; Setup PWM pins
 	CLRF	    CCPR2L
-	MOVLW	    B'10011100'
+	MOVLW	    B'00001100'
 	MOVWF	    CCP1CON
 	MOVWF	    CCP2CON
 	
-	MOVLW	    B'00000101'		; Initialize and start timer 2
+	MOVLW	    B'00000010'		; Initialize and start timer 2
 	MOVWF	    T2CON
 	CLRF	    TMR2
 	BSF	    T2CON, TMR2ON
@@ -162,17 +157,18 @@ INIT
         clrf	    PORTC 
         clrf	    PORTD
 	 
-;	CALL 	    i2c_common_setup
-;		    rtc_resetAll
-;	CALL	    SET_RTC_TIME
+	CALL 	    i2c_common_setup
+		    rtc_resetAll
+	CALL	    SET_RTC_TIME
 	CALL	    InitLCD
 	
 	MOVLW	    b'0'		; Initialize variables
     	MOVWF	    num_spots
 	MOVWF	    spot_count
-	MOVWF	    spot_detected	
-						
+					
+					
 	CALL	    START_MSG
+
 ;******************************************************************************;
 ;			 ROBOT START AND STANDBY			       ;
 ;******************************************************************************;
@@ -188,10 +184,7 @@ START_STDBY
 	GOTO	    $-1
 	
 	CALL	    CLR_LCD
-	;CALL	    GET_START_TIME
-	BSF	    PORTD, 7
-	BSF	    PORTD, 6
-
+	CALL	    GET_START_TIME
 	GOTO	    SCAN
 
 ;******************************************************************************;
@@ -204,12 +197,12 @@ CALIBRATE
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-;	CALL	    USONIC_SEND_PULSE
-;	CALL	    USONIC_READ_ECHO
+	CALL	    USONIC_SEND_PULSE
+	CALL	    USONIC_READ_ECHO
 	CALL	    PWML
 	CALL	    PWMR
 ;	CALL	    SHOW_RTC		    ; DEBUG
-	;CALL	    READ_IRS
+	CALL	    READ_IRS
 	GOTO	    SCAN
 	
 ;******************************************************************************;
@@ -221,9 +214,6 @@ INT_HANDLER
 	MOVWF	    temp_status
 	BCF	    INTCON, RBIF
 	BCF	    INTCON, INTF	  ; Clear the interrupt flag
-	
-	CALL	    WHL_ENC
-	
 	SWAPF	    temp_status, W
 	MOVWF	    STATUS
 	SWAPF	    temp_w, F
@@ -236,8 +226,6 @@ INT_HANDLER
 ;******************************************************************************;
 PWML	
 	INCFSZ	    CCPR1L
-	;CALL	    DEL_20US
-	;CALL	    DEL_20US
 	GOTO	    PWML
 PWML_DN	
 	DECFSZ	    CCPR1L
@@ -246,7 +234,6 @@ PWML_DN
 
 PWMR	
 	INCFSZ	    CCPR2L
-	;CALL	    DEL_20US
 	GOTO	    PWMR
 PWMR_DN	
 	DECFSZ	    CCPR2L
@@ -257,56 +244,27 @@ PWMR_DN
 ;			CYCLE INFRARED SENSORS   			       ;
 ;******************************************************************************;
 READ_IRS
-	MOVLW	    d'0'
+	MOVLW	    d'7'
 	MOVWF	    multiplex_count
 MX_LOOP	
-	;CALL	    LONG_DLY
-	BCF	    PORTE, 0
-	BTFSC	    multiplex_count, 0
-	BSF	    PORTE, 0
+	CALL	    LONG_DLY
+	;BCF	    PORTE, 0
+	;BTFSC	    multiplex_count, 0
+	;BSF	    PORTE, 0
 	BCF	    PORTA, 0
-	BTFSC	    multiplex_count, 1
+	BTFSC	    multiplex_count, 0
 	BSF	    PORTA, 0
 	BCF	    PORTA, 1
-	BTFSC	    multiplex_count, 2
+	BTFSC	    multiplex_count, 1
 	BSF	    PORTA, 1
 	BCF	    PORTA, 2
-	BTFSC	    multiplex_count, 3
+	BTFSC	    multiplex_count, 2
 	BSF	    PORTA, 2
-	
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY	
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	CALL	    LONG_DLY
-	
-	BTFSS	    PORTC, 0
-	GOTO	    $+3
-	BSF	    PORTA, 5
-	MOVFW	    rob_long_distance			; Save spot location
-	ADDWF	    (spot_base_loc + num_spots), F
-	INCF	    num_spots, f
-	INCF	    multiplex_count
-	MOVFW	    multiplex_count
-	BCF	    PORTA, 5
-	SUBLW	    d'16'
-	BTFSS	    STATUS, 2
+	;BTFSS	    PORTC, 0
+	;GOTO	    $+2
+	;INCF	    num_spots, f
+	DECFSZ	    multiplex_count
 	GOTO	    MX_LOOP
-	RETURN
-;******************************************************************************;
-;			  WHEEL ENCODER ROUTINE   			       ;
-;******************************************************************************;
-WHL_ENC
-	MOVLW	    d'19'
-	ADDWF	    rob_long_distance
 	RETURN
 	
 ;******************************************************************************;
@@ -322,8 +280,6 @@ ARM_TOGGLE
 ;			  ROBOT REALIGNMENT ROUTINE	    		       ;
 ;******************************************************************************;
 REALIGN
-	MOVLW	    0x03
-;	SUBWF	    
 	RETURN
 	
 ;******************************************************************************;
@@ -348,18 +304,16 @@ USHOLD	BTFSC	    PORTB, 4
 	MOVWF	    DIV_LO
 	CLRF	    TMR1H
 	CLRF	    TMR1L
+
 	MOVLW	    d'58'
 	MOVWF	    DIVISOR
 	CALL	    DIV16X8
 	MOVF	    Q, W
 	MOVWF	    measured_distance
-	; CALL	    rtc_convert
+	CALL	    rtc_convert
 	;CALL	    CLR_LCD		; DEBUG!
 	;WRT_MEM_LCD 0x77
 	;WRT_MEM_LCD 0x78
-	SUBLW	    0x05
-	MOVWF	    rob_lat_distance
-	;BTFSC	    STATUS
 	RETURN
 
 ;******************************************************************************;
@@ -375,7 +329,7 @@ RETURN_HOME
 ;******************************************************************************;
 STOP_STDBY
 	CALL	    GET_STOP_TIME
-	CALL	    STOP_STDBY_MSG
+;	CALL	    STOP_STDBY_MSG
 	BTFSS	    PORTB, 1	    	; Wait until data is available from the keypad
 	GOTO	    STOP_STDBY
 
