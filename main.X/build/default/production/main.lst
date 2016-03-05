@@ -1,4 +1,4 @@
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE  1
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -57,7 +57,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00014         call        write_rtc           ;Write 0 to Seconds
                       00015         banksel     0x73
                       00016         incf        0x73                        ;Set register address to 1
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE  2
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -116,7 +116,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00067 
                       00068 
                       00069 
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE  3
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -175,7 +175,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
   00000055            00071         measured_distance
   00000056            00072         rob_return
   00000057            00073         spot_count
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE  4
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -234,7 +234,7 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
 0008   009F           00123         MOVWF       ADCON1
                       00124         
 0009   3018           00125         MOVLW       b'00011000'         ; PORT A pin mapping
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE  5
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -260,1013 +260,1022 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
                       00137        
 0014   1283           00138         BCF         STATUS, RP0         ; select bank 0
                       00139         
-                      00140 ;       BSF         INTCON, RBIE        ; Enable interrupts
-                      00141 ;       BSF         INTCON, INTE
-                      00142 ;       BSF         INTCON, GIE
-                      00143         
-0015   0195           00144         CLRF        CCPR1L              ; Se Btup PWM pins
-0016   019B           00145         CLRF        CCPR2L
-0017   309C           00146         MOVLW       B'10011100'
-0018   0097           00147         MOVWF       CCP1CON
-0019   009D           00148         MOVWF       CCP2CON
-                      00149         
-001A   3005           00150         MOVLW       B'00000101'         ; Initialize and start timer 2
-001B   0092           00151         MOVWF       T2CON
-001C   0191           00152         CLRF        TMR2
-001D   1512           00153         BSF         T2CON, TMR2ON
-                      00154         
-001E   3010           00155         MOVLW       0X10                ; TMR1 for Ultrasonic Sensors
-001F   0090           00156         MOVWF       T1CON
-0020   018F           00157         CLRF        TMR1H
-0021   018E           00158         CLRF        TMR1L
-                      00159         
-0022   0185           00160         clrf        PORTA
-0023   0186           00161         clrf        PORTB
-0024   0187           00162         clrf        PORTC 
-0025   0188           00163         clrf        PORTD
-                      00164          
-                      00165 ;       CALL        i2c_common_setup
-                      00166 ;                   rtc_resetAll
-                      00167 ;       CALL        SET_RTC_TIME
-0026   2???           00168         CALL        InitLCD
-                      00169         
-0027   3000           00170         MOVLW       b'0'                ; Initialize variables
-0028   00D8           00171         MOVWF       num_spots
-0029   00D7           00172         MOVWF       spot_count
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE  6
+                      00140 ;       
+                      00141         
+0015   0195           00142         CLRF        CCPR1L              ; Se Btup PWM pins
+0016   019B           00143         CLRF        CCPR2L
+0017   309C           00144         MOVLW       B'10011100'
+0018   0097           00145         MOVWF       CCP1CON
+0019   009D           00146         MOVWF       CCP2CON
+                      00147         
+001A   3005           00148         MOVLW       B'00000101'         ; Initialize and start timer 2
+001B   0092           00149         MOVWF       T2CON
+001C   0191           00150         CLRF        TMR2
+001D   1512           00151         BSF         T2CON, TMR2ON
+                      00152         
+001E   3010           00153         MOVLW       0X10                ; TMR1 for Ultrasonic Sensors
+001F   0090           00154         MOVWF       T1CON
+0020   018F           00155         CLRF        TMR1H
+0021   018E           00156         CLRF        TMR1L
+                      00157         
+0022   0185           00158         clrf        PORTA
+0023   0186           00159         clrf        PORTB
+0024   0187           00160         clrf        PORTC 
+0025   0188           00161         clrf        PORTD
+                      00162          
+                      00163 ;       CALL        i2c_common_setup
+                      00164 ;                   rtc_resetAll
+                      00165 ;       CALL        SET_RTC_TIME
+0026   2???           00166         CALL        InitLCD
+                      00167         
+0027   3000           00168         MOVLW       b'0'                ; Initialize variables
+0028   00D8           00169         MOVWF       num_spots
+0029   00D7           00170         MOVWF       spot_count
+002A   00D1           00171         MOVWF       spot_detected       
+                      00172                                                 
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-002A   00D1           00173         MOVWF       spot_detected       
-                      00174                                                 
-002B   2???           00175         CALL        START_MSG
+002B   2???           00173         CALL        START_MSG
+                      00174 ;******************************************************************************;
+                      00175 ;                        ROBOT START AND STANDBY                               ;
                       00176 ;******************************************************************************;
-                      00177 ;                        ROBOT START AND STANDBY                               ;
-                      00178 ;******************************************************************************;
-002C                  00179 START_STDBY
-002C   1C86           00180         BTFSS       PORTB, 1            ; Wait until data is available from the keypad
-002D   2???           00181         GOTO        START_STDBY
-                      00182 
-002E   0E06           00183         SWAPF       PORTB, W            ; Read PortB<7:4> into W<3:0>
-002F   390F           00184         ANDLW       0x0F
-0030   2???           00185         CALL        CLR_LCD
-                      00186 
-0031   1886           00187         BTFSC       PORTB,1             ; Wait until key is released
-0032   2???           00188         GOTO        $-1
-                      00189         
-0033   2???           00190         CALL        CLR_LCD
-                      00191         ;CALL       GET_START_TIME
-0034   1788           00192         BSF         PORTD, 7
-0035   1708           00193         BSF         PORTD, 6
+002C                  00177 START_STDBY
+002C   1C86           00178         BTFSS       PORTB, 1            ; Wait until data is available from the keypad
+002D   2???           00179         GOTO        START_STDBY
+                      00180 
+002E   0E06           00181         SWAPF       PORTB, W            ; Read PortB<7:4> into W<3:0>
+002F   390F           00182         ANDLW       0x0F
+0030   2???           00183         CALL        CLR_LCD
+                      00184 
+0031   1886           00185         BTFSC       PORTB,1             ; Wait until key is released
+0032   2???           00186         GOTO        $-1
+                      00187         
+0033   2???           00188         CALL        CLR_LCD
+                      00189         ;CALL       GET_START_TIME
+0034   2???           00190         CALL        ARM_TOGGLE
+0035   1788           00191         BSF         PORTD, 7
+0036   1708           00192         BSF         PORTD, 6
+0037   2???           00193         GOTO        CALIBRATE
                       00194 
-0036   2???           00195         GOTO        SCAN
-                      00196 
+                      00195 ;******************************************************************************;
+                      00196 ;                           SENSOR CALIBRATION                                 ;
                       00197 ;******************************************************************************;
-                      00198 ;                           SENSOR CALIBRATION                                 ;
-                      00199 ;******************************************************************************;
-0037                  00200 CALIBRATE
-0037   2???           00201         GOTO        CALIBRATE
-                      00202         
-                      00203 ;******************************************************************************;
-                      00204 ;                         PIPE SCAN SUPERLOOP                                  ;
-                      00205 ;******************************************************************************;
-0038                  00206 SCAN
-                      00207 ;       CALL        USONIC_SEND_PULSE
-                      00208 ;       CALL        USONIC_READ_ECHO
-0038   2???           00209         CALL        PWML
-0039   2???           00210         CALL        PWMR
-                      00211 ;       CALL        SHOW_RTC                ; DEBUG
-                      00212         ;CALL       READ_IRS
-003A   2???           00213         GOTO        SCAN
-                      00214         
-                      00215 ;******************************************************************************;
-                      00216 ;                          INTERRUPT HANDLER                                   ;
-                      00217 ;******************************************************************************;
-003B                  00218 INT_HANDLER
-003B   00C0           00219         MOVWF       temp_w
-003C   0E03           00220         SWAPF       STATUS, W
-003D   00C1           00221         MOVWF       temp_status
-003E   100B           00222         BCF         INTCON, RBIF
-003F   108B           00223         BCF         INTCON, INTF          ; Clear the interrupt flag
-                      00224         
-0040   2???           00225         CALL        WHL_ENC
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE  7
+0038                  00198 CALIBRATE
+0038   2???           00199         CALL        PWML
+0039   2???           00200         CALL        PWMR
+003A   2???           00201         CALL        USONIC_SEND_PULSE
+003B   2???           00202         CALL        USONIC_READ_ECHO
+003C   0853           00203         MOVFW       rob_lat_distance
+003D   3C04           00204         SUBLW       0x04
+003E   1D03           00205         BTFSS       STATUS, 2
+003F   2???           00206         GOTO        CALIBRATE
+0040   158B           00207         BSF         INTCON, RBIE            ; Enable interrupts
+0041   160B           00208         BSF         INTCON, INTE
+0042   178B           00209         BSF         INTCON, GIE
+0043   2???           00210         GOTO        SCAN
+                      00211         
+                      00212 ;******************************************************************************;
+                      00213 ;                         PIPE SCAN SUPERLOOP                                  ;
+                      00214 ;******************************************************************************;
+0044                  00215 SCAN
+                      00216 ;       CALL        USONIC_SEND_PULSE
+                      00217 ;       CALL        USONIC_READ_ECHO
+0044   2???           00218         CALL        PWML
+0045   2???           00219         CALL        PWMR
+                      00220 ;       CALL        SHOW_RTC                ; DEBUG
+                      00221         ;CALL       READ_IRS
+0046   2???           00222         GOTO        SCAN
+                      00223         
+                      00224 ;******************************************************************************;
+                      00225 ;                          INTERRUPT HANDLER                                   ;
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00226         
-0041   0E41           00227         SWAPF       temp_status, W
-0042   0083           00228         MOVWF       STATUS
-0043   0EC0           00229         SWAPF       temp_w, F
-0044   0E40           00230         SWAPF       temp_w, W
-0045   2???           00231         GOTO        STOP_STDBY
-0046   0009           00232         RETFIE
+                      00226 ;******************************************************************************;
+0047                  00227 INT_HANDLER
+0047   00C0           00228         MOVWF       temp_w
+0048   0E03           00229         SWAPF       STATUS, W
+0049   00C1           00230         MOVWF       temp_status
+004A   100B           00231         BCF         INTCON, RBIF
+004B   108B           00232         BCF         INTCON, INTF          ; Clear the interrupt flag
                       00233         
-                      00234 ;******************************************************************************;
-                      00235 ;                           PWM CONTROL                                        ;
-                      00236 ;******************************************************************************;
-0047                  00237 PWML    
+004C   2???           00234         CALL        WHL_ENC
+                      00235         
+004D   0E41           00236         SWAPF       temp_status, W
+004E   0083           00237         MOVWF       STATUS
+004F   0EC0           00238         SWAPF       temp_w, F
+0050   0E40           00239         SWAPF       temp_w, W
+0051   2???           00240         GOTO        STOP_STDBY
+0052   0009           00241         RETFIE
+                      00242         
+                      00243 ;******************************************************************************;
+                      00244 ;                           PWM CONTROL                                        ;
+                      00245 ;******************************************************************************;
+0053                  00246 PWML    
 Message[305]: Using default destination of 1 (file).
-0047   0F95           00238         INCFSZ      CCPR1L
-                      00239         ;CALL       DEL_20US
-                      00240         ;CALL       DEL_20US
-0048   2???           00241         GOTO        PWML
-0049                  00242 PWML_DN 
-Message[305]: Using default destination of 1 (file).
-0049   0B95           00243         DECFSZ      CCPR1L
-004A   2???           00244         GOTO        PWML_DN
-004B   0008           00245         RETURN
-                      00246 
-004C                  00247 PWMR    
-Message[305]: Using default destination of 1 (file).
-004C   0F9B           00248         INCFSZ      CCPR2L
+0053   0F95           00247         INCFSZ      CCPR1L
+                      00248         ;CALL       DEL_20US
                       00249         ;CALL       DEL_20US
-004D   2???           00250         GOTO        PWMR
-004E                  00251 PWMR_DN 
+0054   2???           00250         GOTO        PWML
+0055                  00251 PWML_DN 
 Message[305]: Using default destination of 1 (file).
-004E   0B9B           00252         DECFSZ      CCPR2L
-004F   2???           00253         GOTO        PWMR_DN
-0050   0008           00254         RETURN
+0055   0B95           00252         DECFSZ      CCPR1L
+0056   2???           00253         GOTO        PWML_DN
+0057   0008           00254         RETURN
                       00255 
-                      00256 ;******************************************************************************;
-                      00257 ;                       CYCLE INFRARED SENSORS                                 ;
-                      00258 ;******************************************************************************;
-0051                  00259 READ_IRS
-0051   3000           00260         MOVLW       d'0'
-0052   00D2           00261         MOVWF       multiplex_count
-0053                  00262 MX_LOOP 
-                      00263         ;CALL       LONG_DLY
-0053   1009           00264         BCF         PORTE, 0
-0054   1852           00265         BTFSC       multiplex_count, 0
-0055   1409           00266         BSF         PORTE, 0
-0056   1005           00267         BCF         PORTA, 0
-0057   18D2           00268         BTFSC       multiplex_count, 1
-0058   1405           00269         BSF         PORTA, 0
-0059   1085           00270         BCF         PORTA, 1
-005A   1952           00271         BTFSC       multiplex_count, 2
-005B   1485           00272         BSF         PORTA, 1
-005C   1105           00273         BCF         PORTA, 2
-005D   19D2           00274         BTFSC       multiplex_count, 3
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE  8
+0058                  00256 PWMR    
+Message[305]: Using default destination of 1 (file).
+0058   0F9B           00257         INCFSZ      CCPR2L
+                      00258         ;CALL       DEL_20US
+0059   2???           00259         GOTO        PWMR
+005A                  00260 PWMR_DN 
+Message[305]: Using default destination of 1 (file).
+005A   0B9B           00261         DECFSZ      CCPR2L
+005B   2???           00262         GOTO        PWMR_DN
+005C   0008           00263         RETURN
+                      00264 
+                      00265 ;******************************************************************************;
+                      00266 ;                       CYCLE INFRARED SENSORS                                 ;
+                      00267 ;******************************************************************************;
+005D                  00268 READ_IRS
+005D   3000           00269         MOVLW       d'0'
+005E   00D2           00270         MOVWF       multiplex_count
+005F                  00271 MX_LOOP 
+                      00272         ;CALL       LONG_DLY
+005F   1009           00273         BCF         PORTE, 0
+0060   1852           00274         BTFSC       multiplex_count, 0
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-005E   1505           00275         BSF         PORTA, 2
-                      00276         
-005F   2???           00277         CALL        LONG_DLY
-0060   2???           00278         CALL        LONG_DLY
-0061   2???           00279         CALL        LONG_DLY
-0062   2???           00280         CALL        LONG_DLY    
-0063   2???           00281         CALL        LONG_DLY
-0064   2???           00282         CALL        LONG_DLY
-0065   2???           00283         CALL        LONG_DLY
-0066   2???           00284         CALL        LONG_DLY
-0067   2???           00285         CALL        LONG_DLY
-0068   2???           00286         CALL        LONG_DLY
-0069   2???           00287         CALL        LONG_DLY
-006A   2???           00288         CALL        LONG_DLY
-006B   2???           00289         CALL        LONG_DLY
-                      00290         
-006C   1C07           00291         BTFSS       PORTC, 0
-006D   2???           00292         GOTO        $+3
-006E   1685           00293         BSF         PORTA, 5
-006F   0854           00294         MOVFW       rob_long_distance                   ; Save spot location
+0061   1409           00275         BSF         PORTE, 0
+0062   1005           00276         BCF         PORTA, 0
+0063   18D2           00277         BTFSC       multiplex_count, 1
+0064   1405           00278         BSF         PORTA, 0
+0065   1085           00279         BCF         PORTA, 1
+0066   1952           00280         BTFSC       multiplex_count, 2
+0067   1485           00281         BSF         PORTA, 1
+0068   1105           00282         BCF         PORTA, 2
+0069   19D2           00283         BTFSC       multiplex_count, 3
+006A   1505           00284         BSF         PORTA, 2
+                      00285         
+006B   2???           00286         CALL        LONG_DLY
+006C   2???           00287         CALL        LONG_DLY
+006D   2???           00288         CALL        LONG_DLY
+006E   2???           00289         CALL        LONG_DLY    
+006F   2???           00290         CALL        LONG_DLY
+0070   2???           00291         CALL        LONG_DLY
+0071   2???           00292         CALL        LONG_DLY
+0072   2???           00293         CALL        LONG_DLY
+0073   2???           00294         CALL        LONG_DLY
+0074   2???           00295         CALL        LONG_DLY
+0075   2???           00296         CALL        LONG_DLY
+0076   2???           00297         CALL        LONG_DLY
+0077   2???           00298         CALL        LONG_DLY
+                      00299         
+0078   1C07           00300         BTFSS       PORTC, 0
+0079   2???           00301         GOTO        $+3
+007A   1685           00302         BSF         PORTA, 5                            ; Buzzer start
+007B   0854           00303         MOVFW       rob_long_distance                   ; Save spot location
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0070   07B1           00295         ADDWF       (spot_base_loc + num_spots), F
-0071   0AD8           00296         INCF        num_spots, f
+007C   07B1           00304         ADDWF       (spot_base_loc + num_spots), F
+007D   0AD8           00305         INCF        num_spots, f                        ; Increase number of spots
 Message[305]: Using default destination of 1 (file).
-0072   0AD2           00297         INCF        multiplex_count
-0073   0852           00298         MOVFW       multiplex_count
-0074   1285           00299         BCF         PORTA, 5
-0075   3C10           00300         SUBLW       d'16'
-0076   1D03           00301         BTFSS       STATUS, 2
-0077   2???           00302         GOTO        MX_LOOP
-0078   0008           00303         RETURN
-                      00304 ;******************************************************************************;
-                      00305 ;                         WHEEL ENCODER ROUTINE                                ;
-                      00306 ;******************************************************************************;
-0079                  00307 WHL_ENC
-0079   3013           00308         MOVLW       d'19'
+007E   0AD2           00306         INCF        multiplex_count
+007F   0852           00307         MOVFW       multiplex_count
+0080   1285           00308         BCF         PORTA, 5                            ; Buzzer stop
+0081   3C10           00309         SUBLW       d'16'                               ; Test if all IRs have been checked
+0082   1D03           00310         BTFSS       STATUS, 2
+0083   2???           00311         GOTO        MX_LOOP
+0084   0008           00312         RETURN
+                      00313 ;******************************************************************************;
+                      00314 ;                         WHEEL ENCODER ROUTINE                                ;
+                      00315 ;******************************************************************************;
+0085                  00316 WHL_ENC
+0085   3013           00317         MOVLW       d'19'
 Message[305]: Using default destination of 1 (file).
-007A   07D4           00309         ADDWF       rob_long_distance
-007B   0008           00310         RETURN
-                      00311         
-                      00312 ;******************************************************************************;
-                      00313 ;                       TOGGLE ARM STATE ROUTINE                               ;
-                      00314 ;******************************************************************************;
-007C                  00315 ARM_TOGGLE
-                      00316         ; control servo to control arm
-                      00317         ; if degree is set to 180, set to 0
-                      00318         ; otherwise set to 0
-007C   2???           00319         GOTO        ARM_TOGGLE
-                      00320 
+0086   07D4           00318         ADDWF       rob_long_distance
+0087   0008           00319         RETURN
+                      00320         
                       00321 ;******************************************************************************;
-                      00322 ;                         ROBOT REALIGNMENT ROUTINE                            ;
+                      00322 ;                       TOGGLE ARM STATE ROUTINE                               ;
                       00323 ;******************************************************************************;
-007D                  00324 REALIGN
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE  9
+0088                  00324 ARM_TOGGLE
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-007D   3003           00325         MOVLW       0x03
-                      00326 ;       SUBWF       
-007E   0008           00327         RETURN
-                      00328         
-                      00329 ;******************************************************************************;
-                      00330 ;                     ULTRASONIC SENSOR SUBROUTINES                            ;
-                      00331 ;******************************************************************************;
-007F                  00332 USONIC_SEND_PULSE
-007F   1586           00333         BSF         PORTB, 3
-0080   2???           00334         CALL        DEL_20US
-0081   1186           00335         BCF         PORTB, 3
-0082   0008           00336         RETURN
-                      00337 
-0083                  00338 USONIC_READ_ECHO
-0083   1E06           00339         BTFSS       PORTB, 4
-0084   2???           00340         GOTO        $-1
-0085   1410           00341         BSF         T1CON, 0
-0086   1A06           00342 USHOLD  BTFSC       PORTB, 4
-0087   2???           00343         GOTO        USHOLD
-0088   1010           00344         BCF         T1CON, 0
-0089   080F           00345         MOVF        TMR1H, W
-008A   00C2           00346         MOVWF       DIV_HI
-008B   080E           00347         MOVF        TMR1L, W
-008C   00C3           00348         MOVWF       DIV_LO
-008D   018F           00349         CLRF        TMR1H
-008E   018E           00350         CLRF        TMR1L
-008F   303A           00351         MOVLW       d'58'
-0090   00C4           00352         MOVWF       DIVISOR
-0091   2???           00353         CALL        DIV16X8
-0092   0845           00354         MOVF        Q, W
-0093   00D5           00355         MOVWF       measured_distance
-                      00356         ; CALL      rtc_convert
-                      00357         ;CALL       CLR_LCD             ; DEBUG!
-                      00358         ;WRT_MEM_LCD 0x77
-                      00359         ;WRT_MEM_LCD 0x78
-0094   3C05           00360         SUBLW       0x05
-0095   00D3           00361         MOVWF       rob_lat_distance
-                      00362         ;BTFSC      STATUS
-0096   0008           00363         RETURN
-                      00364 
-                      00365 ;******************************************************************************;
-                      00366 ;                           RETURN HOME ROUTINE                                ;
-                      00367 ;******************************************************************************;
-0097                  00368 RETURN_HOME
-                      00369         
-0097   0008           00370         RETURN
-                      00371 
-                      00372 
-                      00373 ;******************************************************************************;
-                      00374 ;                             STOP STANDBY                                     ;
-                      00375 ;******************************************************************************;
-0098                  00376 STOP_STDBY
-0098   2???           00377         CALL        GET_STOP_TIME
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 10
+                      00325         ; control servo to control arm
+                      00326         ; if degree is set to 180, set to 0
+                      00327         ; otherwise set to 0
+0088   2???           00328         GOTO        ARM_TOGGLE
+                      00329 
+                      00330 ;******************************************************************************;
+                      00331 ;                         ROBOT REALIGNMENT ROUTINE                            ;
+                      00332 ;******************************************************************************;
+0089                  00333 REALIGN
+0089   3003           00334         MOVLW       0x03
+                      00335 ;       SUBWF       
+008A   0008           00336         RETURN
+                      00337         
+                      00338 ;******************************************************************************;
+                      00339 ;                     ULTRASONIC SENSOR SUBROUTINES                            ;
+                      00340 ;******************************************************************************;
+008B                  00341 USONIC_SEND_PULSE
+008B   1586           00342         BSF         PORTB, 3
+008C   2???           00343         CALL        DEL_20US
+008D   1186           00344         BCF         PORTB, 3
+008E   0008           00345         RETURN
+                      00346 
+008F                  00347 USONIC_READ_ECHO
+008F   1E06           00348         BTFSS       PORTB, 4
+0090   2???           00349         GOTO        $-1
+0091   1410           00350         BSF         T1CON, 0
+0092   1A06           00351 USHOLD  BTFSC       PORTB, 4
+0093   2???           00352         GOTO        USHOLD
+0094   1010           00353         BCF         T1CON, 0
+0095   080F           00354         MOVF        TMR1H, W
+0096   00C2           00355         MOVWF       DIV_HI
+0097   080E           00356         MOVF        TMR1L, W
+0098   00C3           00357         MOVWF       DIV_LO
+0099   018F           00358         CLRF        TMR1H
+009A   018E           00359         CLRF        TMR1L
+009B   303A           00360         MOVLW       d'58'
+009C   00C4           00361         MOVWF       DIVISOR
+009D   2???           00362         CALL        DIV16X8
+009E   0845           00363         MOVF        Q, W
+009F   00D5           00364         MOVWF       measured_distance
+                      00365         ; CALL      rtc_convert
+                      00366         ;CALL       CLR_LCD             ; DEBUG!
+                      00367         ;WRT_MEM_LCD 0x77
+                      00368         ;WRT_MEM_LCD 0x78
+00A0   3C05           00369         SUBLW       0x05
+00A1   00D3           00370         MOVWF       rob_lat_distance
+                      00371         ;BTFSC      STATUS
+00A2   0008           00372         RETURN
+                      00373 
+                      00374 ;******************************************************************************;
+                      00375 ;                           RETURN HOME ROUTINE                                ;
+                      00376 ;******************************************************************************;
+00A3                  00377 RETURN_HOME
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0099   2???           00378         CALL        STOP_STDBY_MSG
-009A   1C86           00379         BTFSS       PORTB, 1            ; Wait until data is available from the keypad
-009B   2???           00380         GOTO        STOP_STDBY
+                      00378         
+00A3   0008           00379         RETURN
+                      00380 
                       00381 
-009C   0E06           00382         SWAPF       PORTB, W            ; Read PortB<7:4> into W<3:0>
-009D   390F           00383         ANDLW       0x0F 
-009E   2???           00384         CALL        CLR_LCD
-009F   2???           00385         GOTO        STOP_DATA
-                      00386 
-                      00387 ;******************************************************************************;
-                      00388 ;                               DISPLAY DATA                                   ;
-                      00389 ;******************************************************************************;
-00A0                  00390 STOP_DATA       
-00A0   2???           00391         CALL        WRT_DATA
-00A1   2???           00392         CALL        LONG_DLY
-00A2   2???           00393         CALL        LONG_DLY
-00A3   2???           00394         CALL        LONG_DLY
-00A4   2???           00395         CALL        LONG_DLY
-00A5   2???           00396         CALL        LONG_DLY
-00A6   2???           00397         CALL        LONG_DLY
-00A7   2???           00398         CALL        LONG_DLY
-                      00399         
-00A8   2???           00400         CALL        CLR_LCD
-                      00401         
-00A9   3059           00402         MOVLW       spot_base_loc
-00AA   0084           00403         MOVWF       FSR
-                      00404         
-                      00405         
-00AB                  00406 DATA_LOOP       
-                      00407         WRT_LCD     "S"
-00AB   3053               M         MOVLW       "S"
-00AC   2???               M         CALL        WR_DATA
-                      00408         WRT_LCD     "P"
-00AD   3050               M         MOVLW       "P"
-00AE   2???               M         CALL        WR_DATA
-                      00409         WRT_LCD     "O"
-00AF   304F               M         MOVLW       "O"
-00B0   2???               M         CALL        WR_DATA
-                      00410         WRT_LCD     "T"
-00B1   3054               M         MOVLW       "T"
-00B2   2???               M         CALL        WR_DATA
-                      00411         WRT_LCD     ":"
-00B3   303A               M         MOVLW       ":"
-00B4   2???               M         CALL        WR_DATA
-                      00412         WRT_LCD     " "
-00B5   3020               M         MOVLW       " "
-00B6   2???               M         CALL        WR_DATA
-                      00413 ;       WRT_MEM_LCD INDF
-                      00414         WRT_LCD     "c"
-00B7   3063               M         MOVLW       "c"
+                      00382 ;******************************************************************************;
+                      00383 ;                             STOP STANDBY                                     ;
+                      00384 ;******************************************************************************;
+00A4                  00385 STOP_STDBY
+00A4   2???           00386         CALL        GET_STOP_TIME
+00A5   2???           00387         CALL        STOP_STDBY_MSG
+00A6   1C86           00388         BTFSS       PORTB, 1            ; Wait until data is available from the keypad
+00A7   2???           00389         GOTO        STOP_STDBY
+                      00390 
+00A8   0E06           00391         SWAPF       PORTB, W            ; Read PortB<7:4> into W<3:0>
+00A9   390F           00392         ANDLW       0x0F 
+00AA   2???           00393         CALL        CLR_LCD
+00AB   2???           00394         GOTO        STOP_DATA
+                      00395 
+                      00396 ;******************************************************************************;
+                      00397 ;                               DISPLAY DATA                                   ;
+                      00398 ;******************************************************************************;
+00AC                  00399 STOP_DATA       
+00AC   2???           00400         CALL        WRT_DATA
+00AD   2???           00401         CALL        LONG_DLY
+00AE   2???           00402         CALL        LONG_DLY
+00AF   2???           00403         CALL        LONG_DLY
+00B0   2???           00404         CALL        LONG_DLY
+00B1   2???           00405         CALL        LONG_DLY
+00B2   2???           00406         CALL        LONG_DLY
+00B3   2???           00407         CALL        LONG_DLY
+                      00408         
+00B4   2???           00409         CALL        CLR_LCD
+                      00410         
+00B5   3059           00411         MOVLW       spot_base_loc
+00B6   0084           00412         MOVWF       FSR
+                      00413         
+                      00414         
+00B7                  00415 DATA_LOOP       
+                      00416         WRT_LCD     "S"
+00B7   3053               M         MOVLW       "S"
 00B8   2???               M         CALL        WR_DATA
-                      00415         WRT_LCD     "m"
-00B9   306D               M         MOVLW       "m"
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 11
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
+                      00417         WRT_LCD     "P"
+00B9   3050               M         MOVLW       "P"
 00BA   2???               M         CALL        WR_DATA
-                      00416         
-00BB   2???           00417         CALL        LONG_DLY
-00BC   2???           00418         CALL        LONG_DLY
-00BD   2???           00419         CALL        LONG_DLY
-00BE   2???           00420         CALL        LONG_DLY
-00BF   2???           00421         CALL        LONG_DLY
-00C0   2???           00422         CALL        LONG_DLY
-00C1   2???           00423         CALL        LONG_DLY
-00C2   2???           00424         CALL        LONG_DLY
-00C3   2???           00425         CALL        LONG_DLY
-00C4   2???           00426         CALL        CLR_LCD
-00C5   0A84           00427         INCF        FSR, F
-                      00428 
-00C6   0BD7           00429         DECFSZ      spot_count, F
-00C7   2???           00430         GOTO        DATA_LOOP
-                      00431         
-                      00432         WRT_LCD     "E"
-00C8   3045               M         MOVLW       "E"
-00C9   2???               M         CALL        WR_DATA
-                      00433         WRT_LCD     "N"
-00CA   304E               M         MOVLW       "N"
-00CB   2???               M         CALL        WR_DATA
-                      00434         WRT_LCD     "D"
-00CC   3044               M         MOVLW       "D"
-00CD   2???               M         CALL        WR_DATA
-                      00435 
-00CE   2???           00436         GOTO        FINISH
+                      00418         WRT_LCD     "O"
+00BB   304F               M         MOVLW       "O"
+00BC   2???               M         CALL        WR_DATA
+                      00419         WRT_LCD     "T"
+00BD   3054               M         MOVLW       "T"
+00BE   2???               M         CALL        WR_DATA
+                      00420         WRT_LCD     ":"
+00BF   303A               M         MOVLW       ":"
+00C0   2???               M         CALL        WR_DATA
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 11
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00421         WRT_LCD     " "
+00C1   3020               M         MOVLW       " "
+00C2   2???               M         CALL        WR_DATA
+                      00422 ;       WRT_MEM_LCD INDF
+                      00423         WRT_LCD     "c"
+00C3   3063               M         MOVLW       "c"
+00C4   2???               M         CALL        WR_DATA
+                      00424         WRT_LCD     "m"
+00C5   306D               M         MOVLW       "m"
+00C6   2???               M         CALL        WR_DATA
+                      00425         
+00C7   2???           00426         CALL        LONG_DLY
+00C8   2???           00427         CALL        LONG_DLY
+00C9   2???           00428         CALL        LONG_DLY
+00CA   2???           00429         CALL        LONG_DLY
+00CB   2???           00430         CALL        LONG_DLY
+00CC   2???           00431         CALL        LONG_DLY
+00CD   2???           00432         CALL        LONG_DLY
+00CE   2???           00433         CALL        LONG_DLY
+00CF   2???           00434         CALL        LONG_DLY
+00D0   2???           00435         CALL        CLR_LCD
+00D1   0A84           00436         INCF        FSR, F
                       00437 
-                      00438 ;******************************************************************************;
-                      00439 ;                                  HELLO                                       ;
-                      00440 ;******************************************************************************;
-00CF                  00441 START_MSG
-                      00442         WRT_LCD     "H"
-00CF   3048               M         MOVLW       "H"
-00D0   2???               M         CALL        WR_DATA
-                      00443         WRT_LCD     "I"
-00D1   3049               M         MOVLW       "I"
-00D2   2???               M         CALL        WR_DATA
-                      00444         WRT_LCD     "T"
-00D3   3054               M         MOVLW       "T"
-00D4   2???               M         CALL        WR_DATA
-                      00445         WRT_LCD     " "
-00D5   3020               M         MOVLW       " "
-00D6   2???               M         CALL        WR_DATA
-                      00446         WRT_LCD     "*"
-00D7   302A               M         MOVLW       "*"
-00D8   2???               M         CALL        WR_DATA
-                      00447         WRT_LCD     " "
-00D9   3020               M         MOVLW       " "
-00DA   2???               M         CALL        WR_DATA
-                      00448         WRT_LCD     "T"
-00DB   3054               M         MOVLW       "T"
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 12
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
+00D2   0BD7           00438         DECFSZ      spot_count, F
+00D3   2???           00439         GOTO        DATA_LOOP
+                      00440         
+                      00441         WRT_LCD     "E"
+00D4   3045               M         MOVLW       "E"
+00D5   2???               M         CALL        WR_DATA
+                      00442         WRT_LCD     "N"
+00D6   304E               M         MOVLW       "N"
+00D7   2???               M         CALL        WR_DATA
+                      00443         WRT_LCD     "D"
+00D8   3044               M         MOVLW       "D"
+00D9   2???               M         CALL        WR_DATA
+                      00444 
+00DA   2???           00445         GOTO        FINISH
+                      00446 
+                      00447 ;******************************************************************************;
+                      00448 ;                                  HELLO                                       ;
+                      00449 ;******************************************************************************;
+00DB                  00450 START_MSG
+                      00451         WRT_LCD     "H"
+00DB   3048               M         MOVLW       "H"
 00DC   2???               M         CALL        WR_DATA
-                      00449         WRT_LCD     "O"
-00DD   304F               M         MOVLW       "O"
+                      00452         WRT_LCD     "I"
+00DD   3049               M         MOVLW       "I"
 00DE   2???               M         CALL        WR_DATA
-                      00450         WRT_LCD     " "
-00DF   3020               M         MOVLW       " "
+                      00453         WRT_LCD     "T"
+00DF   3054               M         MOVLW       "T"
 00E0   2???               M         CALL        WR_DATA
-                      00451         WRT_LCD     "S"
-00E1   3053               M         MOVLW       "S"
-00E2   2???               M         CALL        WR_DATA
-                      00452         WRT_LCD     "T"
-00E3   3054               M         MOVLW       "T"
-00E4   2???               M         CALL        WR_DATA
-                      00453         WRT_LCD     "A"
-00E5   3041               M         MOVLW       "A"
-00E6   2???               M         CALL        WR_DATA
-                      00454         WRT_LCD     "R"
-00E7   3052               M         MOVLW       "R"
-00E8   2???               M         CALL        WR_DATA
-                      00455         WRT_LCD     "T"
-00E9   3054               M         MOVLW       "T"
-00EA   2???               M         CALL        WR_DATA
-00EB   0008           00456         RETURN
-                      00457         
-                      00458 ;******************************************************************************;
-                      00459 ;                                GOODBYE                                       ;
-                      00460 ;******************************************************************************;
-00EC                  00461 STOP_STDBY_MSG
-                      00462         WRT_LCD     "H"
-00EC   3048               M         MOVLW       "H"
-00ED   2???               M         CALL        WR_DATA
-                      00463         WRT_LCD     "I"
-00EE   3049               M         MOVLW       "I"
-00EF   2???               M         CALL        WR_DATA
-                      00464         WRT_LCD     "T"
-00F0   3054               M         MOVLW       "T"
-00F1   2???               M         CALL        WR_DATA
-                      00465         WRT_LCD     " "
-00F2   3020               M         MOVLW       " "
-00F3   2???               M         CALL        WR_DATA
-                      00466         WRT_LCD     "*"
-00F4   302A               M         MOVLW       "*"
-00F5   2???               M         CALL        WR_DATA
-                      00467         WRT_LCD     " "
-00F6   3020               M         MOVLW       " "
-00F7   2???               M         CALL        WR_DATA
-                      00468         WRT_LCD     "F"
-00F8   3046               M         MOVLW       "F"
-00F9   2???               M         CALL        WR_DATA
-                      00469         WRT_LCD     "O"
-00FA   304F               M         MOVLW       "O"
-00FB   2???               M         CALL        WR_DATA
-                      00470         WRT_LCD     "R"
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 13
+                      00454         WRT_LCD     " "
+00E1   3020               M         MOVLW       " "
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 12
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-00FC   3052               M         MOVLW       "R"
+00E2   2???               M         CALL        WR_DATA
+                      00455         WRT_LCD     "*"
+00E3   302A               M         MOVLW       "*"
+00E4   2???               M         CALL        WR_DATA
+                      00456         WRT_LCD     " "
+00E5   3020               M         MOVLW       " "
+00E6   2???               M         CALL        WR_DATA
+                      00457         WRT_LCD     "T"
+00E7   3054               M         MOVLW       "T"
+00E8   2???               M         CALL        WR_DATA
+                      00458         WRT_LCD     "O"
+00E9   304F               M         MOVLW       "O"
+00EA   2???               M         CALL        WR_DATA
+                      00459         WRT_LCD     " "
+00EB   3020               M         MOVLW       " "
+00EC   2???               M         CALL        WR_DATA
+                      00460         WRT_LCD     "S"
+00ED   3053               M         MOVLW       "S"
+00EE   2???               M         CALL        WR_DATA
+                      00461         WRT_LCD     "T"
+00EF   3054               M         MOVLW       "T"
+00F0   2???               M         CALL        WR_DATA
+                      00462         WRT_LCD     "A"
+00F1   3041               M         MOVLW       "A"
+00F2   2???               M         CALL        WR_DATA
+                      00463         WRT_LCD     "R"
+00F3   3052               M         MOVLW       "R"
+00F4   2???               M         CALL        WR_DATA
+                      00464         WRT_LCD     "T"
+00F5   3054               M         MOVLW       "T"
+00F6   2???               M         CALL        WR_DATA
+00F7   0008           00465         RETURN
+                      00466         
+                      00467 ;******************************************************************************;
+                      00468 ;                                GOODBYE                                       ;
+                      00469 ;******************************************************************************;
+00F8                  00470 STOP_STDBY_MSG
+                      00471         WRT_LCD     "H"
+00F8   3048               M         MOVLW       "H"
+00F9   2???               M         CALL        WR_DATA
+                      00472         WRT_LCD     "I"
+00FA   3049               M         MOVLW       "I"
+00FB   2???               M         CALL        WR_DATA
+                      00473         WRT_LCD     "T"
+00FC   3054               M         MOVLW       "T"
 00FD   2???               M         CALL        WR_DATA
-                      00471         WRT_LCD     " "
+                      00474         WRT_LCD     " "
 00FE   3020               M         MOVLW       " "
 00FF   2???               M         CALL        WR_DATA
-                      00472         WRT_LCD     "D"
-0100   3044               M         MOVLW       "D"
+                      00475         WRT_LCD     "*"
+0100   302A               M         MOVLW       "*"
 0101   2???               M         CALL        WR_DATA
-                      00473         WRT_LCD     "A"
-0102   3041               M         MOVLW       "A"
+                      00476         WRT_LCD     " "
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 13
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+0102   3020               M         MOVLW       " "
 0103   2???               M         CALL        WR_DATA
-                      00474         WRT_LCD     "T"
-0104   3054               M         MOVLW       "T"
+                      00477         WRT_LCD     "F"
+0104   3046               M         MOVLW       "F"
 0105   2???               M         CALL        WR_DATA
-                      00475         WRT_LCD     "A"
-0106   3041               M         MOVLW       "A"
+                      00478         WRT_LCD     "O"
+0106   304F               M         MOVLW       "O"
 0107   2???               M         CALL        WR_DATA
-0108   0008           00476         RETURN
-                      00477          
-                      00478 ;******************************************************************************;
-                      00479 ;                                 DATA                                         ;
-                      00480 ;******************************************************************************;
-0109                  00481 WRT_DATA        
-                      00482         WRT_LCD     "N"
-0109   304E               M         MOVLW       "N"
-010A   2???               M         CALL        WR_DATA
-                      00483         WRT_LCD     "U"
-010B   3055               M         MOVLW       "U"
-010C   2???               M         CALL        WR_DATA
-                      00484         WRT_LCD     "M"
-010D   304D               M         MOVLW       "M"
-010E   2???               M         CALL        WR_DATA
-                      00485         WRT_LCD     " "
-010F   3020               M         MOVLW       " "
-0110   2???               M         CALL        WR_DATA
-                      00486         WRT_LCD     "S"
-0111   3053               M         MOVLW       "S"
-0112   2???               M         CALL        WR_DATA
-                      00487         WRT_LCD     "P"
-0113   3050               M         MOVLW       "P"
-0114   2???               M         CALL        WR_DATA
-                      00488         WRT_LCD     "O"
-0115   304F               M         MOVLW       "O"
+                      00479         WRT_LCD     "R"
+0108   3052               M         MOVLW       "R"
+0109   2???               M         CALL        WR_DATA
+                      00480         WRT_LCD     " "
+010A   3020               M         MOVLW       " "
+010B   2???               M         CALL        WR_DATA
+                      00481         WRT_LCD     "D"
+010C   3044               M         MOVLW       "D"
+010D   2???               M         CALL        WR_DATA
+                      00482         WRT_LCD     "A"
+010E   3041               M         MOVLW       "A"
+010F   2???               M         CALL        WR_DATA
+                      00483         WRT_LCD     "T"
+0110   3054               M         MOVLW       "T"
+0111   2???               M         CALL        WR_DATA
+                      00484         WRT_LCD     "A"
+0112   3041               M         MOVLW       "A"
+0113   2???               M         CALL        WR_DATA
+0114   0008           00485         RETURN
+                      00486          
+                      00487 ;******************************************************************************;
+                      00488 ;                                 DATA                                         ;
+                      00489 ;******************************************************************************;
+0115                  00490 WRT_DATA        
+                      00491         WRT_LCD     "N"
+0115   304E               M         MOVLW       "N"
 0116   2???               M         CALL        WR_DATA
-                      00489         WRT_LCD     "T"
-0117   3054               M         MOVLW       "T"
+                      00492         WRT_LCD     "U"
+0117   3055               M         MOVLW       "U"
 0118   2???               M         CALL        WR_DATA
-                      00490         WRT_LCD     "S"
-0119   3053               M         MOVLW       "S"
+                      00493         WRT_LCD     "M"
+0119   304D               M         MOVLW       "M"
 011A   2???               M         CALL        WR_DATA
-                      00491         WRT_LCD     ":"
-011B   303A               M         MOVLW       ":"
+                      00494         WRT_LCD     " "
+011B   3020               M         MOVLW       " "
 011C   2???               M         CALL        WR_DATA
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 14
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-                      00492         WRT_LCD     " "
-011D   3020               M         MOVLW       " "
+                      00495         WRT_LCD     "S"
+011D   3053               M         MOVLW       "S"
 011E   2???               M         CALL        WR_DATA
-                      00493 ;       WRT_MEM_LCD num_spots
-011F   0008           00494         RETURN
-                      00495 ;******************************************************************************;
-                      00496 ;                           RETREIVE START TIME                                ;
-                      00497 ;******************************************************************************;
-0120                  00498 GET_START_TIME
-                      00499         ;Get minute             
-                      00500         rtc_read    0x01                ;Read Address 0x01 from DS1307---min
-                          M ;input:         addliteral
-                          M ;output:        0x75, 0x77, 0x78
-                          M ;desc:          From the selected register in the RTC, read the data
-                          M ;                       and load it into 0x75. 0x75 is also converted into 
-                          M ;                       ASCII characters and the tens digit is placed into
-                          M ;                       0x77 and the ones digit is placed in 0x78
-0120   3001               M         movlw       0x01
-0121   1283 1303          M         banksel     0x73
-0123   00F3               M         movwf       0x73
-0124   2???               M         call        read_rtc
-0125   1283 1303          M         banksel     0x75
-0127   0875               M         movf        0x75,w
-0128   2???               M         call        rtc_convert   
-0129   0877           00501         MOVFW       0X77
-012A   00CA           00502         MOVWF       start_min10
-012B   0878           00503         MOVFW       0X78
-012C   00C9           00504         MOVWF       start_min
-                      00505 
-                      00506         ;Get seconds
-                      00507         rtc_read    0x00                ;Read Address 0x00 from DS1307---seconds
-                          M ;input:         addliteral
-                          M ;output:        0x75, 0x77, 0x78
-                          M ;desc:          From the selected register in the RTC, read the data
-                          M ;                       and load it into 0x75. 0x75 is also converted into 
-                          M ;                       ASCII characters and the tens digit is placed into
-                          M ;                       0x77 and the ones digit is placed in 0x78
-012D   3000               M         movlw       0x00
-012E   1283 1303          M         banksel     0x73
-0130   00F3               M         movwf       0x73
-0131   2???               M         call        read_rtc
-0132   1283 1303          M         banksel     0x75
-0134   0875               M         movf        0x75,w
-0135   2???               M         call        rtc_convert   
-0136   0877           00508         MOVFW       0X77
-0137   00CC           00509         MOVWF       start_sec10
-0138   0878           00510         MOVFW       0X78
-0139   00CB           00511         MOVWF       start_sec
-013A   0008           00512         RETURN
-                      00513 ;******************************************************************************;
-                      00514 ;                           RETREIVE STOP TIME                                 ;
-                      00515 ;******************************************************************************;
-013B                  00516 GET_STOP_TIME
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 15
+                      00496         WRT_LCD     "P"
+011F   3050               M         MOVLW       "P"
+0120   2???               M         CALL        WR_DATA
+                      00497         WRT_LCD     "O"
+0121   304F               M         MOVLW       "O"
+0122   2???               M         CALL        WR_DATA
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 14
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00517         ;Get minute             
-                      00518         rtc_read    0x01                ;Read Address 0x01 from DS1307---min
+                      00498         WRT_LCD     "T"
+0123   3054               M         MOVLW       "T"
+0124   2???               M         CALL        WR_DATA
+                      00499         WRT_LCD     "S"
+0125   3053               M         MOVLW       "S"
+0126   2???               M         CALL        WR_DATA
+                      00500         WRT_LCD     ":"
+0127   303A               M         MOVLW       ":"
+0128   2???               M         CALL        WR_DATA
+                      00501         WRT_LCD     " "
+0129   3020               M         MOVLW       " "
+012A   2???               M         CALL        WR_DATA
+                      00502 ;       WRT_MEM_LCD num_spots
+012B   0008           00503         RETURN
+                      00504 ;******************************************************************************;
+                      00505 ;                           RETREIVE START TIME                                ;
+                      00506 ;******************************************************************************;
+012C                  00507 GET_START_TIME
+                      00508         ;Get minute             
+                      00509         rtc_read    0x01                ;Read Address 0x01 from DS1307---min
                           M ;input:         addliteral
                           M ;output:        0x75, 0x77, 0x78
                           M ;desc:          From the selected register in the RTC, read the data
                           M ;                       and load it into 0x75. 0x75 is also converted into 
                           M ;                       ASCII characters and the tens digit is placed into
                           M ;                       0x77 and the ones digit is placed in 0x78
-013B   3001               M         movlw       0x01
-013C   1283 1303          M         banksel     0x73
-013E   00F3               M         movwf       0x73
-013F   2???               M         call        read_rtc
-0140   1283 1303          M         banksel     0x75
-0142   0875               M         movf        0x75,w
-0143   2???               M         call        rtc_convert   
-0144   0877           00519         MOVFW       0X77
-0145   00CE           00520         MOVWF       stop_min10
-0146   0878           00521         MOVFW       0X78
-0147   00CD           00522         MOVWF       stop_min
-                      00523 
-                      00524         ;Get seconds
-                      00525         rtc_read    0x00                ;Read Address 0x00 from DS1307---seconds
+012C   3001               M         movlw       0x01
+012D   1283 1303          M         banksel     0x73
+012F   00F3               M         movwf       0x73
+0130   2???               M         call        read_rtc
+0131   1283 1303          M         banksel     0x75
+0133   0875               M         movf        0x75,w
+0134   2???               M         call        rtc_convert   
+0135   0877           00510         MOVFW       0X77
+0136   00CA           00511         MOVWF       start_min10
+0137   0878           00512         MOVFW       0X78
+0138   00C9           00513         MOVWF       start_min
+                      00514 
+                      00515         ;Get seconds
+                      00516         rtc_read    0x00                ;Read Address 0x00 from DS1307---seconds
                           M ;input:         addliteral
                           M ;output:        0x75, 0x77, 0x78
                           M ;desc:          From the selected register in the RTC, read the data
                           M ;                       and load it into 0x75. 0x75 is also converted into 
                           M ;                       ASCII characters and the tens digit is placed into
                           M ;                       0x77 and the ones digit is placed in 0x78
-0148   3000               M         movlw       0x00
-0149   1283 1303          M         banksel     0x73
-014B   00F3               M         movwf       0x73
-014C   2???               M         call        read_rtc
-014D   1283 1303          M         banksel     0x75
-014F   0875               M         movf        0x75,w
-0150   2???               M         call        rtc_convert   
-0151   0877           00526         MOVFW       0X77
-0152   00D0           00527         MOVWF       stop_sec10
-0153   0878           00528         MOVFW       0X78
-0154   00CF           00529         MOVWF       stop_sec
-0155   0008           00530         RETURN
-                      00531 ;******************************************************************************;
-                      00532 ;                       DISPLAY RTC TIME TO LCD                                ;
-                      00533 ;******************************************************************************;
-0156                  00534 SHOW_RTC
-                      00535         ;clear LCD screen
-0156   3001           00536         movlw       b'00000001'
-0157   2???           00537         call        WR_INS
-                      00538 
-                      00539         ;Get year
-                      00540         WRT_LCD     "2"
-0158   3032               M         MOVLW       "2"
-0159   2???               M         CALL        WR_DATA
-                      00541         WRT_LCD     "0"
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 16
+0139   3000               M         movlw       0x00
+013A   1283 1303          M         banksel     0x73
+013C   00F3               M         movwf       0x73
+013D   2???               M         call        read_rtc
+013E   1283 1303          M         banksel     0x75
+0140   0875               M         movf        0x75,w
+0141   2???               M         call        rtc_convert   
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 15
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-015A   3030               M         MOVLW       "0"
-015B   2???               M         CALL        WR_DATA
-                      00542         rtc_read    0x06                ;Read Address 0x06 from DS1307---year
+0142   0877           00517         MOVFW       0X77
+0143   00CC           00518         MOVWF       start_sec10
+0144   0878           00519         MOVFW       0X78
+0145   00CB           00520         MOVWF       start_sec
+0146   0008           00521         RETURN
+                      00522 ;******************************************************************************;
+                      00523 ;                           RETREIVE STOP TIME                                 ;
+                      00524 ;******************************************************************************;
+0147                  00525 GET_STOP_TIME
+                      00526         ;Get minute             
+                      00527         rtc_read    0x01                ;Read Address 0x01 from DS1307---min
                           M ;input:         addliteral
                           M ;output:        0x75, 0x77, 0x78
                           M ;desc:          From the selected register in the RTC, read the data
                           M ;                       and load it into 0x75. 0x75 is also converted into 
                           M ;                       ASCII characters and the tens digit is placed into
                           M ;                       0x77 and the ones digit is placed in 0x78
-015C   3006               M         movlw       0x06
-015D   1283 1303          M         banksel     0x73
-015F   00F3               M         movwf       0x73
-0160   2???               M         call        read_rtc
-0161   1283 1303          M         banksel     0x75
-0163   0875               M         movf        0x75,w
-0164   2???               M         call        rtc_convert   
-                      00543         WRT_MEM_LCD 0x77
-0165   0877               M         MOVFW       0x77
-0166   2???               M         CALL        WR_DATA
-                      00544         WRT_MEM_LCD 0x78
-0167   0878               M         MOVFW       0x78
-0168   2???               M         CALL        WR_DATA
-                      00545 
-                      00546         WRT_LCD     "/"
-0169   302F               M         MOVLW       "/"
-016A   2???               M         CALL        WR_DATA
+0147   3001               M         movlw       0x01
+0148   1283 1303          M         banksel     0x73
+014A   00F3               M         movwf       0x73
+014B   2???               M         call        read_rtc
+014C   1283 1303          M         banksel     0x75
+014E   0875               M         movf        0x75,w
+014F   2???               M         call        rtc_convert   
+0150   0877           00528         MOVFW       0X77
+0151   00CE           00529         MOVWF       stop_min10
+0152   0878           00530         MOVFW       0X78
+0153   00CD           00531         MOVWF       stop_min
+                      00532 
+                      00533         ;Get seconds
+                      00534         rtc_read    0x00                ;Read Address 0x00 from DS1307---seconds
+                          M ;input:         addliteral
+                          M ;output:        0x75, 0x77, 0x78
+                          M ;desc:          From the selected register in the RTC, read the data
+                          M ;                       and load it into 0x75. 0x75 is also converted into 
+                          M ;                       ASCII characters and the tens digit is placed into
+                          M ;                       0x77 and the ones digit is placed in 0x78
+0154   3000               M         movlw       0x00
+0155   1283 1303          M         banksel     0x73
+0157   00F3               M         movwf       0x73
+0158   2???               M         call        read_rtc
+0159   1283 1303          M         banksel     0x75
+015B   0875               M         movf        0x75,w
+015C   2???               M         call        rtc_convert   
+015D   0877           00535         MOVFW       0X77
+015E   00D0           00536         MOVWF       stop_sec10
+015F   0878           00537         MOVFW       0X78
+0160   00CF           00538         MOVWF       stop_sec
+0161   0008           00539         RETURN
+                      00540 ;******************************************************************************;
+                      00541 ;                       DISPLAY RTC TIME TO LCD                                ;
+                      00542 ;******************************************************************************;
+0162                  00543 SHOW_RTC
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 16
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00544         ;clear LCD screen
+0162   3001           00545         movlw       b'00000001'
+0163   2???           00546         call        WR_INS
                       00547 
-                      00548         ;Get month
-                      00549         rtc_read    0x05                ;Read Address 0x05 from DS1307---month
+                      00548         ;Get year
+                      00549         WRT_LCD     "2"
+0164   3032               M         MOVLW       "2"
+0165   2???               M         CALL        WR_DATA
+                      00550         WRT_LCD     "0"
+0166   3030               M         MOVLW       "0"
+0167   2???               M         CALL        WR_DATA
+                      00551         rtc_read    0x06                ;Read Address 0x06 from DS1307---year
                           M ;input:         addliteral
                           M ;output:        0x75, 0x77, 0x78
                           M ;desc:          From the selected register in the RTC, read the data
                           M ;                       and load it into 0x75. 0x75 is also converted into 
                           M ;                       ASCII characters and the tens digit is placed into
                           M ;                       0x77 and the ones digit is placed in 0x78
-016B   3005               M         movlw       0x05
-016C   1283 1303          M         banksel     0x73
-016E   00F3               M         movwf       0x73
-016F   2???               M         call        read_rtc
-0170   1283 1303          M         banksel     0x75
-0172   0875               M         movf        0x75,w
-0173   2???               M         call        rtc_convert   
-                      00550         WRT_MEM_LCD 0x77
-0174   0877               M         MOVFW       0x77
-0175   2???               M         CALL        WR_DATA
-                      00551         WRT_MEM_LCD 0x78
-0176   0878               M         MOVFW       0x78
-0177   2???               M         CALL        WR_DATA
-                      00552 
-                      00553         WRT_LCD     "/"
-0178   302F               M         MOVLW       "/"
-0179   2???               M         CALL        WR_DATA
+0168   3006               M         movlw       0x06
+0169   1283 1303          M         banksel     0x73
+016B   00F3               M         movwf       0x73
+016C   2???               M         call        read_rtc
+016D   1283 1303          M         banksel     0x75
+016F   0875               M         movf        0x75,w
+0170   2???               M         call        rtc_convert   
+                      00552         WRT_MEM_LCD 0x77
+0171   0877               M         MOVFW       0x77
+0172   2???               M         CALL        WR_DATA
+                      00553         WRT_MEM_LCD 0x78
+0173   0878               M         MOVFW       0x78
+0174   2???               M         CALL        WR_DATA
                       00554 
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 17
+                      00555         WRT_LCD     "/"
+0175   302F               M         MOVLW       "/"
+0176   2???               M         CALL        WR_DATA
+                      00556 
+                      00557         ;Get month
+                      00558         rtc_read    0x05                ;Read Address 0x05 from DS1307---month
+                          M ;input:         addliteral
+                          M ;output:        0x75, 0x77, 0x78
+                          M ;desc:          From the selected register in the RTC, read the data
+                          M ;                       and load it into 0x75. 0x75 is also converted into 
+                          M ;                       ASCII characters and the tens digit is placed into
+                          M ;                       0x77 and the ones digit is placed in 0x78
+0177   3005               M         movlw       0x05
+0178   1283 1303          M         banksel     0x73
+017A   00F3               M         movwf       0x73
+017B   2???               M         call        read_rtc
+017C   1283 1303          M         banksel     0x75
+017E   0875               M         movf        0x75,w
+017F   2???               M         call        rtc_convert   
+                      00559         WRT_MEM_LCD 0x77
+0180   0877               M         MOVFW       0x77
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 17
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00555         ;Get day
-                      00556         rtc_read    0x04                ;Read Address 0x04 from DS1307---day
+0181   2???               M         CALL        WR_DATA
+                      00560         WRT_MEM_LCD 0x78
+0182   0878               M         MOVFW       0x78
+0183   2???               M         CALL        WR_DATA
+                      00561 
+                      00562         WRT_LCD     "/"
+0184   302F               M         MOVLW       "/"
+0185   2???               M         CALL        WR_DATA
+                      00563 
+                      00564         ;Get day
+                      00565         rtc_read    0x04                ;Read Address 0x04 from DS1307---day
                           M ;input:         addliteral
                           M ;output:        0x75, 0x77, 0x78
                           M ;desc:          From the selected register in the RTC, read the data
                           M ;                       and load it into 0x75. 0x75 is also converted into 
                           M ;                       ASCII characters and the tens digit is placed into
                           M ;                       0x77 and the ones digit is placed in 0x78
-017A   3004               M         movlw       0x04
-017B   1283 1303          M         banksel     0x73
-017D   00F3               M         movwf       0x73
-017E   2???               M         call        read_rtc
-017F   1283 1303          M         banksel     0x75
-0181   0875               M         movf        0x75,w
-0182   2???               M         call        rtc_convert   
-                      00557         WRT_MEM_LCD 0x77
-0183   0877               M         MOVFW       0x77
-0184   2???               M         CALL        WR_DATA
-                      00558         WRT_MEM_LCD 0x78
-0185   0878               M         MOVFW       0x78
-0186   2???               M         CALL        WR_DATA
-                      00559 
-0187   30C0           00560         movlw       B'11000000'         ;Next line displays (hour):(min):(sec) **:**:**
-0188   2???           00561         call        WR_INS
-                      00562         ;Get hour
-                      00563         rtc_read    0x02                ;Read Address 0x02 from DS1307---hour
+0186   3004               M         movlw       0x04
+0187   1283 1303          M         banksel     0x73
+0189   00F3               M         movwf       0x73
+018A   2???               M         call        read_rtc
+018B   1283 1303          M         banksel     0x75
+018D   0875               M         movf        0x75,w
+018E   2???               M         call        rtc_convert   
+                      00566         WRT_MEM_LCD 0x77
+018F   0877               M         MOVFW       0x77
+0190   2???               M         CALL        WR_DATA
+                      00567         WRT_MEM_LCD 0x78
+0191   0878               M         MOVFW       0x78
+0192   2???               M         CALL        WR_DATA
+                      00568 
+0193   30C0           00569         movlw       B'11000000'         ;Next line displays (hour):(min):(sec) **:**:**
+0194   2???           00570         call        WR_INS
+                      00571         ;Get hour
+                      00572         rtc_read    0x02                ;Read Address 0x02 from DS1307---hour
                           M ;input:         addliteral
                           M ;output:        0x75, 0x77, 0x78
                           M ;desc:          From the selected register in the RTC, read the data
                           M ;                       and load it into 0x75. 0x75 is also converted into 
                           M ;                       ASCII characters and the tens digit is placed into
                           M ;                       0x77 and the ones digit is placed in 0x78
-0189   3002               M         movlw       0x02
-018A   1283 1303          M         banksel     0x73
-018C   00F3               M         movwf       0x73
-018D   2???               M         call        read_rtc
-018E   1283 1303          M         banksel     0x75
-0190   0875               M         movf        0x75,w
-0191   2???               M         call        rtc_convert   
-                      00564         WRT_MEM_LCD 0x77
-0192   0877               M         MOVFW       0x77
-0193   2???               M         CALL        WR_DATA
-                      00565         WRT_MEM_LCD 0x78
-0194   0878               M         MOVFW       0x78
-0195   2???               M         CALL        WR_DATA
-                      00566         WRT_LCD     ":"
-0196   303A               M         MOVLW       ":"
-0197   2???               M         CALL        WR_DATA
-                      00567 
-                      00568         ;Get minute             
-                      00569         rtc_read    0x01                ;Read Address 0x01 from DS1307---min
-                          M ;input:         addliteral
-                          M ;output:        0x75, 0x77, 0x78
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 18
+0195   3002               M         movlw       0x02
+0196   1283 1303          M         banksel     0x73
+0198   00F3               M         movwf       0x73
+0199   2???               M         call        read_rtc
+019A   1283 1303          M         banksel     0x75
+019C   0875               M         movf        0x75,w
+019D   2???               M         call        rtc_convert   
+                      00573         WRT_MEM_LCD 0x77
+019E   0877               M         MOVFW       0x77
+019F   2???               M         CALL        WR_DATA
+                      00574         WRT_MEM_LCD 0x78
+01A0   0878               M         MOVFW       0x78
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 18
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                          M ;desc:          From the selected register in the RTC, read the data
-                          M ;                       and load it into 0x75. 0x75 is also converted into 
-                          M ;                       ASCII characters and the tens digit is placed into
-                          M ;                       0x77 and the ones digit is placed in 0x78
-0198   3001               M         movlw       0x01
-0199   1283 1303          M         banksel     0x73
-019B   00F3               M         movwf       0x73
-019C   2???               M         call        read_rtc
-019D   1283 1303          M         banksel     0x75
-019F   0875               M         movf        0x75,w
-01A0   2???               M         call        rtc_convert   
-                      00570         WRT_MEM_LCD 0x77
-01A1   0877               M         MOVFW       0x77
-01A2   2???               M         CALL        WR_DATA
-                      00571         WRT_MEM_LCD 0x78
-01A3   0878               M         MOVFW       0x78
-01A4   2???               M         CALL        WR_DATA
-                      00572         WRT_LCD     ":"
-01A5   303A               M         MOVLW       ":"
-01A6   2???               M         CALL        WR_DATA
-                      00573 
-                      00574         ;Get seconds
-                      00575         rtc_read    0x00                ;Read Address 0x00 from DS1307---seconds
+01A1   2???               M         CALL        WR_DATA
+                      00575         WRT_LCD     ":"
+01A2   303A               M         MOVLW       ":"
+01A3   2???               M         CALL        WR_DATA
+                      00576 
+                      00577         ;Get minute             
+                      00578         rtc_read    0x01                ;Read Address 0x01 from DS1307---min
                           M ;input:         addliteral
                           M ;output:        0x75, 0x77, 0x78
                           M ;desc:          From the selected register in the RTC, read the data
                           M ;                       and load it into 0x75. 0x75 is also converted into 
                           M ;                       ASCII characters and the tens digit is placed into
                           M ;                       0x77 and the ones digit is placed in 0x78
-01A7   3000               M         movlw       0x00
-01A8   1283 1303          M         banksel     0x73
-01AA   00F3               M         movwf       0x73
-01AB   2???               M         call        read_rtc
-01AC   1283 1303          M         banksel     0x75
-01AE   0875               M         movf        0x75,w
-01AF   2???               M         call        rtc_convert   
-                      00576         WRT_MEM_LCD 0x77
-01B0   0877               M         MOVFW       0x77
-01B1   2???               M         CALL        WR_DATA
-                      00577         WRT_MEM_LCD 0x78
-01B2   0878               M         MOVFW       0x78
-01B3   2???               M         CALL        WR_DATA
-                      00578 
-01B4   0008           00579         RETURN
-                      00580 ;******************************************************************************;
-                      00581 ;                       INITIALIZE RTC TIME                                    ;
-                      00582 ;******************************************************************************;                
-01B5                  00583 SET_RTC_TIME
-                      00584         rtc_resetAll    ;reset rtc
+01A4   3001               M         movlw       0x01
+01A5   1283 1303          M         banksel     0x73
+01A7   00F3               M         movwf       0x73
+01A8   2???               M         call        read_rtc
+01A9   1283 1303          M         banksel     0x75
+01AB   0875               M         movf        0x75,w
+01AC   2???               M         call        rtc_convert   
+                      00579         WRT_MEM_LCD 0x77
+01AD   0877               M         MOVFW       0x77
+01AE   2???               M         CALL        WR_DATA
+                      00580         WRT_MEM_LCD 0x78
+01AF   0878               M         MOVFW       0x78
+01B0   2???               M         CALL        WR_DATA
+                      00581         WRT_LCD     ":"
+01B1   303A               M         MOVLW       ":"
+01B2   2???               M         CALL        WR_DATA
+                      00582 
+                      00583         ;Get seconds
+                      00584         rtc_read    0x00                ;Read Address 0x00 from DS1307---seconds
+                          M ;input:         addliteral
+                          M ;output:        0x75, 0x77, 0x78
+                          M ;desc:          From the selected register in the RTC, read the data
+                          M ;                       and load it into 0x75. 0x75 is also converted into 
+                          M ;                       ASCII characters and the tens digit is placed into
+                          M ;                       0x77 and the ones digit is placed in 0x78
+01B3   3000               M         movlw       0x00
+01B4   1283 1303          M         banksel     0x73
+01B6   00F3               M         movwf       0x73
+01B7   2???               M         call        read_rtc
+01B8   1283 1303          M         banksel     0x75
+01BA   0875               M         movf        0x75,w
+01BB   2???               M         call        rtc_convert   
+                      00585         WRT_MEM_LCD 0x77
+01BC   0877               M         MOVFW       0x77
+01BD   2???               M         CALL        WR_DATA
+                      00586         WRT_MEM_LCD 0x78
+01BE   0878               M         MOVFW       0x78
+01BF   2???               M         CALL        WR_DATA
+                      00587 
+01C0   0008           00588         RETURN
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 19
+
+
+LOC  OBJECT CODE     LINE SOURCE TEXT
+  VALUE
+
+                      00589 ;******************************************************************************;
+                      00590 ;                       INITIALIZE RTC TIME                                    ;
+                      00591 ;******************************************************************************;                
+01C1                  00592 SET_RTC_TIME
+                      00593         rtc_resetAll    ;reset rtc
                           M ;input:         none
                           M ;output:        none
                           M ;desc:          Resets all the time keeping registers on the RTC to zero
-01B5   1283 1303          M         banksel     0x74
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 19
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-01B7   01F4               M         clrf        0x74
-01B8   1283 1303          M         banksel     0x73
-01BA   01F3               M         clrf        0x73
-01BB   2???               M         call        write_rtc           ;Write 0 to Seconds
-01BC   1283 1303          M         banksel     0x73
-Message[305]: Using default destination of 1 (file).
-01BE   0AF3               M         incf        0x73                        ;Set register address to 1
-01BF   2???               M         call        write_rtc
-01C0   1283 1303          M         banksel     0x73
-Message[305]: Using default destination of 1 (file).
-01C2   0AF3               M         incf        0x73                        ;Set register address to 2
-01C3   2???               M         call        write_rtc
+01C1   1283 1303          M         banksel     0x74
+01C3   01F4               M         clrf        0x74
 01C4   1283 1303          M         banksel     0x73
-Message[305]: Using default destination of 1 (file).
-01C6   0AF3               M         incf        0x73                        ;Set register address to 3
-01C7   2???               M         call        write_rtc
+01C6   01F3               M         clrf        0x73
+01C7   2???               M         call        write_rtc           ;Write 0 to Seconds
 01C8   1283 1303          M         banksel     0x73
 Message[305]: Using default destination of 1 (file).
-01CA   0AF3               M         incf        0x73                        ;Set register address to 4
+01CA   0AF3               M         incf        0x73                        ;Set register address to 1
 01CB   2???               M         call        write_rtc
 01CC   1283 1303          M         banksel     0x73
 Message[305]: Using default destination of 1 (file).
-01CE   0AF3               M         incf        0x73                        ;Set register address to 5
+01CE   0AF3               M         incf        0x73                        ;Set register address to 2
 01CF   2???               M         call        write_rtc
 01D0   1283 1303          M         banksel     0x73
 Message[305]: Using default destination of 1 (file).
-01D2   0AF3               M         incf        0x73                        ;Set register address to 6
+01D2   0AF3               M         incf        0x73                        ;Set register address to 3
 01D3   2???               M         call        write_rtc
-                      00585 
-                      00586         rtc_set     0x00,       B'10000000'
-                          M ;input:         addliteral: value of address
-                          M ;                       datliteral: value of data
-                          M ;output:        none
-                          M ;desc:          loads the data in datliteral into the 
-                          M ;                       address specified by addliteral in the RTC
 01D4   1283 1303          M         banksel     0x73
-01D6   3000               M         movlw       0x00
-01D7   00F3               M         movwf       0x73
-01D8   1283 1303          M         banksel     0x74
-01DA   3080               M         movlw       B'10000000'
-01DB   00F4               M         movwf       0x74        
-01DC   2???               M         call        write_rtc
-                      00587 
-                      00588         ;set time 
-                      00589         rtc_set     0x06,       B'00010110'             ; Year
+Message[305]: Using default destination of 1 (file).
+01D6   0AF3               M         incf        0x73                        ;Set register address to 4
+01D7   2???               M         call        write_rtc
+01D8   1283 1303          M         banksel     0x73
+Message[305]: Using default destination of 1 (file).
+01DA   0AF3               M         incf        0x73                        ;Set register address to 5
+01DB   2???               M         call        write_rtc
+01DC   1283 1303          M         banksel     0x73
+Message[305]: Using default destination of 1 (file).
+01DE   0AF3               M         incf        0x73                        ;Set register address to 6
+01DF   2???               M         call        write_rtc
+                      00594 
+                      00595         rtc_set     0x00,       B'10000000'
                           M ;input:         addliteral: value of address
                           M ;                       datliteral: value of data
                           M ;output:        none
                           M ;desc:          loads the data in datliteral into the 
                           M ;                       address specified by addliteral in the RTC
-01DD   1283 1303          M         banksel     0x73
-01DF   3006               M         movlw       0x06
-01E0   00F3               M         movwf       0x73
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 20
+01E0   1283 1303          M         banksel     0x73
+01E2   3000               M         movlw       0x00
+01E3   00F3               M         movwf       0x73
+01E4   1283 1303          M         banksel     0x74
+01E6   3080               M         movlw       B'10000000'
+01E7   00F4               M         movwf       0x74        
+01E8   2???               M         call        write_rtc
+                      00596 
+                      00597         ;set time 
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 20
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-01E1   1283 1303          M         banksel     0x74
-01E3   3016               M         movlw       B'00010110'
-01E4   00F4               M         movwf       0x74        
-01E5   2???               M         call        write_rtc
-                      00590         rtc_set     0x05,       B'00000100'             ; Month
+                      00598         rtc_set     0x06,       B'00010110'             ; Year
                           M ;input:         addliteral: value of address
                           M ;                       datliteral: value of data
                           M ;output:        none
                           M ;desc:          loads the data in datliteral into the 
                           M ;                       address specified by addliteral in the RTC
-01E6   1283 1303          M         banksel     0x73
-01E8   3005               M         movlw       0x05
-01E9   00F3               M         movwf       0x73
-01EA   1283 1303          M         banksel     0x74
-01EC   3004               M         movlw       B'00000100'
-01ED   00F4               M         movwf       0x74        
-01EE   2???               M         call        write_rtc
-                      00591         rtc_set     0x04,       B'00000110'             ; Date
+01E9   1283 1303          M         banksel     0x73
+01EB   3006               M         movlw       0x06
+01EC   00F3               M         movwf       0x73
+01ED   1283 1303          M         banksel     0x74
+01EF   3016               M         movlw       B'00010110'
+01F0   00F4               M         movwf       0x74        
+01F1   2???               M         call        write_rtc
+                      00599         rtc_set     0x05,       B'00000100'             ; Month
                           M ;input:         addliteral: value of address
                           M ;                       datliteral: value of data
                           M ;output:        none
                           M ;desc:          loads the data in datliteral into the 
                           M ;                       address specified by addliteral in the RTC
-01EF   1283 1303          M         banksel     0x73
-01F1   3004               M         movlw       0x04
-01F2   00F3               M         movwf       0x73
-01F3   1283 1303          M         banksel     0x74
-01F5   3006               M         movlw       B'00000110'
-01F6   00F4               M         movwf       0x74        
-01F7   2???               M         call        write_rtc
-                      00592         rtc_set     0x03,       B'00000010'             ; Day
+01F2   1283 1303          M         banksel     0x73
+01F4   3005               M         movlw       0x05
+01F5   00F3               M         movwf       0x73
+01F6   1283 1303          M         banksel     0x74
+01F8   3004               M         movlw       B'00000100'
+01F9   00F4               M         movwf       0x74        
+01FA   2???               M         call        write_rtc
+                      00600         rtc_set     0x04,       B'00000110'             ; Date
                           M ;input:         addliteral: value of address
                           M ;                       datliteral: value of data
                           M ;output:        none
                           M ;desc:          loads the data in datliteral into the 
                           M ;                       address specified by addliteral in the RTC
-01F8   1283 1303          M         banksel     0x73
-01FA   3003               M         movlw       0x03
-01FB   00F3               M         movwf       0x73
-01FC   1283 1303          M         banksel     0x74
-01FE   3002               M         movlw       B'00000010'
-01FF   00F4               M         movwf       0x74        
-0200   2???               M         call        write_rtc
-                      00593         rtc_set     0x02,       B'00000000'             ; Hours
+01FB   1283 1303          M         banksel     0x73
+01FD   3004               M         movlw       0x04
+01FE   00F3               M         movwf       0x73
+01FF   1283 1303          M         banksel     0x74
+0201   3006               M         movlw       B'00000110'
+0202   00F4               M         movwf       0x74        
+0203   2???               M         call        write_rtc
+                      00601         rtc_set     0x03,       B'00000010'             ; Day
                           M ;input:         addliteral: value of address
                           M ;                       datliteral: value of data
                           M ;output:        none
                           M ;desc:          loads the data in datliteral into the 
                           M ;                       address specified by addliteral in the RTC
-0201   1283 1303          M         banksel     0x73
-0203   3002               M         movlw       0x02
-0204   00F3               M         movwf       0x73
-0205   1283 1303          M         banksel     0x74
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 21
+0204   1283 1303          M         banksel     0x73
+0206   3003               M         movlw       0x03
+0207   00F3               M         movwf       0x73
+0208   1283 1303          M         banksel     0x74
+020A   3002               M         movlw       B'00000010'
+020B   00F4               M         movwf       0x74        
+020C   2???               M         call        write_rtc
+                      00602         rtc_set     0x02,       B'00000000'             ; Hours
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 21
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0207   3000               M         movlw       B'00000000'
-0208   00F4               M         movwf       0x74        
-0209   2???               M         call        write_rtc
-                      00594         rtc_set     0x01,       B'00000000'             ; Minutes
                           M ;input:         addliteral: value of address
                           M ;                       datliteral: value of data
                           M ;output:        none
                           M ;desc:          loads the data in datliteral into the 
                           M ;                       address specified by addliteral in the RTC
-020A   1283 1303          M         banksel     0x73
-020C   3001               M         movlw       0x01
-020D   00F3               M         movwf       0x73
-020E   1283 1303          M         banksel     0x74
-0210   3000               M         movlw       B'00000000'
-0211   00F4               M         movwf       0x74        
-0212   2???               M         call        write_rtc
-                      00595         rtc_set     0x00,       B'00000000'             ; Seconds
+020D   1283 1303          M         banksel     0x73
+020F   3002               M         movlw       0x02
+0210   00F3               M         movwf       0x73
+0211   1283 1303          M         banksel     0x74
+0213   3000               M         movlw       B'00000000'
+0214   00F4               M         movwf       0x74        
+0215   2???               M         call        write_rtc
+                      00603         rtc_set     0x01,       B'00000000'             ; Minutes
                           M ;input:         addliteral: value of address
                           M ;                       datliteral: value of data
                           M ;output:        none
                           M ;desc:          loads the data in datliteral into the 
                           M ;                       address specified by addliteral in the RTC
-0213   1283 1303          M         banksel     0x73
-0215   3000               M         movlw       0x00
-0216   00F3               M         movwf       0x73
-0217   1283 1303          M         banksel     0x74
-0219   3000               M         movlw       B'00000000'
-021A   00F4               M         movwf       0x74        
-021B   2???               M         call        write_rtc
-021C   0008           00596         return
-                      00597 
-                      00598 ;******************************************************************************;                
-                      00599 ;******************************************************************************;
-                      00600 ;******************************************************************************;
-021D                  00601 DIV16X8 ; DIV_HI and DIV_LO / DIVSOR.  result to Q
-                      00602                 ; does not deal with divide by 0 case
-021D   01C5           00603         CLRF Q
-021E                  00604 DIV_1
-021E   0844           00605         MOVF DIVISOR, W
-021F   02C3           00606         SUBWF DIV_LO, F
-0220   1C03           00607         BTFSS STATUS, C ; if positive skip
-0221   2???           00608         GOTO BORROW
-0222   2???           00609         GOTO DIV_2
-0223                  00610 BORROW
-0223   3001           00611         MOVLW 0x01
-0224   02C2           00612         SUBWF DIV_HI, F ; DIV_HI = DIV_HI - 1
-0225   1C03           00613         BTFSS STATUS, C ; if no borrow occurred
-0226   2???           00614         GOTO DIV_DONE   
-0227                  00615 DIV_2
-0227   0AC5           00616         INCF Q, F
-0228   2???           00617         GOTO DIV_1
-0229                  00618 DIV_DONE
-0229   0008           00619         RETURN
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 22
+0216   1283 1303          M         banksel     0x73
+0218   3001               M         movlw       0x01
+0219   00F3               M         movwf       0x73
+021A   1283 1303          M         banksel     0x74
+021C   3000               M         movlw       B'00000000'
+021D   00F4               M         movwf       0x74        
+021E   2???               M         call        write_rtc
+                      00604         rtc_set     0x00,       B'00000000'             ; Seconds
+                          M ;input:         addliteral: value of address
+                          M ;                       datliteral: value of data
+                          M ;output:        none
+                          M ;desc:          loads the data in datliteral into the 
+                          M ;                       address specified by addliteral in the RTC
+021F   1283 1303          M         banksel     0x73
+0221   3000               M         movlw       0x00
+0222   00F3               M         movwf       0x73
+0223   1283 1303          M         banksel     0x74
+0225   3000               M         movlw       B'00000000'
+0226   00F4               M         movwf       0x74        
+0227   2???               M         call        write_rtc
+0228   0008           00605         return
+                      00606 
+                      00607 ;******************************************************************************;                
+                      00608 ;******************************************************************************;
+                      00609 ;******************************************************************************;
+0229                  00610 DIV16X8 ; DIV_HI and DIV_LO / DIVSOR.  result to Q
+                      00611                 ; does not deal with divide by 0 case
+0229   01C5           00612         CLRF Q
+022A                  00613 DIV_1
+022A   0844           00614         MOVF DIVISOR, W
+022B   02C3           00615         SUBWF DIV_LO, F
+022C   1C03           00616         BTFSS STATUS, C ; if positive skip
+022D   2???           00617         GOTO BORROW
+022E   2???           00618         GOTO DIV_2
+022F                  00619 BORROW
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 22
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00620         
-022A                  00621 LONG_DLY
-022A   30FF           00622         MOVLW       0xFF
-022B   00BF           00623         MOVWF       long_del
-022C                  00624 LD_LOOP 
+022F   3001           00620         MOVLW 0x01
+0230   02C2           00621         SUBWF DIV_HI, F ; DIV_HI = DIV_HI - 1
+0231   1C03           00622         BTFSS STATUS, C ; if no borrow occurred
+0232   2???           00623         GOTO DIV_DONE   
+0233                  00624 DIV_2
+0233   0AC5           00625         INCF Q, F
+0234   2???           00626         GOTO DIV_1
+0235                  00627 DIV_DONE
+0235   0008           00628         RETURN
+                      00629         
+0236                  00630 LONG_DLY
+0236   30FF           00631         MOVLW       0xFF
+0237   00BF           00632         MOVWF       long_del
+0238                  00633 LD_LOOP 
 Warning[207]: Found label after column 1. (LCD_DLY)
-022C                  00625         LCD_DLY
-022C   0BBF           00626         DECFSZ      long_del, f
-022D   2???           00627         GOTO        LD_LOOP
-022E   0008           00628         RETURN
-                      00629 
-022F                  00630 DEL_20US
-022F   3021           00631         movlw   0x21
-0230   00C6           00632         movwf   d1
-0231                  00633 DEL_20US_0
-0231   0BC6           00634         decfsz  d1, f
-0232   2???           00635         goto    DEL_20US_0
-0233   0008           00636         RETURN
-                      00637 
-0234                  00638 FINISH  
-0234   2???           00639         GOTO    FINISH
-                      00640         
-3F72                  00641         END
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 23
+0238                  00634         LCD_DLY
+0238   0BBF           00635         DECFSZ      long_del, f
+0239   2???           00636         GOTO        LD_LOOP
+023A   0008           00637         RETURN
+                      00638 
+023B                  00639 DEL_20US
+023B   3021           00640         movlw   0x21
+023C   00C6           00641         movwf   d1
+023D                  00642 DEL_20US_0
+023D   0BC6           00643         decfsz  d1, f
+023E   2???           00644         goto    DEL_20US_0
+023F   0008           00645         RETURN
+                      00646 
+0240                  00647 FINISH  
+0240   2???           00648         GOTO    FINISH
+                      00649         
+3F72                  00650         END
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 23
 
 
 SYMBOL TABLE
@@ -1287,16 +1296,16 @@ ADIF                              00000006
 ADON                              00000000
 ADRESH                            0000001E
 ADRESL                            0000009E
-ARM_TOGGLE                        0000007C
+ARM_TOGGLE                        00000088
 B1                                0000003A
 B2                                0000003B
 BCLIE                             00000003
 BCLIF                             00000003
 BF                                00000000
-BORROW                            00000223
+BORROW                            0000022F
 BRGH                              00000002
 C                                 00000000
-CALIBRATE                         00000037
+CALIBRATE                         00000038
 CCP1CON                           00000017
 CCP1IE                            00000002
 CCP1IF                            00000002
@@ -1325,7 +1334,7 @@ CHS0                              00000003
 CHS1                              00000004
 CHS2                              00000005
 CKE                               00000006
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 24
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 24
 
 
 SYMBOL TABLE
@@ -1339,15 +1348,15 @@ CSRC                              00000007
 D                                 00000005
 DAT                               00000037
 DATA_ADDRESS                      00000005
-DATA_LOOP                         000000AB
+DATA_LOOP                         000000B7
 DC                                00000001
-DEL_20US                          0000022F
-DEL_20US_0                        00000231
-DIV16X8                           0000021D
+DEL_20US                          0000023B
+DEL_20US_0                        0000023D
+DIV16X8                           00000229
 DIVISOR                           00000044
-DIV_1                             0000021E
-DIV_2                             00000227
-DIV_DONE                          00000229
+DIV_1                             0000022A
+DIV_2                             00000233
+DIV_DONE                          00000235
 DIV_HI                            00000042
 DIV_LO                            00000043
 DOUT                              00000039
@@ -1364,11 +1373,11 @@ EEIF                              00000004
 EEPGD                             00000007
 F                                 00000001
 FERR                              00000002
-FINISH                            00000234
+FINISH                            00000240
 FSR                               00000004
 GCEN                              00000007
-GET_START_TIME                    00000120
-GET_STOP_TIME                     0000013B
+GET_START_TIME                    0000012C
+GET_STOP_TIME                     00000147
 GIE                               00000007
 GO                                00000002
 GO_DONE                           00000002
@@ -1384,22 +1393,22 @@ INIT                              00000005
 INTCON                            0000000B
 INTE                              00000004
 INTEDG                            00000006
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 25
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 25
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
 INTF                              00000001
-INT_HANDLER                       0000003B
+INT_HANDLER                       00000047
 IRP                               00000007
 InitLCD                           00000000
-LCD_DLY                           0000022C
+LCD_DLY                           00000238
 LCD_INS                           
-LD_LOOP                           0000022C
-LONG_DLY                          0000022A
+LD_LOOP                           00000238
+LONG_DLY                          00000236
 MULT                              
-MX_LOOP                           00000053
+MX_LOOP                           0000005F
 NOT_A                             00000005
 NOT_ADDRESS                       00000005
 NOT_BO                            00000000
@@ -1443,17 +1452,17 @@ PS2                               00000002
 PSA                               00000003
 PSPIE                             00000007
 PSPIF                             00000007
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 26
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 26
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
 PSPMODE                           00000004
-PWML                              00000047
-PWML_DN                           00000049
-PWMR                              0000004C
-PWMR_DN                           0000004E
+PWML                              00000053
+PWML_DN                           00000055
+PWMR                              00000058
+PWMR_DN                           0000005A
 Q                                 00000045
 R                                 00000002
 RA0                               00000000
@@ -1500,16 +1509,16 @@ RD7                               00000007
 RE0                               00000000
 RE1                               00000001
 RE2                               00000002
-READ_IRS                          00000051
+READ_IRS                          0000005D
 READ_WRITE                        00000002
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 27
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 27
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
-REALIGN                           0000007D
-RETURN_HOME                       00000097
+REALIGN                           00000089
+RETURN_HOME                       000000A3
 RP0                               00000005
 RP1                               00000006
 RSEN                              00000001
@@ -1518,10 +1527,10 @@ RX9D                              00000000
 R_NOT_W                           00000002
 R_W                               00000002
 S                                 00000003
-SCAN                              00000038
+SCAN                              00000044
 SEN                               00000000
-SET_RTC_TIME                      000001B5
-SHOW_RTC                          00000156
+SET_RTC_TIME                      000001C1
+SHOW_RTC                          00000162
 SMP                               00000007
 SPBRG                             00000099
 SPEN                              00000007
@@ -1539,12 +1548,12 @@ SSPM2                             00000002
 SSPM3                             00000003
 SSPOV                             00000006
 SSPSTAT                           00000094
-START_MSG                         000000CF
+START_MSG                         000000DB
 START_STDBY                       0000002C
 STATUS                            00000003
-STOP_DATA                         000000A0
-STOP_STDBY                        00000098
-STOP_STDBY_MSG                    000000EC
+STOP_DATA                         000000AC
+STOP_STDBY                        000000A4
+STOP_STDBY_MSG                    000000F8
 SYNC                              00000004
 T0CS                              00000005
 T0IE                              00000005
@@ -1561,7 +1570,7 @@ T2CKPS1                           00000001
 T2CON                             00000012
 TMR0                              00000001
 TMR0IE                            00000005
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 28
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 28
 
 
 SYMBOL TABLE
@@ -1620,7 +1629,7 @@ TRISD7                            00000007
 TRISE                             00000089
 TRISE0                            00000000
 TRISE1                            00000001
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 29
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 29
 
 
 SYMBOL TABLE
@@ -1638,16 +1647,16 @@ TXIF                              00000004
 TXREG                             00000019
 TXSTA                             00000098
 UA                                00000001
-USHOLD                            00000086
-USONIC_READ_ECHO                  00000083
-USONIC_SEND_PULSE                 0000007F
+USHOLD                            00000092
+USONIC_READ_ECHO                  0000008F
+USONIC_SEND_PULSE                 0000008B
 W                                 00000000
 WCOL                              00000007
-WHL_ENC                           00000079
+WHL_ENC                           00000085
 WR                                00000001
 WREN                              00000002
 WRERR                             00000003
-WRT_DATA                          00000109
+WRT_DATA                          00000115
 WRT_LCD                           
 WRT_MEM_LCD                       
 WR_DATA                           00000000
@@ -1655,8 +1664,8 @@ WR_INS                            00000000
 XBUF                              00000033
 Z                                 00000002
 _.org_1_0032                      00000032
-_.org_1_006D                      0000006D
-_.org_1_0084                      00000084
+_.org_1_0079                      00000079
+_.org_1_0090                      00000090
 _BODEN_OFF                        00003FBF
 _BODEN_ON                         00003FFF
 _BOREN_OFF                        00003FBF
@@ -1679,7 +1688,7 @@ _HS_OSC                           00003FFE
 _IDLOC0                           00002000
 _IDLOC1                           00002001
 _IDLOC2                           00002002
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 30
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 30
 
 
 SYMBOL TABLE
@@ -1738,7 +1747,7 @@ stop_min                          0000004D
 stop_min10                        0000004E
 stop_sec                          0000004F
 stop_sec10                        00000050
-MPASM 5.65                          MAIN.ASM   3-5-2016  8:01:29         PAGE 31
+MPASM 5.65                          MAIN.ASM   3-5-2016  8:09:03         PAGE 31
 
 
 SYMBOL TABLE

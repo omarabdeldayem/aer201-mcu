@@ -137,9 +137,7 @@ INIT
        
 	BCF	    STATUS, RP0		; select bank 0
 	
-;	BSF	    INTCON, RBIE	; Enable interrupts
-;	BSF	    INTCON, INTE
-;	BSF	    INTCON, GIE
+;	
 	
 	CLRF	    CCPR1L		; Se Btup PWM pins
 	CLRF	    CCPR2L
@@ -189,16 +187,27 @@ START_STDBY
 	
 	CALL	    CLR_LCD
 	;CALL	    GET_START_TIME
+	CALL	    ARM_TOGGLE
 	BSF	    PORTD, 7
 	BSF	    PORTD, 6
-
-	GOTO	    SCAN
+	GOTO	    CALIBRATE
 
 ;******************************************************************************;
 ;			    SENSOR CALIBRATION				       ;
 ;******************************************************************************;
 CALIBRATE
+	CALL	    PWML
+	CALL	    PWMR
+	CALL	    USONIC_SEND_PULSE
+	CALL	    USONIC_READ_ECHO
+	MOVFW	    rob_lat_distance
+	SUBLW	    0x04
+	BTFSS	    STATUS, 2
 	GOTO	    CALIBRATE
+	BSF	    INTCON, RBIE	    ; Enable interrupts
+	BSF	    INTCON, INTE
+	BSF	    INTCON, GIE
+	GOTO	    SCAN
 	
 ;******************************************************************************;
 ;			  PIPE SCAN SUPERLOOP				       ;
@@ -290,14 +299,14 @@ MX_LOOP
 	
 	BTFSS	    PORTC, 0
 	GOTO	    $+3
-	BSF	    PORTA, 5
+	BSF	    PORTA, 5				; Buzzer start
 	MOVFW	    rob_long_distance			; Save spot location
 	ADDWF	    (spot_base_loc + num_spots), F
-	INCF	    num_spots, f
+	INCF	    num_spots, f			; Increase number of spots
 	INCF	    multiplex_count
 	MOVFW	    multiplex_count
-	BCF	    PORTA, 5
-	SUBLW	    d'16'
+	BCF	    PORTA, 5				; Buzzer stop
+	SUBLW	    d'16'				; Test if all IRs have been checked
 	BTFSS	    STATUS, 2
 	GOTO	    MX_LOOP
 	RETURN
