@@ -68,7 +68,8 @@
 	multiplex_count
 	rob_lat_distance
 	rob_long_distance
-	measured_distance
+	measured_distance_lat
+	measured_distance_sup
 	rob_return
 	spot_count
 	num_spots
@@ -198,8 +199,7 @@ START_STDBY
 CALIBRATE
 	CALL	    PWML
 	CALL	    PWMR
-	CALL	    USONIC_SEND_PULSE
-	CALL	    USONIC_READ_ECHO
+	CALL	    USONIC_LAT
 	MOVFW	    rob_lat_distance
 	SUBLW	    0x04
 	BTFSS	    STATUS, 2
@@ -213,8 +213,7 @@ CALIBRATE
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-;	CALL	    USONIC_SEND_PULSE
-;	CALL	    USONIC_READ_ECHO
+;	CALL	    USONIC_LAT
 	CALL	    PWML
 	CALL	    PWMR
 ;	CALL	    SHOW_RTC		    ; DEBUG
@@ -338,18 +337,16 @@ REALIGN
 ;******************************************************************************;
 ;		      ULTRASONIC SENSOR SUBROUTINES			       ;
 ;******************************************************************************;
-USONIC_SEND_PULSE
+USONIC_LAT
 	BSF	    PORTB, 3
 	CALL	    DEL_20US
 	BCF	    PORTB, 3
-	RETURN
-
-USONIC_READ_ECHO
+USONIC_LAT_ECHO
 	BTFSS	    PORTB, 4
 	GOTO	    $-1
 	BSF	    T1CON, 0
-USHOLD	BTFSC	    PORTB, 4
-	GOTO	    USHOLD
+USHOLDL	BTFSC	    PORTB, 4
+	GOTO	    USHOLDL
 	BCF	    T1CON, 0
 	MOVF	    TMR1H, W
 	MOVWF	    DIV_HI
@@ -361,16 +358,32 @@ USHOLD	BTFSC	    PORTB, 4
 	MOVWF	    DIVISOR
 	CALL	    DIV16X8
 	MOVF	    Q, W
-	MOVWF	    measured_distance
-	; CALL	    rtc_convert
-	;CALL	    CLR_LCD		; DEBUG!
-	;WRT_MEM_LCD 0x77
-	;WRT_MEM_LCD 0x78
-	SUBLW	    0x05
-	MOVWF	    rob_lat_distance
-	;BTFSC	    STATUS
+	MOVWF	    measured_distance_lat
 	RETURN
 
+USONIC_SUP
+	BSF	    PORTC, 3
+	CALL	    DEL_20US
+	BCF	    PORTC, 3
+USONIC_SUP_ECHO
+	BTFSS	    PORTC, 4
+	GOTO	    $-1
+	BSF	    T1CON, 0
+USHOLDS	BTFSC	    PORTC, 4
+	GOTO	    USHOLDS
+	BCF	    T1CON, 0
+	MOVF	    TMR1H, W
+	MOVWF	    DIV_HI
+	MOVF	    TMR1L, W
+	MOVWF	    DIV_LO
+	CLRF	    TMR1H
+	CLRF	    TMR1L
+	MOVLW	    d'58'
+	MOVWF	    DIVISOR
+	CALL	    DIV16X8
+	MOVF	    Q, W
+	MOVWF	    measured_distance_sup
+	RETURN
 ;******************************************************************************;
 ;			    RETURN HOME ROUTINE				       ;
 ;******************************************************************************;
