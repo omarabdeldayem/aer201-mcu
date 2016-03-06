@@ -77,9 +77,10 @@
 	ENDC
 
 ;******************************************************************************;
-;				BANK0 RAM				       ;
+;				EQUATES				       ;
 ;******************************************************************************;
 	#define	    crit_dist	    d'5'
+	#define	    MOTOR_DIR_CTRL  PORTC, 5
 ;******************************************************************************;
 ;				MACROS					       ;
 ;******************************************************************************;
@@ -189,8 +190,7 @@ START_STDBY
 	CALL	    CLR_LCD
 	;CALL	    GET_START_TIME
 	CALL	    ARM_TOGGLE
-	BSF	    PORTD, 7
-	BSF	    PORTD, 6
+	BSF	    MOTOR_DIR_CTRL
 	GOTO	    CALIBRATE
 
 ;******************************************************************************;
@@ -201,7 +201,7 @@ CALIBRATE
 	CALL	    PWMR
 	CALL	    USONIC_LAT
 	MOVFW	    rob_lat_distance
-	SUBLW	    0x04
+	SUBLW	    crit_dist
 	BTFSS	    STATUS, 2
 	GOTO	    CALIBRATE
 	BSF	    INTCON, RBIE	    ; Enable interrupts
@@ -265,10 +265,10 @@ PWMR_DN
 ;			CYCLE INFRARED SENSORS   			       ;
 ;******************************************************************************;
 READ_IRS
-	MOVLW	    d'0'
+	MOVLW	    d'16'
 	MOVWF	    multiplex_count
 MX_LOOP	
-	;CALL	    LONG_DLY
+	DECF	    multiplex_count
 	BCF	    PORTE, 0
 	BTFSC	    multiplex_count, 0
 	BSF	    PORTE, 0
@@ -305,8 +305,8 @@ MX_LOOP
 	INCF	    multiplex_count
 	MOVFW	    multiplex_count
 	BCF	    PORTA, 5				; Buzzer stop
-	SUBLW	    d'16'				; Test if all IRs have been checked
-	BTFSS	    STATUS, 2
+	INCF	    multiplex_count
+	DECFSZ	    multiplex_count
 	GOTO	    MX_LOOP
 	RETURN
 ;******************************************************************************;
@@ -325,14 +325,6 @@ ARM_TOGGLE
 	; if degree is set to 180, set to 0
 	; otherwise set to 0
 	GOTO	    ARM_TOGGLE
-
-;******************************************************************************;
-;			  ROBOT REALIGNMENT ROUTINE	    		       ;
-;******************************************************************************;
-REALIGN
-	MOVLW	    0x03
-;	SUBWF	    
-	RETURN
 	
 ;******************************************************************************;
 ;		      ULTRASONIC SENSOR SUBROUTINES			       ;
@@ -388,9 +380,9 @@ USHOLDS	BTFSC	    PORTC, 4
 ;			    RETURN HOME ROUTINE				       ;
 ;******************************************************************************;
 RETURN_HOME
-	
+	BCF	    MOTOR_DIR_CTRL
+	CALL	    TOGGLE_ARM
 	RETURN
-
 
 ;******************************************************************************;
 ;			      STOP STANDBY				       ;
@@ -423,7 +415,6 @@ STOP_DATA
 	
 	MOVLW	    spot_base_loc
 	MOVWF	    FSR
-	
 	
 DATA_LOOP	
 	WRT_LCD	    "S"
