@@ -214,6 +214,16 @@ CALIBRATE
 ;******************************************************************************;
 SCAN
 ;	CALL	    USONIC_LAT
+	MOVLW	    0x05
+	SUBWF	    measured_distance_lat, W
+	BTFSC	    STATUS, 2
+	GOTO	    RETURN_HOME
+;	CALL	    USONIC_SUP
+	MOVLW	    0x05
+	SUBWF	    measured_distance_sup, W
+	BTFSC	    STATUS, 2
+	CALL	    ARM_OPEN
+	CALL	    ARM_CLOSE
 ;	CALL	    SHOW_RTC		    ; DEBUG
 	;CALL	    READ_IRS
 	GOTO	    SCAN
@@ -294,14 +304,16 @@ WHL_ENC
 	RETURN
 	
 ;******************************************************************************;
-;			TOGGLE ARM STATE ROUTINE   			       ;
+;			TOGGLE ARM STATE SUBROUTINES  			       ;
 ;******************************************************************************;
-ARM_TOGGLE
+ARM_OPEN
 	; control servo to control arm
 	; if degree is set to 180, set to 0
 	; otherwise set to 0
-	GOTO	    ARM_TOGGLE
+	RETURN	    
 	
+ARM_CLOSE
+	RETURN
 ;******************************************************************************;
 ;		      ULTRASONIC SENSOR SUBROUTINES			       ;
 ;******************************************************************************;
