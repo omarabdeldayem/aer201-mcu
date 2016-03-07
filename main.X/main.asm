@@ -134,23 +134,23 @@ INIT
 	MOVLW	    b'00000111'		; PORT E pin mapping
 	MOVWF	    TRISE
 	
-	MOVLW	    b'01000001'		; PWM pulsing period (484Hz)
+	MOVLW	    B'11111111'		; PWM pulsing period (484Hz)
 	MOVWF	    PR2
        
 	BCF	    STATUS, RP0		; select bank 0
-	
-;	
-	
-	CLRF	    CCPR1L		; Se Btup PWM pins
-	CLRF	    CCPR2L
-	MOVLW	    B'10011100'
+
+	MOVLW	    B'01100100'		; 100% DUTY CYCLE
+	MOVWF	    CCPR1L		
+	MOVLW	    B'00000110'		; 10% DUTY CYCLE
+	MOVWF	    CCPR2L
+	MOVLW	    B'11111111'
 	MOVWF	    CCP1CON
 	MOVWF	    CCP2CON
-	
-	MOVLW	    B'00000101'		; Initialize and start timer 2
+;	
+	MOVLW	    B'00000101'		; Initialize and hold timer 2
 	MOVWF	    T2CON
 	CLRF	    TMR2
-	BSF	    T2CON, TMR2ON
+	BCF	    T2CON, TMR2ON
 	
 	MOVLW	    0X10		; TMR1 for Ultrasonic Sensors
 	MOVWF	    T1CON
@@ -189,16 +189,16 @@ START_STDBY
 	
 	CALL	    CLR_LCD
 	;CALL	    GET_START_TIME
-	CALL	    ARM_TOGGLE
+	;CALL	    ARM_TOGGLE
 	BSF	    MOTOR_DIR_CTRL
-	GOTO	    CALIBRATE
+	BSF	    T2CON, TMR2ON
+	GOTO	    SCAN
+	;GOTO	    CALIBRATE
 
 ;******************************************************************************;
 ;			    SENSOR CALIBRATION				       ;
 ;******************************************************************************;
 CALIBRATE
-	CALL	    PWML
-	CALL	    PWMR
 	CALL	    USONIC_LAT
 	MOVFW	    rob_lat_distance
 	SUBLW	    crit_dist
@@ -214,8 +214,6 @@ CALIBRATE
 ;******************************************************************************;
 SCAN
 ;	CALL	    USONIC_LAT
-	CALL	    PWML
-	CALL	    PWMR
 ;	CALL	    SHOW_RTC		    ; DEBUG
 	;CALL	    READ_IRS
 	GOTO	    SCAN
@@ -238,28 +236,6 @@ INT_HANDLER
 	SWAPF	    temp_w, W
 	GOTO	    STOP_STDBY
 	RETFIE
-	
-;******************************************************************************;
-;			    PWM CONTROL					       ;
-;******************************************************************************;
-PWML	
-	INCFSZ	    CCPR1L
-	;CALL	    DEL_20US
-	;CALL	    DEL_20US
-	GOTO	    PWML
-PWML_DN	
-	DECFSZ	    CCPR1L
-	GOTO	    PWML_DN
-	RETURN
-
-PWMR	
-	INCFSZ	    CCPR2L
-	;CALL	    DEL_20US
-	GOTO	    PWMR
-PWMR_DN	
-	DECFSZ	    CCPR2L
-	GOTO	    PWMR_DN
-	RETURN
 
 ;******************************************************************************;
 ;			CYCLE INFRARED SENSORS   			       ;
@@ -381,7 +357,7 @@ USHOLDS	BTFSC	    PORTC, 4
 ;******************************************************************************;
 RETURN_HOME
 	BCF	    MOTOR_DIR_CTRL
-	CALL	    TOGGLE_ARM
+;	CALL	    TOGGLE_ARM
 	RETURN
 
 ;******************************************************************************;
