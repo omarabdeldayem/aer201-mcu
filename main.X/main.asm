@@ -27,30 +27,13 @@
 ;				BANK0 RAM				       ;
 ;******************************************************************************;
 	CBLOCK	    0x30
-		    ; RTC I2C Mem
-	dt1	    ; 0x30	    
-        dt2
-        dt3
-        XBUF
-        count
-        CONTROL
-        ADD
-        DAT
-        flag
-        DOUT
-        B1
-        B2
-		    ; LCD MEM
-	lcd_tmp
-	lcd_d1
-	lcd_d2
 	long_del
-	temp_w	    ; 0x40
-	temp_status ; 0x41
+	temp_w	    ; 0x30
+	temp_status ; 0x31
 		    ; DIVISION Registers
-	DIV_HI	    ; 0X42
-	DIV_LO	    ; 0X43
-	DIVISOR	    ; 0X44
+	DIV_HI	    ; 0X32
+	DIV_LO	    ; 0X33
+	DIVISOR	    ; 0X34
 	Q
 	d1
 	d2
@@ -197,10 +180,6 @@ START_STDBY
 	BSF	    T2CON, TMR2ON
 	CALL	    SET_RTC_TIME
 	CALL	    GET_START_TIME
-	
-	BSF	    INTCON, RBIE	    ; Enable interrupts
-	BSF	    INTCON, INTE
-	BSF	    INTCON, GIE
 	;GOTO	    SCAN
 	GOTO	    CALIBRATE
 	;CALL	    DEL_1S
@@ -312,13 +291,10 @@ WHL_ENC
 ARM_CTRL
 	MOVLW	    crit_dist
 	SUBWF	    measured_distance_sup, W
-	BTFSC	    STATUS, 0
+	BTFSC	    STATUS, 0		    ; C==0 if measured_distance_sup < crit_dist
 	GOTO	    ARM_CLOSE
 	GOTO	    ARM_OPEN
-ARM_CLOSE
-	; control servo to control arm
-	; if degree is set to 180, set to 0
-	; otherwise set to 0
+ARM_CLOSE				    ; Close arm for full scan
 	BSF	    PORTA, 5
 	CALL	    DEL_1_5MS
 	BCF	    PORTA, 5
@@ -328,7 +304,7 @@ ARM_CLOSE
 	CALL	    DEL_10MS
 	RETURN	    
 	
-ARM_OPEN
+ARM_OPEN				    ; Open arm to clear support
 	BSF	    PORTA, 5
 	CALL	    DEL_2_1MS
 	CALL	    DEL_2_1MS
@@ -398,15 +374,17 @@ USHOLDS	BTFSC	    PORTC, 7
 RETURN_HOME
 	CLRF	    INTCON
 	BCF	    MOTOR_DIR_CTRL
-	CALL	    ARM_OPEN
+	CALL	    ARM_CTRL
 	CALL	    USONIC_LAT
-	MOVFW	    rob_lat_distance
-	SUBLW	    crit_dist
-	BTFSS	    STATUS, 2
-	GOTO	    FINAL_BACKUP
+	MOVLW	    crit_dist
+	SUBWF	    measured_distance_lat, W
+	BTFSC	    STATUS, 0
 	GOTO	    RETURN_HOME
+	GOTO	    FINAL_BACKUP
 
 FINAL_BACKUP
+	CALL	    DEL_1S
+	CALL	    DEL_1S
 	CALL	    DEL_1S
 	CALL	    DEL_1S
 	GOTO	    STOP_STDBY
