@@ -50,6 +50,7 @@
 	spot_detected
 	multiplex_count
 	rob_lat_distance
+	rob_long_distance_count
 	rob_long_distance
 	measured_distance_lat
 	measured_distance_sup
@@ -151,7 +152,6 @@ INIT
         clrf	    PORTD
 	
 	CALL 	    i2c_common_setup
-		    rtc_resetAll
 	CALL	    InitLCD
 	
     	CLRF	    num_spots
@@ -180,12 +180,7 @@ START_STDBY
 	BSF	    T2CON, TMR2ON
 	CALL	    SET_RTC_TIME
 	CALL	    GET_START_TIME
-	;GOTO	    SCAN
 	GOTO	    CALIBRATE
-	;CALL	    DEL_1S
-	;CALL	    DEL_1S
-	;CALL	    DEL_1S
-	;GOTO	    STOP_STDBY
 
 ;******************************************************************************;
 ;			    SENSOR CALIBRATION				       ;
@@ -281,8 +276,11 @@ NO_SPOT	INCF	    multiplex_count
 ;			  WHEEL ENCODER ROUTINE   			       ;
 ;******************************************************************************;
 WHL_ENC
-	MOVLW	    d'19'
-	ADDWF	    rob_long_distance
+	INCF	    rob_long_distance_count ; Increment number of changes
+	MOVLW	    0x06		    ; Every six changes is approx 1in
+	SUBWF	    rob_long_distance_count, F
+	BTFSS	    STATUS, 0
+	INCF	    rob_long_distance	    ; One inch was covered
 	RETURN
 	
 ;******************************************************************************;
