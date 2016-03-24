@@ -345,7 +345,7 @@ WHL_ENC
 ;******************************************************************************;
 ARM_CTRL
 	MOVLW	    crit_dist
-	SUBWF	    measured_distance_lat, W
+	SUBWF	    measured_distance_sup, W
 	BTFSC	    STATUS, 0		    ; C==0 if measured_distance_sup < crit_dist
 	GOTO	    ARM_CLOSE
 	GOTO	    ARM_OPEN
@@ -427,8 +427,8 @@ USHOLDS	BTFSC	    US_LAT_ECHO
 ;******************************************************************************;
 ;			       ACTIVE CONTROL				       ;
 ;******************************************************************************;
-MOTOR_CTRL_R
-	MOVLW	    crit_dist_r
+MOTOR_CTRL_R				    ; Turn right - robot is too far
+	MOVLW	    crit_dist_l
 	SUBWF	    measured_distance_lat, W
 	BTFSS	    STATUS, 0		    ; C==0 if measured_distance_lat >= crit_dist
 	RETURN
@@ -438,18 +438,24 @@ MOTOR_CTRL_R
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
 	MOVLW	    R_MOTOR_SPD
 	MOVWF	    CCPR1L
 	BCF	    BUZZER
 	RETURN
 
-MOTOR_CTRL_L
-	MOVFW	    measured_distance_lat
-	SUBLW	    crit_dist_l
-	BTFSS	    STATUS, 0
+MOTOR_CTRL_L				    ; Turn left - robot is too close
+	MOVLW	    crit_dist_r
+	SUBWF	    measured_distance_lat, W
+	BTFSC	    STATUS, 0
 	RETURN
 	CLRF	    CCPR2L
 	CLRF	    CCP2CON
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
