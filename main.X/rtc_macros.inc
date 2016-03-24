@@ -62,9 +62,3 @@ rtc_read macro	    addliteral
 	movf	    0x75,w
 	call	    rtc_convert   
 	endm
-
-
-
-
-
-

@@ -46,7 +46,7 @@
 	stop_min
 	stop_min10
 	stop_sec
-	stop_sec10
+	stop_sec10  ; 0x40
 	spot_detected
 	multiplex_count
 	rob_lat_distance
@@ -64,7 +64,22 @@
 ;				EQUATES				       ;
 ;******************************************************************************;
 	#define	    crit_dist	        0X08
+	#define	    crit_dist_r		0x02
+	#define	    crit_dist_l		0x05
+	#define	    MUX_CTRL_0		PORTA, 0
+	#define	    MUX_CTRL_1		PORTA, 1
+	#define	    MUX_CTRL_2		PORTA, 2
+	#define	    MUX_CTRL_3		PORTA, 3
+	#define	    SERVO_CTRL		PORTA, 5
+	#define	    US_SUP_TRIG		PORTB, 3
+	#define	    US_SUP_ECHO		PORTB, 4
+	#define	    MUX_IN		PORTC, 0
 	#define	    MOTOR_DIR_CTRL	PORTC, 5
+	#define	    US_LAT_TRIG		PORTC, 6
+	#define	    US_LAT_ECHO		PORTC, 7
+	#define	    BUZZER		PORTD, 0
+	#define	    L_MOTOR_SPD		B'11111111'
+	#define	    R_MOTOR_SPD		B'11111111'
 ;******************************************************************************;
 ;				MACROS					       ;
 ;******************************************************************************;
@@ -117,7 +132,7 @@ INIT
 	MOVWF	    TRISA
 	MOVLW	    b'11110011'		; PORT B pin mapping
 	MOVWF	    TRISB
-	MOVLW	    b'10111001'		; PORT C pin mapping
+	MOVLW	    b'10011001'		; PORT C pin mapping
 	MOVWF	    TRISC
 	CLRF	    TRISD	    	; PORT D pin mapping
 	MOVLW	    b'00000111'		; PORT E pin mapping
@@ -128,12 +143,13 @@ INIT
        
 	BCF	    STATUS, RP0		; select bank 0
 
-	MOVLW	    B'11111111'		; 100% DUTY CYCLE
+	MOVLW	    L_MOTOR_SPD		; 100% DUTY CYCLE
 	MOVWF	    CCPR1L		
-	MOVLW	    B'11111111'		; '01100100' 100% DUTY CYCLE
+	MOVLW	    R_MOTOR_SPD		; '01100100' 100% DUTY CYCLE
 	MOVWF	    CCPR2L
 	MOVLW	    B'11111111'
 	MOVWF	    CCP1CON
+	MOVLW	    B'11111111'
 	MOVWF	    CCP2CON
 	
 	MOVLW	    B'00000101'		; Initialize and hold timer 2
@@ -146,12 +162,12 @@ INIT
 	CLRF	    TMR1H
 	CLRF	    TMR1L
 	
-	clrf	    PORTA
-        clrf	    PORTB
-        clrf	    PORTC 
-        clrf	    PORTD
+;	clrf	    PORTA
+ ;       clrf	    PORTB
+  ;      clrf	    PORTC 
+   ;     clrf	    PORTD
 	
-	CALL 	    i2c_common_setup
+;	CALL 	    i2c_common_setup
 	CALL	    InitLCD
 	
     	CLRF	    num_spots
@@ -176,38 +192,44 @@ START_STDBY
 	GOTO	    $-1
 	
 	CALL	    CLR_LCD
-	BSF	    MOTOR_DIR_CTRL
+
+	BCF	    MOTOR_DIR_CTRL
 	BSF	    T2CON, TMR2ON
-	CALL	    SET_RTC_TIME
-	CALL	    GET_START_TIME
-	GOTO	    CALIBRATE
+	GOTO	    SCAN
+;	CALL	    SET_RTC_TIME
+;	CALL	    GET_START_TIME
+;	GOTO	    CALIBRATE
 
 ;******************************************************************************;
 ;			    SENSOR CALIBRATION				       ;
 ;******************************************************************************;
 CALIBRATE
-	CALL	    ARM_OPEN  
+	CALL	    USONIC_LAT  
+	CALL	    ARM_CTRL
 	CALL	    USONIC_LAT
 	MOVLW	    crit_dist
 	SUBWF	    measured_distance_lat, W
 	BTFSC	    STATUS, 0
 	GOTO	    CALIBRATE
-	BSF	    INTCON, RBIE	    ; Enable interrupts
-	BSF	    INTCON, INTE
-	BSF	    INTCON, GIE
+;	BCF	    PORTD, 0
+;	BSF	    INTCON, RBIE	    ; Enable interrupts
+;	BSF	    INTCON, INTE
+;	BSF	    INTCON, GIE 
 	GOTO	    SCAN
 	
 ;******************************************************************************;
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-	CALL	    USONIC_SUP
-	CALL	    ARM_CTRL
-	CALL	    USONIC_LAT
-	MOVLW	    crit_dist
-	SUBWF	    measured_distance_lat, W
-	BTFSC	    STATUS, 0
-	GOTO	    RETURN_HOME
+	;CALL	    USONIC_SUP
+;	CALL	    ARM_CTRL
+;	CALL	    USONIC_LAT
+;	CALL	    MOTOR_CTRL_R
+;	CALL	    MOTOR_CTRL_L
+;	MOVLW	    crit_dist
+;	SUBWF	    measured_distance_lat, W
+;	BTFSC	    STATUS, 0
+;	GOTO	    RETURN_HOME
 ;	CALL	    SHOW_RTC		    ; DEBUG
 	CALL	    READ_IRS
 	GOTO	    SCAN
@@ -238,18 +260,18 @@ READ_IRS
 	MOVWF	    multiplex_count
 MX_LOOP	
 	DECF	    multiplex_count
-	BCF	    PORTA, 0
+	BCF	    MUX_CTRL_0
 	BTFSC	    multiplex_count, 0
-	BSF	    PORTA, 0
-	BCF	    PORTA, 1
+	BSF	    MUX_CTRL_0
+	BCF	    MUX_CTRL_1
 	BTFSC	    multiplex_count, 1
-	BSF	    PORTA, 1
-	BCF	    PORTA, 2
+	BSF	    MUX_CTRL_1
+	BCF	    MUX_CTRL_2
 	BTFSC	    multiplex_count, 2
-	BSF	    PORTA, 2
-	BCF	    PORTA, 3
+	BSF	    MUX_CTRL_2
+	BCF	    MUX_CTRL_3
 	BTFSC	    multiplex_count, 3
-	BSF	    PORTA, 3
+	BSF	    MUX_CTRL_3
 	
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
@@ -259,19 +281,22 @@ MX_LOOP
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
 	
-	BTFSS	    PORTC, 0
+	BTFSC	    MUX_IN
 	GOTO	    NO_SPOT 
-	BSF	    PORTD, 0				; Buzzer start
+	BSF	    BUZZER				; Buzzer start
 	CALL	    DEL_1S
 	MOVFW	    rob_long_distance			; Save spot location
 	MOVWF	    spot_base_loc + num_spots
 	INCF	    num_spots, f			; Increase number of spots
-	BCF	    PORTD, 0				; Buzzer stop
+	BCF	    BUZZER				; Buzzer stop
 NO_SPOT	INCF	    multiplex_count
 	DECFSZ	    multiplex_count
 	GOTO	    MX_LOOP
 	RETURN
+	
 ;******************************************************************************;
 ;			  WHEEL ENCODER ROUTINE   			       ;
 ;******************************************************************************;
@@ -288,14 +313,14 @@ WHL_ENC
 ;******************************************************************************;
 ARM_CTRL
 	MOVLW	    crit_dist
-	SUBWF	    measured_distance_sup, W
+	SUBWF	    measured_distance_lat, W
 	BTFSC	    STATUS, 0		    ; C==0 if measured_distance_sup < crit_dist
 	GOTO	    ARM_CLOSE
 	GOTO	    ARM_OPEN
 ARM_CLOSE				    ; Close arm for full scan
-	BSF	    PORTA, 5
+	BSF	    SERVO_CTRL
 	CALL	    DEL_1_5MS
-	BCF	    PORTA, 5
+	BCF	    SERVO_CTRL
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
@@ -303,10 +328,10 @@ ARM_CLOSE				    ; Close arm for full scan
 	RETURN	    
 	
 ARM_OPEN				    ; Open arm to clear support
-	BSF	    PORTA, 5
+	BSF	    SERVO_CTRL
 	CALL	    DEL_2_1MS
 	CALL	    DEL_2_1MS
-	BCF	    PORTA, 5
+	BCF	    SERVO_CTRL
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
@@ -315,15 +340,15 @@ ARM_OPEN				    ; Open arm to clear support
 ;******************************************************************************;
 ;		      ULTRASONIC SENSOR SUBROUTINES			       ;
 ;******************************************************************************;
-USONIC_LAT
-	BSF	    PORTB, 3
+USONIC_SUP
+	BSF	    US_SUP_TRIG
 	CALL	    DEL_20US
-	BCF	    PORTB, 3
-USONIC_LAT_ECHO
-	BTFSS	    PORTB, 4
+	BCF	    US_SUP_TRIG
+USONIC_SUP_ECHO
+	BTFSS	    US_SUP_ECHO
 	GOTO	    $-1
 	BSF	    T1CON, 0
-USHOLDL	BTFSC	    PORTB, 4
+USHOLDL	BTFSC	    US_SUP_ECHO
 	GOTO	    USHOLDL
 	BCF	    T1CON, 0
 	MOVF	    TMR1H, W
@@ -336,18 +361,18 @@ USHOLDL	BTFSC	    PORTB, 4
 	MOVWF	    DIVISOR
 	CALL	    DIV16X8
 	MOVF	    Q, W
-	MOVWF	    measured_distance_lat
+	MOVWF	    measured_distance_sup
 	RETURN
 
-USONIC_SUP
-	BSF	    PORTC, 6
+USONIC_LAT
+	BSF	    US_LAT_TRIG
 	CALL	    DEL_20US
-	BCF	    PORTC, 6
-USONIC_SUP_ECHO
-	BTFSS	    PORTC, 7
+	BCF	    US_LAT_ECHO
+USONIC_LAT_ECHO
+	BTFSS	    US_LAT_ECHO
 	GOTO	    $-1
 	BSF	    T1CON, 0
-USHOLDS	BTFSC	    PORTC, 7
+USHOLDS	BTFSC	    US_LAT_ECHO
 	GOTO	    USHOLDS
 	BCF	    T1CON, 0
 	MOVF	    TMR1H, W
@@ -360,12 +385,46 @@ USHOLDS	BTFSC	    PORTC, 7
 	MOVWF	    DIVISOR
 	CALL	    DIV16X8
 	MOVF	    Q, W
-	MOVWF	    measured_distance_sup
+	MOVWF	    measured_distance_lat
 	;CALL	    rtc_convert
 	;CALL	    CLR_LCD		; DEBUG!
 	;WRT_MEM_LCD 0x77
 	;WRT_MEM_LCD 0x78
 	RETURN
+	
+;******************************************************************************;
+;			       ACTIVE CONTROL				       ;
+;******************************************************************************;
+MOTOR_CTRL_R
+	MOVLW	    crit_dist_r
+	SUBWF	    measured_distance_lat, W
+	BTFSS	    STATUS, 0		    ; C==0 if measured_distance_lat >= crit_dist
+	RETURN
+	BSF	    BUZZER
+	CLRF	    CCPR1L
+	CLRF	    CCP1CON
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
+	MOVLW	    R_MOTOR_SPD
+	MOVWF	    CCPR1L
+	BCF	    BUZZER
+	RETURN
+
+MOTOR_CTRL_L
+	MOVFW	    measured_distance_lat
+	SUBLW	    crit_dist_l
+	BTFSS	    STATUS, 0
+	RETURN
+	CLRF	    CCPR2L
+	CLRF	    CCP2CON
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
+	MOVLW	    R_MOTOR_SPD
+	MOVWF	    CCPR2L
+	RETURN
+	
 ;******************************************************************************;
 ;			    RETURN HOME ROUTINE				       ;
 ;******************************************************************************;
@@ -392,6 +451,9 @@ FINAL_BACKUP
 ;******************************************************************************;
 STOP_STDBY
 	BCF	    T2CON, TMR2ON	; Turn off motors
+	CLRF	    CCP1CON
+	CLRF	    CCP2CON
+
 	CALL	    GET_STOP_TIME	; Get stop time
 	CALL	    STOP_STDBY_MSG	; Display standby message
 	BTFSS	    PORTB, 1	    	; Wait until data is available from the keypad
@@ -657,15 +719,6 @@ DEL_1S_0
 	goto	$+1
 	goto	$+1
 	return
-	
-LONG_DLY
-	MOVLW	    0xFF
-	MOVWF	    long_del
-LD_LOOP	
-	LCD_DLY
-	DECFSZ	    long_del, f
-	GOTO	    LD_LOOP
-	RETURN
 	
 DEL_10MS
 	movlw	0x86
