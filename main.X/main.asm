@@ -27,26 +27,26 @@
 ;				BANK0 RAM				       ;
 ;******************************************************************************;
 	CBLOCK	    0x30
-	long_del
-	temp_w	    ; 0x30
-	temp_status ; 0x31
+	long_del    ; 0x30
+	temp_w	    ; 0x31
+	temp_status ; 0x32
 		    ; DIVISION Registers
-	DIV_HI	    ; 0X32
-	DIV_LO	    ; 0X33
-	DIVISOR	    ; 0X34
-	Q
+	DIV_HI	    ; 0X33
+	DIV_LO	    ; 0X34
+	DIVISOR	    ; 0X35
+	Q	    ; 0X36
 	d1
 	d2
-	d3
+	d3	    ; 0X39
 		    ; ROBOT VARS
-	start_min
-	start_min10
+	start_min   ; 0X3A
+	start_min10 ; 0X3B
 	start_sec
 	start_sec10
 	stop_min
 	stop_min10
-	stop_sec
-	stop_sec10  ; 0x40
+	stop_sec    ; 0X40
+	stop_sec10  ; 0x41
 	spot_detected
 	multiplex_count
 	rob_lat_distance
@@ -55,7 +55,7 @@
 	measured_distance_lat
 	measured_distance_sup
 	rob_return
-	spot_count
+	spot_count  ; 0X4A
 	num_spots
 	spot_base_loc
 	ENDC
@@ -162,12 +162,7 @@ INIT
 	CLRF	    TMR1H
 	CLRF	    TMR1L
 	
-;	clrf	    PORTA
- ;       clrf	    PORTB
-  ;      clrf	    PORTC 
-   ;     clrf	    PORTD
-	
-;	CALL 	    i2c_common_setup
+	CALL 	    i2c_common_setup
 	CALL	    InitLCD
 	
     	CLRF	    num_spots
@@ -195,10 +190,10 @@ START_STDBY
 
 	BCF	    MOTOR_DIR_CTRL
 	BSF	    T2CON, TMR2ON
-	GOTO	    SCAN
-;	CALL	    SET_RTC_TIME
-;	CALL	    GET_START_TIME
-;	GOTO	    CALIBRATE
+
+	CALL	    SET_RTC_TIME
+	CALL	    GET_START_TIME
+	GOTO	    CALIBRATE
 
 ;******************************************************************************;
 ;			    SENSOR CALIBRATION				       ;
@@ -211,29 +206,66 @@ CALIBRATE
 	SUBWF	    measured_distance_lat, W
 	BTFSC	    STATUS, 0
 	GOTO	    CALIBRATE
-;	BCF	    PORTD, 0
-;	BSF	    INTCON, RBIE	    ; Enable interrupts
-;	BSF	    INTCON, INTE
-;	BSF	    INTCON, GIE 
+	BSF	    INTCON, RBIE	    ; Enable interrupts
+	BSF	    INTCON, INTE
+	BSF	    INTCON, GIE 
 	GOTO	    SCAN
 	
 ;******************************************************************************;
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-	;CALL	    USONIC_SUP
-;	CALL	    ARM_CTRL
-;	CALL	    USONIC_LAT
-;	CALL	    MOTOR_CTRL_R
-;	CALL	    MOTOR_CTRL_L
-;	MOVLW	    crit_dist
-;	SUBWF	    measured_distance_lat, W
-;	BTFSC	    STATUS, 0
-;	GOTO	    RETURN_HOME
+	CALL	    USONIC_SUP
+	CALL	    ARM_CTRL
+	CALL	    USONIC_LAT
+	CALL	    MOTOR_CTRL_R
+	CALL	    MOTOR_CTRL_L
+	MOVLW	    crit_dist
+	SUBWF	    measured_distance_lat, W
+	BTFSC	    STATUS, 0
+	GOTO	    RETURN_HOME
 ;	CALL	    SHOW_RTC		    ; DEBUG
 	CALL	    READ_IRS
 	GOTO	    SCAN
+
+;******************************************************************************;
+;			    RETURN HOME ROUTINE				       ;
+;******************************************************************************;
+RETURN_HOME
+	CLRF	    INTCON
+	BCF	    MOTOR_DIR_CTRL
+	CALL	    ARM_CTRL
+	CALL	    USONIC_LAT
+	MOVLW	    crit_dist
+	SUBWF	    measured_distance_lat, W
+	BTFSC	    STATUS, 0
+	GOTO	    RETURN_HOME
+	GOTO	    FINAL_BACKUP
+
+FINAL_BACKUP
+	CALL	    DEL_1S
+	CALL	    DEL_1S
+	CALL	    DEL_1S
+	CALL	    DEL_1S
+	GOTO	    STOP_STDBY
 	
+;******************************************************************************;
+;			      STOP STANDBY				       ;
+;******************************************************************************;
+STOP_STDBY
+	BCF	    T2CON, TMR2ON	; Turn off motors
+	CLRF	    CCP1CON
+	CLRF	    CCP2CON
+
+	CALL	    GET_STOP_TIME	; Get stop time
+	CALL	    STOP_STDBY_MSG	; Display standby message
+	BTFSS	    PORTB, 1	    	; Wait until data is available from the keypad
+	GOTO	    $-1
+	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
+	ANDLW	    0x0F 
+	CALL	    CLR_LCD
+	GOTO	    STOP_DATA		; Display run data
+
 ;******************************************************************************;
 ;			   INTERRUPT HANDLER				       ;
 ;******************************************************************************;
@@ -304,8 +336,9 @@ WHL_ENC
 	INCF	    rob_long_distance_count ; Increment number of changes
 	MOVLW	    0x06		    ; Every six changes is approx 1in
 	SUBWF	    rob_long_distance_count, F
-	BTFSS	    STATUS, 0
+	BTFSC	    STATUS, 0
 	INCF	    rob_long_distance	    ; One inch was covered
+	CLRF	    rob_long_distance_count
 	RETURN
 	
 ;******************************************************************************;
@@ -425,44 +458,6 @@ MOTOR_CTRL_L
 	MOVWF	    CCPR2L
 	RETURN
 	
-;******************************************************************************;
-;			    RETURN HOME ROUTINE				       ;
-;******************************************************************************;
-RETURN_HOME
-	CLRF	    INTCON
-	BCF	    MOTOR_DIR_CTRL
-	CALL	    ARM_CTRL
-	CALL	    USONIC_LAT
-	MOVLW	    crit_dist
-	SUBWF	    measured_distance_lat, W
-	BTFSC	    STATUS, 0
-	GOTO	    RETURN_HOME
-	GOTO	    FINAL_BACKUP
-
-FINAL_BACKUP
-	CALL	    DEL_1S
-	CALL	    DEL_1S
-	CALL	    DEL_1S
-	CALL	    DEL_1S
-	GOTO	    STOP_STDBY
-	
-;******************************************************************************;
-;			      STOP STANDBY				       ;
-;******************************************************************************;
-STOP_STDBY
-	BCF	    T2CON, TMR2ON	; Turn off motors
-	CLRF	    CCP1CON
-	CLRF	    CCP2CON
-
-	CALL	    GET_STOP_TIME	; Get stop time
-	CALL	    STOP_STDBY_MSG	; Display standby message
-	BTFSS	    PORTB, 1	    	; Wait until data is available from the keypad
-	GOTO	    $-1
-	SWAPF	    PORTB, W		; Read PortB<7:4> into W<3:0>
-	ANDLW	    0x0F 
-	CALL	    CLR_LCD
-	GOTO	    STOP_DATA		; Display run data
-
 ;******************************************************************************;
 ;			        DISPLAY DATA				       ;
 ;******************************************************************************;
