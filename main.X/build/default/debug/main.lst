@@ -1,4 +1,4 @@
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE  1
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -57,7 +57,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00014         call        write_rtc           ;Write 0 to Seconds
                       00015         banksel     0x73
                       00016         incf        0x73                        ;Set register address to 1
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE  2
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -116,7 +116,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00026 ;******************************************************************************;
                       00027 ;                               BANK0 RAM                                      ;
                       00028 ;******************************************************************************;
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE  3
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -175,7 +175,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00079         #define     US_LAT_ECHO         PORTC, 7
                       00080         #define     BUZZER              PORTD, 0
                       00081         #define     L_MOTOR_SPD         B'11111111'
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE  4
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -234,7 +234,7 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
 0009   3010           00131         MOVLW       b'00010000'         ; PORT A pin mapping
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
 000A   0085           00132         MOVWF       TRISA
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE  5
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -293,7 +293,7 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
 002D                  00178 START_STDBY
 002D   1C86           00179         BTFSS       PORTB, 1            ; Wait until data is available from the keypad
 002E   2???           00180         GOTO        START_STDBY
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE  6
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -352,7 +352,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00231 ;******************************************************************************;
                       00232 ;                           RETURN HOME ROUTINE                                ;
                       00233 ;******************************************************************************;
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE  7
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE  7
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -411,7 +411,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0072   0E31           00284         SWAPF       temp_w, W
 0073   0009           00285         RETFIE
                       00286 
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE  8
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE  8
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -470,7 +470,7 @@ Message[305]: Using default destination of 1 (file).
                       00332 ;******************************************************************************;
                       00333 ;                         WHEEL ENCODER ROUTINE                                ;
                       00334 ;******************************************************************************;
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE  9
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE  9
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -529,7 +529,7 @@ Message[305]: Using default destination of 1 (file).
 00BB   1410           00383         BSF         T1CON, 0
 00BC   1A06           00384 USHOLDL BTFSC       US_SUP_ECHO
 00BD   2???           00385         GOTO        USHOLDL
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 10
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 10
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -588,7 +588,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 00E4   1408           00436         BSF         BUZZER
 00E5   0195           00437         CLRF        CCPR1L
 00E6   0197           00438         CLRF        CCP1CON
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 11
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 11
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -647,7 +647,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                           M ;                       ASCII characters and the tens digit is placed into
                           M ;                       0x77 and the ones digit is placed in 0x78
 0106   3001               M         movlw       0x01
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 12
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 12
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -706,7 +706,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00494 ;       WRT_LCD     "P"
                       00495 ;       WRT_LCD     "O"
                       00496 ;       WRT_LCD     "T"
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 13
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 13
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -765,7 +765,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 013E   2???               M         CALL        WR_DATA
                       00528         WRT_LCD     "O"
 013F   304F               M         MOVLW       "O"
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 14
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 14
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -824,7 +824,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 015E   3052               M         MOVLW       "R"
 015F   2???               M         CALL        WR_DATA
                       00550         WRT_LCD     " "
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 15
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 15
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -883,7 +883,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00571         WRT_LCD     " "
 017F   3020               M         MOVLW       " "
 0180   2???               M         CALL        WR_DATA
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 16
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 16
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -942,7 +942,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00593 ;                           RETREIVE STOP TIME                                 ;
                       00594 ;******************************************************************************;
 01A0                  00595 GET_STOP_TIME
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 17
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 17
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -1001,7 +1001,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 01BD   3032               M         MOVLW       "2"
 01BE   2???               M         CALL        WR_DATA
                       00620         WRT_LCD     "0"
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 18
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 18
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -1060,7 +1060,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 01DD   302F               M         MOVLW       "/"
 01DE   2???               M         CALL        WR_DATA
                       00633 
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 19
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 19
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -1119,7 +1119,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00648         rtc_read    0x01                ;Read Address 0x01 from DS1307---min
                           M ;input:         addliteral
                           M ;output:        0x75, 0x77, 0x78
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 20
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 20
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -1178,7 +1178,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                           M ;output:        none
                           M ;desc:          Resets all the time keeping registers on the RTC to zero
 021A   1283 1303          M         banksel     0x74
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 21
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 21
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -1237,7 +1237,7 @@ Message[305]: Using default destination of 1 (file).
 0242   1283 1303          M         banksel     0x73
 0244   3006               M         movlw       0x06
 0245   00F3               M         movwf       0x73
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 22
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 22
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -1296,7 +1296,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0268   3002               M         movlw       0x02
 0269   00F3               M         movwf       0x73
 026A   1283 1303          M         banksel     0x74
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 23
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 23
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -1355,7 +1355,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 028D   2???           00696         GOTO DIV_1
 028E                  00697 DIV_DONE
 028E   0008           00698         RETURN
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 24
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 24
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -1414,7 +1414,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 02B6   3003           00749         movlw   0x03
 02B7   00B8           00750         movwf   d2
 02B8                  00751 DEL_1_5MS_0
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 25
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 25
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -1441,7 +1441,7 @@ Warning[207]: Found label after column 1. (FINISH)
 02C4   2???           00769         GOTO    FINISH
                       00770         
 3F72                  00771         END
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 26
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 26
 
 
 SYMBOL TABLE
@@ -1500,7 +1500,7 @@ CHS0                              00000003
 CHS1                              00000004
 CHS2                              00000005
 CKE                               00000006
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 27
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 27
 
 
 SYMBOL TABLE
@@ -1559,7 +1559,7 @@ I2C_DATA                          00000005
 I2C_READ                          00000002
 I2C_START                         00000003
 I2C_STOP                          00000004
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 28
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 28
 
 
 SYMBOL TABLE
@@ -1618,7 +1618,7 @@ PEIE                              00000006
 PEN                               00000002
 PIE1                              0000008C
 PIE2                              0000008D
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 29
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 29
 
 
 SYMBOL TABLE
@@ -1677,7 +1677,7 @@ RD                                00000000
 RD0                               00000000
 RD1                               00000001
 RD2                               00000002
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 30
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 30
 
 
 SYMBOL TABLE
@@ -1736,7 +1736,7 @@ T0CS                              00000005
 T0IE                              00000005
 T0IF                              00000002
 T0SE                              00000004
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 31
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 31
 
 
 SYMBOL TABLE
@@ -1795,7 +1795,7 @@ TRISC5                            00000005
 TRISC6                            00000006
 TRISC7                            00000007
 TRISD                             00000088
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 32
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 32
 
 
 SYMBOL TABLE
@@ -1854,7 +1854,7 @@ _.org_1_0296                      00000296
 _.org_1_0298                      00000298
 _.org_1_029B                      0000029B
 _.org_1_029C                      0000029C
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 33
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 33
 
 
 SYMBOL TABLE
@@ -1905,20 +1905,22 @@ _WRT_OFF                          00003DFF
 _WRT_ON                           00003FFF
 _XT_OSC                           00003FFD
 __16F877                          00000001
+__DEBUG                           
+__MPLAB_DEBUGGER_SIMULATOR        1
 crit_dist                         0X08
 crit_dist_l                       0x05
 crit_dist_r                       0x02
 d1                                00000037
 d2                                00000038
 d3                                00000039
-i2c_common_setup                  00000000
-long_del                          00000030
-MPASM 5.65                          MAIN.ASM   3-24-2016  11:47:59         PAGE 34
+MPASM 5.65                          MAIN.ASM   3-24-2016  11:48:35         PAGE 34
 
 
 SYMBOL TABLE
   LABEL                             VALUE 
 
+i2c_common_setup                  00000000
+long_del                          00000030
 measured_distance_lat             00000047
 measured_distance_sup             00000048
 multiplex_count                   00000043

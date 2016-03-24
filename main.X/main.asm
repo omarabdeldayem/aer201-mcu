@@ -233,8 +233,8 @@ SCAN
 ;******************************************************************************;
 RETURN_HOME
 	CLRF	    INTCON
-	BCF	    MOTOR_DIR_CTRL
-	CALL	    ARM_CTRL
+	BSF	    MOTOR_DIR_CTRL
+	CALL	    ARM_OPEN
 	CALL	    USONIC_LAT
 	MOVLW	    crit_dist
 	SUBWF	    measured_distance_lat, W
@@ -243,7 +243,6 @@ RETURN_HOME
 	GOTO	    FINAL_BACKUP
 
 FINAL_BACKUP
-	CALL	    DEL_1S
 	CALL	    DEL_1S
 	CALL	    DEL_1S
 	CALL	    DEL_1S
