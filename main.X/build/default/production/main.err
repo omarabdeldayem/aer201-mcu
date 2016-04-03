@@ -1,15 +1,12 @@
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 124 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 127 : Register in operand not in bank 0.  Ensure that bank bits are correct.
 Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 129 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 132 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 134 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 136 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 131 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 133 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 135 : Register in operand not in bank 0.  Ensure that bank bits are correct.
 Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 138 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 140 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[302] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 143 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 308 : Using default destination of 1 (file).
-Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 342 : Using default destination of 1 (file).
-Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 343 : Using default destination of 1 (file).
-Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 351 : Using default destination of 1 (file).
-Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 355 : Using default destination of 1 (file).
+Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 375 : Using default destination of 1 (file).
+Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\MAIN.ASM 379 : Using default destination of 1 (file).
 Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\RTC_MACROS.INC 16 : Using default destination of 1 (file).
 Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\RTC_MACROS.INC 19 : Using default destination of 1 (file).
 Message[305] C:\USERS\OMAR ABDELDAYEM\DESKTOP\NSCI\YEAR2\SEM2\AER201\MCU\AER201-MCU\MAIN.X\RTC_MACROS.INC 22 : Using default destination of 1 (file).
