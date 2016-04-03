@@ -64,7 +64,7 @@
 ;				EQUATES					       ;
 ;******************************************************************************;
 	#define	    crit_dist	        0X0A
-	#define	    crit_dist_l		0x03
+	#define	    crit_dist_l		0x05
 	#define	    crit_dist_r		0x0A
 	#define	    MUX_IN		PORTA, 0
 	#define	    MUX_CTRL_0		PORTA, 1
@@ -211,9 +211,8 @@ CALIBRATE
 	BTFSC	    STATUS, 0
 	GOTO	    CALIBRATE
 	BSF	    BUZZER
-	;MOVLW	    0XA
-	;MOVWF	    measured_distance_lat
-	CALL	    DEL_1S
+	CALL	    DEL_10MS
+	CALL	    DEL_10MS
 	BCF	    US_LAT_TRIG
 	BCF	    US_LAT_ECHO
 	CLRF	    measured_distance_lat
@@ -230,26 +229,24 @@ CALIBRATE
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-	;CALL	    USONIC_SUP
-	;CALL	    ARM_CTRL
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	;CALL	    USONIC_LAT
-	;CALL	    MOTOR_CTRL_R
-	;CALL	    MOTOR_CTRL_L
-	
 	CALL	    USONIC_LAT
-	MOVLW	    crit_dist
-	SUBWF	    measured_distance_lat, W
-	BTFSS	    STATUS, 0
-	GOTO	    RETURN_HOME
-;	CALL	    SHOW_RTC		    ; DEBUG
+	CALL	    MOTOR_CTRL_R
+	CALL	    MOTOR_CTRL_L
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+;	CALL	    USONIC_LAT
+;	MOVLW	    crit_dist
+;	SUBWF	    measured_distance_lat, W
+;	BTFSS	    STATUS, 0
+;	GOTO	    RETURN_HOME
+;;	CALL	    SHOW_RTC		    ; DEBUG
 	;CALL	    READ_IRS
 	
 	GOTO	    SCAN
@@ -434,10 +431,6 @@ USHOLDS	BTFSC	    US_SUP_ECHO
 	CALL	    DIV16X8
 	MOVF	    Q, W
 	MOVWF	    measured_distance_sup
-	CALL	    rtc_convert
-	CALL	    CLR_LCD		; DEBUG!
-	WRT_MEM_LCD 0x77
-	WRT_MEM_LCD 0x78
 	RETURN
 
 USONIC_LAT
@@ -462,7 +455,10 @@ USHOLDL	BTFSC	    US_LAT_ECHO
 	CALL	    DIV16X8
 	MOVF	    Q, W
 	MOVWF	    measured_distance_lat
-	
+;	CALL	    rtc_convert
+;	CALL	    CLR_LCD		; DEBUG!
+;	WRT_MEM_LCD 0x77
+;	WRT_MEM_LCD 0x78
 	RETURN
 	
 ;******************************************************************************;
@@ -471,41 +467,35 @@ USHOLDL	BTFSC	    US_LAT_ECHO
 MOTOR_CTRL_R				    ; Turn right - robot is too close
 	MOVLW	    crit_dist_l
 	SUBWF	    measured_distance_lat, W
-	BTFSC	    STATUS, 0		    ; C==0 if measured_distance_lat < crit_dist
+	BTFSs	    STATUS, 0		    ; C==0 if measured_distance_lat < crit_dist
 	RETURN
 	BTFSC	    MOTOR_DIR_CTRL
 	GOTO	    STOP_L
-STOP_R	BCF	    T2CON, TMR2ON
-	CLRF	    CCP1CON
+STOP_R	;BCF	    T2CON, TMR2ON
+	CLRF	    CCP2CON
 	;CLRF	    CCPR1L
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
 	MOVLW	    R_MOTOR_SPD
-	;MOVWF	    CCP1CON
-	BSF	    T2CON, TMR2ON
+	MOVWF	    CCP2CON
+	;BSF	    T2CON, TMR2ON
 	RETURN
 
 MOTOR_CTRL_L				    ; Turn left - robot is too far
 	MOVLW	    crit_dist_r
 	SUBWF	    measured_distance_lat, W
-	BTFSS	    STATUS, 0		    ; C==0 if measured_distance_lat >= crit_dist
+	BTFSc	    STATUS, 0		    ; C==0 if measured_distance_lat >= crit_dist
 	RETURN
 	BTFSC	    MOTOR_DIR_CTRL
 	GOTO	    STOP_R
-STOP_L	BCF	    T2CON, TMR2ON
-	CLRF	    CCP2CON
+STOP_L	;BCF	    T2CON, TMR2ON
+	CLRF	    CCP1CON
 	;CLRF	    CCPR2L
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
 	MOVLW	    L_MOTOR_SPD
-	;MOVWF	    CCP2CON
-	BSF	    T2CON, TMR2ON
+	MOVWF	    CCP1CON
+	;BSF	    T2CON, TMR2ON
 	RETURN
 	
 ;******************************************************************************;
