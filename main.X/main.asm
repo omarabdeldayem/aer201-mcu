@@ -67,9 +67,9 @@
 	#define	    crit_dist_l		0x05
 	#define	    crit_dist_r		0x0A
 	#define	    MUX_IN		PORTA, 0
-	#define	    MUX_CTRL_0		PORTA, 1
-	#define	    MUX_CTRL_1		PORTA, 2
-	#define	    MUX_CTRL_2		PORTA, 3
+	#define	    MUX_CTRL_0		PORTE, 0
+	#define	    MUX_CTRL_1		PORTE, 1
+	#define	    MUX_CTRL_2		PORTA, 2
 	#define	    MUX_CTRL_3		PORTA, 5
 	#define	    SERVO_CTRL		PORTC, 0
 	#define	    US_SUP_TRIG		PORTB, 3
@@ -120,7 +120,7 @@ INIT
 	
 	;MOVLW	    0x06		; Turn PORT A to digital
 	;MOVWF	    ADCON1
-	movlw	    b'00001110'
+	movlw	    b'00001110'		; All digital except A0
 	movwf	    ADCON1
 	
 	MOVLW	    b'00010001'		; PORT A pin mapping
@@ -131,16 +131,13 @@ INIT
 	MOVWF	    TRISC
 	MOVLW	    B'00000010'		; PORT D pin mapping
 	MOVWF	    TRISD	    	
-	MOVLW	    b'00000001'		; PORT E pin mapping
+	MOVLW	    b'00000000'		; PORT E pin mapping
 	MOVWF	    TRISE
 	
 	MOVLW	    B'11111111'		; PWM pulsing period (484Hz)
 	MOVWF	    PR2
        
 	BCF	    STATUS, RP0		; select bank 0
-
-	MOVLW	    b'11000101'		;clock selected, ADC module turned on
-	MOVWF	    ADCON0
 		
 	MOVLW	    L_MOTOR_SPD		; 100% DUTY CYCLE
 	MOVWF	    CCPR1L		
@@ -163,6 +160,12 @@ INIT
 	
 	;CALL 	    i2c_common_setup
 	CALL	    InitLCD
+	
+	CLRF	    PORTA
+	CLRF	    PORTB
+	CLRF	    PORTC
+	CLRF	    PORTD
+	CLRF	    PORTE
 	
     	CLRF	    num_spots
 	CLRF	    spot_count
@@ -229,25 +232,25 @@ CALIBRATE
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    USONIC_LAT
-	CALL	    MOTOR_CTRL_R
-	CALL	    MOTOR_CTRL_L
+;	CALL	    DEL_10MS
 ;	CALL	    DEL_10MS
 ;	CALL	    DEL_10MS
 ;	CALL	    DEL_10MS
 ;	CALL	    DEL_10MS
 ;	CALL	    USONIC_LAT
+;	CALL	    MOTOR_CTRL_R
+;	CALL	    MOTOR_CTRL_L
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+	CALL	    USONIC_LAT
 ;	MOVLW	    crit_dist
 ;	SUBWF	    measured_distance_lat, W
 ;	BTFSS	    STATUS, 0
 ;	GOTO	    RETURN_HOME
 ;;	CALL	    SHOW_RTC		    ; DEBUG
-	;CALL	    READ_IRS
+	CALL	    READ_IRS
 	
 	GOTO	    SCAN
 
@@ -319,23 +322,7 @@ READ_IRS
 	MOVLW	    d'16'
 	MOVWF	    multiplex_count
 MX_LOOP	
-	BCF	    MUX_CTRL_0
-	BSF	    MUX_CTRL_1
-	BCF	    MUX_CTRL_2
-	BCF	    MUX_CTRL_3
-
-	CALL	    DEL_1S
-	
-	MOVFW	    ADRESH 
-	SUBLW	    D'200'
-	BTFSS	    STATUS, 0
-	GOTO	    MX_LOOP
-	BSF	    BUZZER
-	CALL	    DEL_1S
-	BCF	    BUZZER
-	GOTO	    MX_LOOP
-	
-;	DECF	    multiplex_count
+	;	DECF	    multiplex_count
 ;	BCF	    MUX_CTRL_0
 ;	BTFSC	    multiplex_count, 0
 ;	BSF	    MUX_CTRL_0
@@ -348,6 +335,30 @@ MX_LOOP
 ;	BCF	    MUX_CTRL_3
 ;	BTFSC	    multiplex_count, 3
 ;	BSF	    MUX_CTRL_3
+	
+	BSF	    MUX_CTRL_0
+	BCF	    MUX_CTRL_1
+	BSF	    MUX_CTRL_2
+	BSF	    MUX_CTRL_3
+
+	movlw	    b'11000001' ; AD at RA0
+	movwf	    ADCON0
+	CALL	    DEL_20US
+	CALL	    DEL_20US
+	CALL	    DEL_20US
+	CALL	    DEL_20US
+	CALL	    DEL_20US
+	bsf	    ADCON0,2
+	btfsc	    ADCON0,2
+	goto	    $-1
+
+	MOVFW	    ADRESH 
+	SUBLW	    D'200'
+	BTFSS	    STATUS, 0
+	GOTO	    MX_LOOP
+	BSF	    BUZZER
+	CALL	    DEL_1S
+	BCF	    BUZZER
 	
 ;	
 ;	BTFSC	    MUX_IN
@@ -363,8 +374,7 @@ MX_LOOP
 ;;NO_SPOT	INCF	    multiplex_count
 ;;	DECFSZ	    multiplex_count
 ;	GOTO	    MX_LOOP
-	RETURN
-	
+	RETURN	
 ;******************************************************************************;
 ;			  WHEEL ENCODER ROUTINE   			       ;
 ;******************************************************************************;
@@ -378,61 +388,8 @@ WHL_ENC
 	RETURN
 	
 ;******************************************************************************;
-;			TOGGLE ARM STATE SUBROUTINES  			       ;
-;******************************************************************************;
-ARM_CTRL
-	MOVLW	    crit_dist
-	SUBWF	    measured_distance_sup, W
-	BTFSC	    STATUS, 0		    ; C==0 if measured_distance_sup < crit_dist
-	GOTO	    ARM_CLOSE
-	GOTO	    ARM_OPEN
-ARM_CLOSE				    ; Close arm for full scan
-	BSF	    SERVO_CTRL
-	CALL	    DEL_1_5MS
-	BCF	    SERVO_CTRL
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	RETURN	    
-	
-ARM_OPEN				    ; Open arm to clear support
-	BSF	    SERVO_CTRL
-	CALL	    DEL_2_1MS
-	CALL	    DEL_2_1MS
-	BCF	    SERVO_CTRL
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	RETURN
-;******************************************************************************;
 ;		      ULTRASONIC SENSOR SUBROUTINES			       ;
 ;******************************************************************************;
-USONIC_SUP
-	BSF	    US_SUP_TRIG
-	CALL	    DEL_20US
-	BCF	    US_SUP_TRIG
-USONIC_SUP_ECHO
-	BTFSS	    US_SUP_ECHO
-	GOTO	    $-1
-	BSF	    T1CON, 0
-USHOLDS	BTFSC	    US_SUP_ECHO
-	GOTO	    USHOLDS
-	BCF	    T1CON, 0
-	MOVF	    TMR1H, W
-	MOVWF	    DIV_HI
-	MOVF	    TMR1L, W
-	MOVWF	    DIV_LO
-	CLRF	    TMR1H
-	CLRF	    TMR1L
-	MOVLW	    d'58'
-	MOVWF	    DIVISOR
-	CALL	    DIV16X8
-	MOVF	    Q, W
-	MOVWF	    measured_distance_sup
-	RETURN
-
 USONIC_LAT
 	BSF	    US_LAT_TRIG
 	CALL	    DEL_20US
@@ -765,34 +722,6 @@ DEL_10MS_0
 	goto	$+2
 	decfsz	d2, f
 	goto	DEL_10MS_0
-	goto	$+1
-	nop
-	return
-
-DEL_2_1MS
-	movlw	0x18
-	movwf	d1
-	movlw	0x05
-	movwf	d2
-DEL_2_1MS_0
-	decfsz	d1, f
-	goto	$+2
-	decfsz	d2, f
-	goto	DEL_2_1MS_0
-	goto	$+1
-	nop
-	return
-	
-DEL_1_5MS
-	movlw	0xEC
-	movwf	d1
-	movlw	0x03
-	movwf	d2
-DEL_1_5MS_0
-	decfsz	d1, f
-	goto	$+2
-	decfsz	d2, f
-	goto	DEL_1_5MS_0
 	goto	$+1
 	nop
 	return
