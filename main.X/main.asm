@@ -93,8 +93,8 @@
 	#define	    BUZZER		PORTC, 7
 	#define	    US_LAT_TRIG		PORTD, 0
 	#define	    US_LAT_ECHO		PORTD, 1
+	#define	    R_MOTOR_SPD		B'11110101'
 	#define	    L_MOTOR_SPD		B'11111111'
-	#define	    R_MOTOR_SPD		B'11111111'
 	#define	    IR0_VAL		D'200'
 	#define	    IR1_VAL		D'201'
 	#define	    IR2_VAL		D'202'
