@@ -183,6 +183,7 @@ INIT
 	CLRF	    TMR1L
 	
 	CALL 	    i2c_common_setup
+	rtc_resetAll
 	CALL	    InitLCD
 	
 	CLRF	    PORTA
@@ -239,8 +240,8 @@ START_STDBY
 	CALL	    CLR_LCD
 	CALL	    DEL_1S
 	CALL	    DEL_1S
+
 	BSF	    T2CON, TMR2ON
-	
 	GOTO	    CALIBRATE
 
 ;******************************************************************************;
@@ -550,14 +551,16 @@ STOP_DATA
 	WRT_LCD	    " "
 	;Get minute		
 ;	rtc_read    0x01		;Read Address 0x01 from DS1307---min
-	;WRT_MEM_LCD 0x77
-;	.WRT_MEM_LCD 0x78
-;	WRT_LCD	    ":"
+	WRT_MEM_LCD stop_min10 
+	WRT_MEM_LCD stop_min
+;	WRT_MEM_LCD 0x77
+;	WRT_MEM_LCD 0x78
+	WRT_LCD	    ":"
 
 	;Get seconds
 	;rtc_read    0x00		;Read Address 0x00 from DS1307---seconds
-;	WRT_MEM_LCD 0x77
-;	WRT_MEM_LCD 0x78
+	WRT_MEM_LCD stop_sec10
+	WRT_MEM_LCD stop_sec
 
 	movlw	    B'11000000'		;Next line displays (min):(sec) **:**
 	call	    WR_INS
@@ -570,6 +573,17 @@ STOP_DATA
 	MOVWF	    FSR
 	
 DATA_LOOP	
+	BTFSC	    spot_count, 3
+	GOTO	    PRT_DATA
+	BTFSC	    spot_count, 2
+	GOTO	    PRT_DATA
+	BTFSC	    spot_count, 1
+	GOTO	    PRT_DATA
+	BTFSC	    spot_count, 0
+	GOTO	    PRT_DATA
+	GOTO	    END_DATA
+	
+PRT_DATA
 	WRT_LCD	    "S"
 	WRT_LCD	    "P"
 	WRT_LCD	    "O"
@@ -586,8 +600,9 @@ DATA_LOOP
 	INCF	    FSR, F
 
 	DECFSZ	    spot_count, F
-	GOTO	    DATA_LOOP
-	
+	GOTO	    PRT_DATA
+
+END_DATA
 	CALL	    CLR_LCD
 	WRT_LCD	    "E"
 	WRT_LCD	    "N"
@@ -652,6 +667,24 @@ WRT_DATA
 	WRT_LCD	    " "
 	CWRT_MEM_LCD num_spots
 	RETURN
+;******************************************************************************;
+;			INITIALIZE RTC TIME				       ;
+;******************************************************************************;		
+SET_RTC_TIME
+	rtc_resetAll	;reset rtc
+
+	rtc_set	    0x00,	B'10000000'
+
+	;set time 
+	rtc_set	    0x06,	B'00010110'		; Year
+	rtc_set	    0x05,	B'00000100'		; Month
+	rtc_set	    0x04,	B'00000110'		; Date
+	rtc_set	    0x03,	B'00000010'		; Day
+	rtc_set	    0x02,	B'00000000'		; Hours
+	rtc_set	    0x01,	B'00000000'		; Minutes
+	rtc_set	    0x00,	B'00000000'		; Seconds
+	return
+
 ;******************************************************************************;
 ;			    RETREIVE STOP TIME				       ;
 ;******************************************************************************;

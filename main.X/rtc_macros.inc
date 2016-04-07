@@ -11,7 +11,7 @@ rtc_resetAll	macro
 	clrf	    0x74
 	banksel	    0x73
 	clrf	    0x73
-	call        write_rtc		;Write 0 to Seconds
+	call        write_rtc			;Write 0 to Seconds
 	banksel	    0x73
 	incf        0x73   			;Set register address to 1
 	call	    write_rtc
