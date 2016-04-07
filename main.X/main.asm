@@ -79,8 +79,8 @@
 ;				EQUATES					       ;
 ;******************************************************************************;
 	#define	    crit_dist	        0X25
-	#define	    crit_dist_l		0x09
-	#define	    crit_dist_r		0x09
+	#define	    crit_dist_l		0x0C
+	#define	    crit_dist_r		0x0C
 	#define	    MUX_IN		PORTA, 0
 	#define	    MUX_CTRL_0		PORTE, 0
 	#define	    MUX_CTRL_1		PORTE, 1
@@ -93,7 +93,7 @@
 	#define	    BUZZER		PORTC, 7
 	#define	    US_LAT_TRIG		PORTD, 0
 	#define	    US_LAT_ECHO		PORTD, 1
-	#define	    R_MOTOR_SPD		B'11110101'
+	#define	    R_MOTOR_SPD		B'11110000'
 	#define	    L_MOTOR_SPD		B'11111111'
 	#define	    IR0_VAL		D'200'
 	#define	    IR1_VAL		D'201'
@@ -294,8 +294,7 @@ SCAN
 	SUBWF	    measured_distance_lat, W
 	BTFSC	    STATUS, 0
 	GOTO	    RETURN_HOME
-;;	CALL	    SHOW_RTC		    ; DEBUG
-;	CALL	    READ_IRS	
+	CALL	    READ_IRS	
 	GOTO	    SCAN
 
 ;******************************************************************************;
@@ -391,13 +390,13 @@ READ_IRS
 	MOVLW	    d'12'
 	MOVWF	    multiplex_count
 	MOVLW	    0X72
-	MOVWF	    ir_addr
-	MOVFW	    FSR
-	MOVWF	    temp_fsr
+;	MOVWF	    ir_addr
+;	MOVFW	    FSR
+;	MOVWF	    temp_fsr
 MX_LOOP	
-	MOVFW	    ir_addr
-	MOVWF	    FSR
-	INCF	    ir_addr
+;	MOVFW	    ir_addr
+;	MOVWF	    FSR
+;	INCF	    ir_addr
 	
 	DECF	    multiplex_count
 	BCF	    MUX_CTRL_0
@@ -427,10 +426,12 @@ MX_LOOP
 	btfsc	    ADCON0,2
 	goto	    $-1
 
-	MOVFW	    INDF
-	MOVWF	    indf_t
-	SUBWF	    ADRESH
-	BTFSS	    STATUS, 0 ; USE BTFSS FOR DEMO DAY CODE!!!!!!!
+	;MOVFW	    INDF
+	;MOVWF	    indf_t
+	;SUBWF	    ADRESH
+	MOVFW	    ADRESH
+	SUBLW	    D'240'
+	BTFSC	    STATUS, 0 ; USE BTFSS FOR DEMO DAY CODE!!!!!!!
 	GOTO	    NO_SPOT
 	BSF	    BUZZER
 	MOVFW	    temp_fsr
@@ -532,8 +533,9 @@ STOP_L	;BCF	    T2CON, TMR2ON
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
 	CALL	    DEL_10MS
-	CALL	    DEL_10MS
+	CALL	    DEL_10MS	
 	MOVLW	    L_MOTOR_SPD
+	
 	MOVWF	    CCPR2L
 	;BSF	    PORTC, 1
 	;BSF	    T2CON, TMR2ON
@@ -573,13 +575,13 @@ STOP_DATA
 	MOVWF	    FSR
 	
 DATA_LOOP	
-	BTFSC	    spot_count, 3
+	BTFSC	    num_spots, 3
 	GOTO	    PRT_DATA
-	BTFSC	    spot_count, 2
+	BTFSC	    num_spots, 2
 	GOTO	    PRT_DATA
-	BTFSC	    spot_count, 1
+	BTFSC	    num_spots, 1
 	GOTO	    PRT_DATA
-	BTFSC	    spot_count, 0
+	BTFSC	    num_spots, 0
 	GOTO	    PRT_DATA
 	GOTO	    END_DATA
 	
@@ -599,7 +601,7 @@ PRT_DATA
 	CALL	    CLR_LCD
 	INCF	    FSR, F
 
-	DECFSZ	    spot_count, F
+	DECFSZ	    num_spots, F
 	GOTO	    PRT_DATA
 
 END_DATA
