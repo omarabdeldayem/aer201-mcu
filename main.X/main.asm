@@ -231,14 +231,14 @@ CALIBRATE
 ;			  PIPE SCAN SUPERLOOP				       ;
 ;******************************************************************************;
 SCAN
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    DEL_10MS
-	CALL	    USONIC_LAT
-	CALL	    MOTOR_CTRL_R
-	CALL	    MOTOR_CTRL_L
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+;	CALL	    DEL_10MS
+;	CALL	    USONIC_LAT
+;	CALL	    MOTOR_CTRL_R
+;	CALL	    MOTOR_CTRL_L
 ;	CALL	    DEL_10MS
 ;	CALL	    DEL_10MS
 ;	CALL	    DEL_10MS
@@ -249,7 +249,7 @@ SCAN
 ;	BTFSC	    STATUS, 0
 ;	GOTO	    RETURN_HOME
 ;;	CALL	    SHOW_RTC		    ; DEBUG
-;	CALL	    READ_IRS	
+s	CALL	    READ_IRS	
 	GOTO	    SCAN
 
 ;******************************************************************************;
@@ -335,9 +335,9 @@ MX_LOOP
 ;	BSF	    MUX_CTRL_3
 	
 	BCF	    MUX_CTRL_0
-	BSF	    MUX_CTRL_1
+	BCF	    MUX_CTRL_1
 	BCF	    MUX_CTRL_2
-	BCF	    MUX_CTRL_3
+	BSF	    MUX_CTRL_3
 
 	movlw	    b'11000001' ; AD at RA0
 	movwf	    ADCON0
